@@ -1,13 +1,15 @@
 package syntaxAnalyser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import GrammarObjects.*;
 
 public class LR0Parser extends SyntaxAnalyser {
 
-    protected Map<NonTerminal, ProductionRule> productionMap;
+    protected Map<NonTerminal, List<ProductionRule>> productionMap;
 
     LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -17,8 +19,23 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private void generateProductionMap() {
-        //TODO: Generate mapping of NonTerminals to their production rules
         productionMap = new HashMap<>();
+
+        for (NonTerminal nonTerminal : nonTerminals) {
+            ArrayList<ProductionRule> rules = new ArrayList<>();
+
+            for (ProductionRule productionRule : productionRules) {
+                if(nonTerminal.equals(productionRule.nonTerminal())) {
+                    rules.add(productionRule);
+                }
+            }
+
+            if(rules.isEmpty()) {
+                //TODO: cause appropriate warning
+            }
+
+            productionMap.put(nonTerminal, rules);
+        }
     }
 
     private void generateTables() {
