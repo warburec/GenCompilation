@@ -51,8 +51,34 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private State formStateTree(State state, GrammarPosition[] startPositions) {
-        //TODO: Populate tree/graph
+        for (GrammarPosition grammarPosition : startPositions) {
+            state.positions().add(grammarPosition);
+        }
+
+        expandPositions(state);
+
         return state;
+    }
+
+    /**
+     * Expands the existing positions in the given state based on the production rules.
+     * All espansions will be positioned at the start of the production sequences.
+     * @param state The state to expand the positions for
+     */
+    private void expandPositions(State state) {
+        List<NonTerminal> seenNonTerminals = new ArrayList<>();
+
+        for (GrammarPosition position : state.positions()) {
+            LexicalElement firstElement = position.rule().getFirstElement();
+            if(!(firstElement instanceof NonTerminal)) { continue; }
+
+            NonTerminal firstNonTerminal = (NonTerminal)firstElement;
+            if(seenNonTerminals.contains(firstNonTerminal)) { continue; }
+
+            for (ProductionRule rule : productionMap.get(firstNonTerminal)) {
+                state.positions().add(new GrammarPosition(rule, 0));
+            }
+        }
     }
 
     @Override

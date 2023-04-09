@@ -1,5 +1,7 @@
 package GrammarObjects;
 
-public record State(GrammarPosition[] positions, State parentState) {
+import java.util.List;
+
+public record State(List<GrammarPosition> positions, State parentState) {
     
 }

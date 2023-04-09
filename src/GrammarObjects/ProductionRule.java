@@ -2,6 +2,10 @@ package GrammarObjects;
 
 public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productionSequence) {
     
+    public LexicalElement getFirstElement() {
+        return productionSequence[0];
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ProductionRule)) {
