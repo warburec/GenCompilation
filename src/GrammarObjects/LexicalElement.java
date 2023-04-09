@@ -3,7 +3,7 @@ package GrammarObjects;
 public abstract class LexicalElement {
     private String name;
 
-    LexicalElement(String name) {
+    public LexicalElement(String name) {
         this.name = name;
     }
 
