@@ -1,0 +1,30 @@
+<statement list> := <statement list>; <statement> |
+                    <statement>
+
+<statement> := <assignment> |
+               <if statement>
+
+<if statement> := if(<condition>) {<statement list>} |
+                  if(<condition>) {<statement list>} else {<statement list>}
+
+<condition> := identifier <conditional operator> identifier |
+               identifier <conditional operator> numConstant
+
+<conditional operator> := > |
+                          >= |
+                          == |
+                          != |
+                          <=
+
+<assignment> := identifier = <expression>
+
+<expression> := <value> |
+                <expression> + <value> |
+                <expression> - <value> |
+                <expression> * <value> |
+                <expression> / <value> |
+
+<value> := identifier |
+           numConstant
+
+[Note: All spaces and newlines are ignored]
