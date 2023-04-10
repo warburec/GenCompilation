@@ -1,23 +1,29 @@
 package syntaxAnalyser;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import GrammarObjects.*;
 
 public abstract class SyntaxAnalyser {
     
-    protected final List<Token> tokens;
-    protected final List<NonTerminal> nonTerminals;
+    protected final Set<Token> tokens;
+    protected final Set<NonTerminal> nonTerminals;
     protected final NonTerminal sentinel;
-    protected final List<ProductionRule> productionRules;
+    protected final Set<ProductionRule> productionRules;
 
-    protected Map<NonTerminal, ProductionRule[]> productionsForNonTerminal;
+    protected Map<NonTerminal, Set<ProductionRule>> productionsForNonTerminal;
     
-    SyntaxAnalyser(List<Token> tokens, List<NonTerminal> nonTerminals, List<ProductionRule> productionRules, NonTerminal sentinel) {
+    public SyntaxAnalyser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         this.tokens = tokens;
         this.nonTerminals = nonTerminals;
         this.productionRules = productionRules;
+        this.sentinel = sentinel;
+    }
+
+    public SyntaxAnalyser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
+        this.tokens = Set.of(tokens);
+        this.nonTerminals = Set.of(nonTerminals);
+        this.productionRules = Set.of(productionRules);
         this.sentinel = sentinel;
     }
     

@@ -20,7 +20,7 @@ public abstract class Grammar {
     }
 
     public GrammarParts getParts() {
-        return new GrammarParts(tokens, nonTerminals, productionRules, sentinal);
+        return new GrammarParts((Token[])tokens.toArray(), (NonTerminal[])nonTerminals.toArray(), (ProductionRule[])productionRules.toArray(), sentinal);
     }
 
 }

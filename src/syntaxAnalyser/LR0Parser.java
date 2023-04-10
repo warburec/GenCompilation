@@ -6,12 +6,17 @@ import GrammarObjects.*;
 
 public class LR0Parser extends SyntaxAnalyser {
 
-    protected Map<NonTerminal, List<ProductionRule>> productionMap;
-    protected List<State> states;
+    protected Map<NonTerminal, Set<ProductionRule>> productionMap;
+    protected Set<State> states;
 
-    public LR0Parser(List<Token> tokens, List<NonTerminal> nonTerminals, List<ProductionRule> productionRules, NonTerminal sentinel) {
+    public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
+        generateProductionMap();
+        generateTables();
+    }
 
+    public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
+        super(tokens, nonTerminals, productionRules, sentinel);
         generateProductionMap();
         generateTables();
     }
@@ -20,7 +25,7 @@ public class LR0Parser extends SyntaxAnalyser {
         productionMap = new HashMap<>();
 
         for (NonTerminal nonTerminal : nonTerminals) {
-            ArrayList<ProductionRule> rules = new ArrayList<>();
+            Set<ProductionRule> rules = new HashSet<>();
 
             for (ProductionRule productionRule : productionRules) {
                 if(nonTerminal.equals(productionRule.nonTerminal())) {
@@ -37,7 +42,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private void generateTables() {
-        states = new LinkedList<>();
+        states = new HashSet<>();
 
         NonTerminal start = new NonTerminal("Start");
         LexicalElement[] startProductionSequence = new LexicalElement[] { sentinel };
@@ -137,5 +142,7 @@ public class LR0Parser extends SyntaxAnalyser {
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
     
-    
+    public State[] getStates() {
+        return (State[]) states.toArray();
+    }
 }
