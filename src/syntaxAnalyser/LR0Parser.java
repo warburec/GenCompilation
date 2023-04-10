@@ -9,7 +9,7 @@ public class LR0Parser extends SyntaxAnalyser {
     protected Map<NonTerminal, List<ProductionRule>> productionMap;
     protected List<State> states;
 
-    LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
+    public LR0Parser(List<Token> tokens, List<NonTerminal> nonTerminals, List<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
 
         generateProductionMap();
@@ -131,6 +131,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
