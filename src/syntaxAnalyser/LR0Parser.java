@@ -88,20 +88,28 @@ public class LR0Parser extends SyntaxAnalyser {
 
         graphBranches.forEach((branch) -> newState.addGraphBranch(branch));
 
+        List<LexicalElement> elementsUsed = new ArrayList<>();
+
         for (GrammarPosition position : positions) {
             if(position.isClosed()) { continue; }
 
             LexicalElement nextElement = position.getNextElement();
+
+            if(elementsUsed.contains(nextElement)) { continue; }
+
             List<GrammarPosition> nextPositions = new ArrayList<>();
 
-            for (GrammarPosition nextPosition : positions) {
-                if(nextElement.equals(nextPosition.getNextElement())) {
-                    nextPositions.add(nextPosition);
+            for (GrammarPosition currentPosition : positions) {
+                if(currentPosition.isClosed()) { continue; }
+
+                if(nextElement.equals(currentPosition.getNextElement())) {
+                    nextPositions.add(currentPosition.getNextPosition());
                 }
             }
 
-            State createdState = createNewState(newState, nextPositions);
+            elementsUsed.add(nextElement);
 
+            State createdState = createNewState(newState, nextPositions);
             newState.addTreeBranch(new Route(createdState, nextElement));
         }
 
@@ -131,19 +139,20 @@ public class LR0Parser extends SyntaxAnalyser {
         int i = 0;
         while(i < positionsList.size()) {
             GrammarPosition position = positionsList.get(i);
+            if(position.isClosed()) { i++; continue; }
 
-            LexicalElement firstElement = position.rule().getFirstElement();
-            if(!(firstElement instanceof NonTerminal)) { i++; continue; }
+            LexicalElement nextElement = position.getNextElement();
+            if(!(nextElement instanceof NonTerminal)) { i++; continue; }
 
-            NonTerminal firstNonTerminal = (NonTerminal)firstElement;
-            if(seenNonTerminals.contains(firstNonTerminal)) { i++; continue; }
+            NonTerminal nextNonTerminal = (NonTerminal)nextElement;
+            if(seenNonTerminals.contains(nextNonTerminal)) { i++; continue; }
 
-            for (ProductionRule rule : productionMap.get(firstNonTerminal)) {
+            for (ProductionRule rule : productionMap.get(nextNonTerminal)) {
                 GrammarPosition newPosition = new GrammarPosition(rule, 0);
                 positionsList.add(newPosition);
             }
 
-            seenNonTerminals.add(firstNonTerminal);
+            seenNonTerminals.add(nextNonTerminal);
 
             i++;
         }
