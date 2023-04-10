@@ -9,16 +9,30 @@ public class LR0Parser extends SyntaxAnalyser {
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
 
+    protected Set<NonTerminal> invalidNonTerminals = Set.of(new NonTerminal[] {
+                                                                new NonTerminal("Start")
+                                                            });
+
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
+        checkForInvalidNonTerminals();
         generateProductionMap();
         generateTables();
     }
 
     public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
+        checkForInvalidNonTerminals();
         generateProductionMap();
         generateTables();
+    }
+
+    private void checkForInvalidNonTerminals() {
+        for (NonTerminal nonTerminal : nonTerminals) {
+            if(invalidNonTerminals.contains(nonTerminal)) {
+                throw new RuntimeException("Reserved name " + nonTerminal.getName() + "Please use a different name for this non-terminal");
+            }
+        }
     }
 
     private void generateProductionMap() {
@@ -56,7 +70,7 @@ public class LR0Parser extends SyntaxAnalyser {
         formStateTree(rootState, startPosList);
     }
 
-    private State createState(List<GrammarPosition> positions, State parentState) {
+    private State createState(Set<GrammarPosition> positions, State parentState) {
         State newState = new State(positions, parentState);
         states.add(newState);
 
@@ -129,9 +143,13 @@ public class LR0Parser extends SyntaxAnalyser {
             NonTerminal firstNonTerminal = (NonTerminal)firstElement;
             if(seenNonTerminals.contains(firstNonTerminal)) { continue; }
 
+            Set<ProductionRule> found = productionMap.get(firstNonTerminal); //Debug
+
             for (ProductionRule rule : productionMap.get(firstNonTerminal)) {
                 state.getPositions().add(new GrammarPosition(rule, 0));
             }
+
+            seenNonTerminals.add(firstNonTerminal);
         }
     }
 
@@ -142,7 +160,7 @@ public class LR0Parser extends SyntaxAnalyser {
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
     
-    public State[] getStates() {
-        return (State[]) states.toArray();
+    public Set<State> getStates() {
+        return states;
     }
 }

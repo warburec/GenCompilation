@@ -1,24 +1,25 @@
 package GrammarObjects;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class State {
-    private List<GrammarPosition> positions;
+    private Set<GrammarPosition> positions;
     private State parentState;
 
-    private List<Route> treeBranches;
-    private List<Route> graphBranches;
+    private Set<Route> treeBranches;
+    private Set<Route> graphBranches;
 
-    public State(List<GrammarPosition> positions, State parentState) {
+    public State(Set<GrammarPosition> positions, State parentState) {
+        if(positions == null) { positions = new HashSet<>(); }
+        
         this.positions = positions;
         this.parentState = parentState;
 
-        treeBranches = new LinkedList<>();
-        graphBranches = new LinkedList<>();
+        treeBranches = new HashSet<>();
+        graphBranches = new HashSet<>();
     }
 
-    public List<GrammarPosition> getPositions() {
+    public Set<GrammarPosition> getPositions() {
         return positions;
     }
 
@@ -26,19 +27,21 @@ public class State {
         return parentState;
     }
 
-    public List<Route> getTreeBranches() {
+    public Set<Route> getTreeBranches() {
         return treeBranches;
     }
 
-    public List<Route> getGraphBranches() {
+    public Set<Route> getGraphBranches() {
         return graphBranches;
     }
 
-    public void addTreeBranch(Route branch) {
+    public State addTreeBranch(Route branch) {
         treeBranches.add(branch);
+        return this;
     }
 
-    public void addGraphBranch(Route branch) {
+    public State addGraphBranch(Route branch) {
         graphBranches.add(branch);
+        return this;
     }
 }
