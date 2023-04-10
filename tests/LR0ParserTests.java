@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -146,7 +147,7 @@ public class LR0ParserTests {
             expectedStates.get(0)
         ));
 
-        Set<State> expectedStateSet = Set.of((State[]) expectedStates.toArray());
+        Set<State> expectedStateSet = new HashSet<>(expectedStates);
         
         assertEquals(expectedStateSet, generatedStates);
     }
