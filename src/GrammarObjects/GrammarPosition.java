@@ -11,7 +11,14 @@ public record GrammarPosition(ProductionRule rule, int position) {
     }
 
     public LexicalElement getNextElement() {
+        if(isClosed()) { throw new ClosedRuleException(); }
         return rule.productionSequence()[position];
+    }
+    
+    public class ClosedRuleException extends RuntimeException {
+        public ClosedRuleException() {
+            super("A next element could not be found as this position is closed");
+        }
     }
     
 }

@@ -110,6 +110,8 @@ public class LR0Parser extends SyntaxAnalyser {
         List<GrammarPosition> nextPositions = new ArrayList<>();
 
         for (GrammarPosition position : state.getPositions()) {
+            if(position.isClosed()) { continue; }
+
             if(position.getNextElement().equals(traversedElement)) {
                 nextPositions.add(position.getNextPosition());
             }
@@ -134,22 +136,30 @@ public class LR0Parser extends SyntaxAnalyser {
      * @param state The state to expand the positions for
      */
     private void expandPositions(State state) {
-        List<NonTerminal> seenNonTerminals = new ArrayList<>();
+        Set<NonTerminal> seenNonTerminals = new HashSet<>();
 
-        for (GrammarPosition position : state.getPositions()) {
+
+        List<GrammarPosition> positions = new ArrayList<>(state.getPositions());
+
+        int i = 0;
+        while(i < positions.size()) {
+            GrammarPosition position = positions.get(i);
+
             LexicalElement firstElement = position.rule().getFirstElement();
-            if(!(firstElement instanceof NonTerminal)) { continue; }
+            if(!(firstElement instanceof NonTerminal)) { i++; continue; }
 
             NonTerminal firstNonTerminal = (NonTerminal)firstElement;
-            if(seenNonTerminals.contains(firstNonTerminal)) { continue; }
-
-            Set<ProductionRule> found = productionMap.get(firstNonTerminal); //Debug
+            if(seenNonTerminals.contains(firstNonTerminal)) { i++; continue; }
 
             for (ProductionRule rule : productionMap.get(firstNonTerminal)) {
-                state.getPositions().add(new GrammarPosition(rule, 0));
+                GrammarPosition newPosition = new GrammarPosition(rule, 0);
+                state.getPositions().add(newPosition);
+                positions.add(newPosition);
             }
 
             seenNonTerminals.add(firstNonTerminal);
+
+            i++;
         }
     }
 
