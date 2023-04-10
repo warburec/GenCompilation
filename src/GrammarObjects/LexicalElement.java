@@ -21,4 +21,9 @@ public abstract class LexicalElement {
 
         return getName().equals(otherElement.getName());
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }
