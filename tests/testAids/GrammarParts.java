@@ -1,5 +1,7 @@
 package tests.testAids;
 
+import java.util.Set;
+
 import GrammarObjects.*;
 
-public record GrammarParts(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinal) {}
+public record GrammarParts(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinal) {}

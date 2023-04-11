@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ public class LR0ParserTests {
 
     @Test
     public void smallTestGrammar() {
+        //Arrange
         Token[] tokens = new Token[] {
             new Token("0"),
             new Token("1"),
@@ -80,7 +82,7 @@ public class LR0ParserTests {
                                                     sentinal);
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-
+        //Assert
         ProductionRule extraRootRule = new ProductionRule(null, new LexicalElement[] {sentinal});
 
         List<State> expectedStates = new ArrayList<>();
@@ -146,7 +148,29 @@ public class LR0ParserTests {
             expectedStates.get(0)
         ));
 
-        Set<State> expectedStateSet = Set.of((State[]) expectedStates.toArray());
+        //Tree branches
+        expectedStates.get(0)
+            .addTreeBranch(new Route(expectedStates.get(1), new NonTerminal("E")))
+            .addTreeBranch(new Route(expectedStates.get(6), new NonTerminal("B")))
+            .addTreeBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addTreeBranch(new Route(expectedStates.get(8), new Token("1")));
+        expectedStates.get(1)
+            .addTreeBranch(new Route(expectedStates.get(4), new Token("+")))
+            .addTreeBranch(new Route(expectedStates.get(2), new Token("*")));
+        expectedStates.get(2)
+            .addTreeBranch(new Route(expectedStates.get(3), new NonTerminal("B")));
+        expectedStates.get(4)
+            .addTreeBranch(new Route(expectedStates.get(5), new NonTerminal("B")));
+
+        //Graph branches
+        expectedStates.get(2)
+            .addGraphBranch(new Route(expectedStates.get(0), new Token("0")))
+            .addGraphBranch(new Route(expectedStates.get(0), new Token("1")));
+        expectedStates.get(4)
+            .addGraphBranch(new Route(expectedStates.get(0), new Token("0")))
+            .addGraphBranch(new Route(expectedStates.get(0), new Token("1")));
+
+        Set<State> expectedStateSet = new HashSet<>(expectedStates);
         
         assertEquals(expectedStateSet, generatedStates);
     }
