@@ -172,9 +172,7 @@ public class LR0ParserTests {
 
         Set<State> expectedStateSet = new HashSet<>(expectedStates);
         
-        for(State state : expectedStateSet) {
-            assertTrue(generatedStates.contains(state));
-        }
+        assertEquals(expectedStateSet, generatedStates);
     }
 
     @Test

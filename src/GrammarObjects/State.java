@@ -68,8 +68,8 @@ public class State {
 
         if(treeBranches.size() != otherState.getTreeBranches().size()) { return false; }
 
-        for (Route treeReRoute : treeBranches) {
-            if(!otherState.getTreeBranches().contains(treeReRoute)) { return false; }
+        for (Route treeRoute : treeBranches) {
+            if(!otherState.getTreeBranches().contains(treeRoute)) { return false; }
         }
 
         if(graphBranches.size() != otherState.getGraphBranches().size()) { return false; }
@@ -93,11 +93,12 @@ public class State {
             hashCode *= parentState.hashCode();
         }
 
-        for(Route branch : treeBranches) {
-            hashCode *= branch.hashCode();
-        }
+        //TODO reintroduce hashCodes by recursion if necessary (This will be slower and needs thought to not cause indefinite loops)
+        // for(Route branch : treeBranches) {
+        //     hashCode *= branch.hashCode();
+        // }
 
-        hashCode *= graphBranches.size();
+        // hashCode *= graphBranches.size();
 
         return hashCode;
     }
