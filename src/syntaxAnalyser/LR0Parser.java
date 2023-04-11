@@ -3,7 +3,7 @@ package syntaxAnalyser;
 import java.util.*;
 
 import GrammarObjects.*;
-import tests.GrammarPositionTest;
+import tests.GrammarPositionTests;
 
 public class LR0Parser extends SyntaxAnalyser {
 

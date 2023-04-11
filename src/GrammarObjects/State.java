@@ -44,4 +44,61 @@ public class State {
         graphBranches.add(branch);
         return this;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof State)) { return false; }
+
+        State otherState = (State)obj;
+
+        try {
+            if(!parentState.equals(otherState.getParentState())) {
+                return false;
+            }
+        }
+        catch(NullPointerException e) {
+            if((parentState == null) != (otherState.getParentState() == null)) { return false; }
+        }
+
+        if(positions.size() != otherState.getPositions().size()) { return false; }
+
+        for (GrammarPosition position : positions) {
+            if(!otherState.getPositions().contains(position)) { return false; }
+        }
+
+        if(treeBranches.size() != otherState.getTreeBranches().size()) { return false; }
+
+        for (Route treeReRoute : treeBranches) {
+            if(!otherState.getTreeBranches().contains(treeReRoute)) { return false; }
+        }
+
+        if(graphBranches.size() != otherState.getGraphBranches().size()) { return false; }
+
+        for (Route graphBranch : graphBranches) {
+            if(!otherState.getGraphBranches().contains(graphBranch)) { return false; }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+
+        for(GrammarPosition position : positions) {
+            hashCode *= position.hashCode();
+        }
+
+        if(parentState != null) {
+            hashCode *= parentState.hashCode();
+        }
+
+        for(Route branch : treeBranches) {
+            hashCode *= branch.hashCode();
+        }
+
+        hashCode *= graphBranches.size();
+
+        return hashCode;
+    }
 }

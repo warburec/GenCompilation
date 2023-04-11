@@ -13,7 +13,7 @@ import GrammarObjects.NonTerminal;
 import GrammarObjects.ProductionRule;
 import GrammarObjects.Token;
 
-public class GrammarPositionTest {
+public class GrammarPositionTests {
     
     @Test
     public void equality() {
