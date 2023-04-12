@@ -164,14 +164,18 @@ public class LR0ParserTests {
 
         //Graph branches
         expectedStates.get(2)
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("0")))
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("1")));
+            .addGraphBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addGraphBranch(new Route(expectedStates.get(8), new Token("1")));
         expectedStates.get(4)
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("0")))
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("1")));
+            .addGraphBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addGraphBranch(new Route(expectedStates.get(8), new Token("1")));
 
         Set<State> expectedStateSet = new HashSet<>(expectedStates);
         
+        for (State state : generatedStates) {
+            assertTrue(expectedStateSet.contains(state));
+        }
+
         assertEquals(expectedStateSet, generatedStates);
     }
 
