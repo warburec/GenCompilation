@@ -3,16 +3,11 @@ package syntaxAnalyser;
 import java.util.*;
 
 import GrammarObjects.*;
-import tests.GrammarPositionTests;
 
 public class LR0Parser extends SyntaxAnalyser {
 
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
-
-    protected Set<NonTerminal> invalidNonTerminals = Set.of(new NonTerminal[] {
-                                                                new NonTerminal("Start")
-                                                            });
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -30,8 +25,8 @@ public class LR0Parser extends SyntaxAnalyser {
 
     private void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
-            if(invalidNonTerminals.contains(nonTerminal)) {
-                throw new RuntimeException("Reserved name " + nonTerminal.getName() + "Please use a different name for this non-terminal");
+            if(nonTerminal.getName().equals(null)) {
+                throw new RuntimeException("Grammar cannot include a null non-terminal");
             }
         }
     }
@@ -59,7 +54,7 @@ public class LR0Parser extends SyntaxAnalyser {
     private void generateTables() {
         states = new HashSet<>();
 
-        NonTerminal start = new NonTerminal("Start");
+        NonTerminal start = null;
         LexicalElement[] startProductionSequence = new LexicalElement[] { sentinel };
         ProductionRule startProduction = new ProductionRule(start, startProductionSequence);
 

@@ -19,11 +19,11 @@ import tests.testAids.GrammarGenerator.Grammar;
 public class LR0ParserTests {
     
     @Test
-    public void nonTerminalStart() {
+    public void nonTerminalNull() {
         Token[] tokens = new Token[] {};
-        NonTerminal sentinal = new NonTerminal("Start");
+        NonTerminal sentinal = null;
         NonTerminal[] nonTerminals = new NonTerminal[] {
-            new NonTerminal("Start")
+            null
         };
         ProductionRule[] productionRules = new ProductionRule[] {};
 

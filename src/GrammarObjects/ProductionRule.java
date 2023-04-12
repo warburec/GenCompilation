@@ -14,7 +14,13 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
          
         ProductionRule otherRule = (ProductionRule)obj;
 
-        if(!nonTerminal.equals(otherRule.nonTerminal())) { return false; }
+        if(nonTerminal == null) {
+            if(otherRule != null) { return false; }
+        }
+        else {
+            if(!nonTerminal.equals(otherRule.nonTerminal())) { return false; }
+        }
+
         if(productionSequence.length != otherRule.productionSequence().length) { return false; }
 
         LexicalElement[] otherProductionSequence = otherRule.productionSequence();
