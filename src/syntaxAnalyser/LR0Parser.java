@@ -90,7 +90,7 @@ public class LR0Parser extends SyntaxAnalyser {
             State createdState = createState(currentState, nextPositions, nextElement);
 
             if(createdState != null) {
-                currentState.addTreeBranch(new Route(createdState, nextElement));
+                currentState.addBranch(new Route(createdState, nextElement));
             }
         }
 
@@ -121,7 +121,7 @@ public class LR0Parser extends SyntaxAnalyser {
                 State stateFound = getStateContainingPosition(position);
 
                 if(stateFound != null) {
-                    parentState.addGraphBranch(new Route(stateFound, elemantTraversed));
+                    parentState.addBranch(new Route(stateFound, elemantTraversed));
                     currentPositions.remove(i);
                 }
             }

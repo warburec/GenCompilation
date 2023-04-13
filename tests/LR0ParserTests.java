@@ -151,25 +151,25 @@ public class LR0ParserTests {
 
         //Tree branches
         expectedStates.get(0)
-            .addTreeBranch(new Route(expectedStates.get(1), new NonTerminal("E")))
-            .addTreeBranch(new Route(expectedStates.get(6), new NonTerminal("B")))
-            .addTreeBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addTreeBranch(new Route(expectedStates.get(8), new Token("1")));
+            .addBranch(new Route(expectedStates.get(1), new NonTerminal("E")))
+            .addBranch(new Route(expectedStates.get(6), new NonTerminal("B")))
+            .addBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addBranch(new Route(expectedStates.get(8), new Token("1")));
         expectedStates.get(1)
-            .addTreeBranch(new Route(expectedStates.get(4), new Token("+")))
-            .addTreeBranch(new Route(expectedStates.get(2), new Token("*")));
+            .addBranch(new Route(expectedStates.get(4), new Token("+")))
+            .addBranch(new Route(expectedStates.get(2), new Token("*")));
         expectedStates.get(2)
-            .addTreeBranch(new Route(expectedStates.get(3), new NonTerminal("B")));
+            .addBranch(new Route(expectedStates.get(3), new NonTerminal("B")));
         expectedStates.get(4)
-            .addTreeBranch(new Route(expectedStates.get(5), new NonTerminal("B")));
+            .addBranch(new Route(expectedStates.get(5), new NonTerminal("B")));
 
         //Graph branches
         expectedStates.get(2)
-            .addGraphBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addGraphBranch(new Route(expectedStates.get(8), new Token("1")));
+            .addBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addBranch(new Route(expectedStates.get(8), new Token("1")));
         expectedStates.get(4)
-            .addGraphBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addGraphBranch(new Route(expectedStates.get(8), new Token("1")));
+            .addBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addBranch(new Route(expectedStates.get(8), new Token("1")));
 
         Set<State> expectedStateSet = new HashSet<>(expectedStates);
 
