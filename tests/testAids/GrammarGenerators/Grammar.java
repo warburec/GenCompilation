@@ -7,19 +7,20 @@ import tests.testAids.GrammarParts;
 
 public abstract class Grammar {
     
-    Set<Token> tokens;
-    Set<NonTerminal> nonTerminals;
-    Set<ProductionRule> productionRules;
+    Token[] tokens;
+    NonTerminal[] nonTerminals;
+    ProductionRule[] productionRules;
     NonTerminal sentinal;
     
-    public Grammar() {
-        tokens = new HashSet<>();
-        nonTerminals = new HashSet<>();
-        productionRules = new HashSet<>();
-    }
+    public Grammar() {}
 
     public GrammarParts getParts() {
-        return new GrammarParts(tokens, nonTerminals, productionRules, sentinal);
+        return new GrammarParts(
+                        Set.of(tokens), 
+                        Set.of(nonTerminals), 
+                        Set.of(productionRules), 
+                        sentinal
+                );
     }
 
 }
