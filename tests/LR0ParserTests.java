@@ -2,7 +2,6 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,8 +12,6 @@ import org.junit.Test;
 
 import GrammarObjects.*;
 import syntaxAnalyser.*;
-import tests.testAids.*;
-import tests.testAids.GrammarGenerator.Grammar;
 
 public class LR0ParserTests {
     
@@ -175,21 +172,17 @@ public class LR0ParserTests {
             .addGraphBranch(new Route(expectedStates.get(8), new Token("1")));
 
         Set<State> expectedStateSet = new HashSet<>(expectedStates);
-        
-        for (State state : generatedStates) {
-            assertTrue(expectedStateSet.contains(state));
-        }
 
         assertEquals(expectedStateSet, generatedStates);
     }
 
-    @Test
-    public void basicGrammar() {
-        GrammarParts parts = GrammarGenerator.generateParts(Grammar.IntegerComputation);
-        SyntaxAnalyser syntaxAnalyser = new syntaxAnalyser.LR0Parser(parts.tokens(),
-                                                                    parts.nonTerminals(),
-                                                                    parts.productionRules(),
-                                                                    parts.sentinal());
-        assertTrue(false);
-    }
+    // @Test
+    // public void basicGrammar() {
+    //     GrammarParts parts = GrammarGenerator.generateParts(Grammar.IntegerComputation);
+    //     SyntaxAnalyser syntaxAnalyser = new syntaxAnalyser.LR0Parser(parts.tokens(),
+    //                                                                 parts.nonTerminals(),
+    //                                                                 parts.productionRules(),
+    //                                                                 parts.sentinal());
+    //     assertTrue(false);
+    // }
 }

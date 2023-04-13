@@ -62,16 +62,6 @@ public class State {
             if(!otherState.getPositions().contains(position)) { return false; }
         }
 
-        // if(treeBranches.size() != otherState.getTreeBranches().size()) { return false; } //TODO: Check all outbound links as one set (not as seperate branch sets)
-        // for(Route treeRoute : treeBranches) {                                                // Maybe only check the elementTraversed on the routes and not the states they end at
-        //     if(!otherState.getTreeBranches().contains(treeRoute)) { return false; }
-        // }
-
-        // if(graphBranches.size() != otherState.getGraphBranches().size()) { return false; }
-        // for(Route graphBranch : graphBranches) {
-        //     if(!otherState.getGraphBranches().contains(graphBranch)) { return false; }
-        // }
-
         Set<Route> branches = getBranches();
         if(branches.size() != otherState.getBranches().size()) { return false; }
         for(Route branch : branches) {
@@ -83,11 +73,11 @@ public class State {
 
     @Override
     public int hashCode() {
-        int hashCode = 1; //TODO make better hash
+        int hashCode = 1;
 
-        // for(GrammarPosition position : positions) {
-        //     hashCode *= position.hashCode();
-        // }
+        for(GrammarPosition position : positions) {
+            hashCode *= position.hashCode();
+        }
 
         return hashCode;
     }
