@@ -108,6 +108,8 @@ public class LR0ParserTests {
         expectedStates.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[1], 2),
+                new GrammarPosition(productionRules[3], 0),
+                new GrammarPosition(productionRules[4], 0),
             }),
             expectedStates.get(1)
         ));
@@ -120,6 +122,8 @@ public class LR0ParserTests {
         expectedStates.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[0], 2),
+                new GrammarPosition(productionRules[3], 0),
+                new GrammarPosition(productionRules[4], 0),
             }),
             expectedStates.get(1)
         ));
