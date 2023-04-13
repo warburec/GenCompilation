@@ -15,10 +15,21 @@ public record GrammarPosition(ProductionRule rule, int position) {
         return rule.productionSequence()[position];
     }
     
+    public LexicalElement getLastElementRead() {
+        if(position == 0) { return null; }
+        return rule.productionSequence()[position - 1];
+    }
+    
     public class ClosedRuleException extends RuntimeException {
         public ClosedRuleException() {
             super("A next element could not be found as this position is closed");
         }
     }
     
+    @Override
+    public int hashCode() {
+        int hashCode = position;
+        return hashCode;
+    }
+
 }

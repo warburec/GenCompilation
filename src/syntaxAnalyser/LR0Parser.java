@@ -3,16 +3,11 @@ package syntaxAnalyser;
 import java.util.*;
 
 import GrammarObjects.*;
-import tests.GrammarPositionTests;
 
 public class LR0Parser extends SyntaxAnalyser {
 
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
-
-    protected Set<NonTerminal> invalidNonTerminals = Set.of(new NonTerminal[] {
-                                                                new NonTerminal("Start")
-                                                            });
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -30,8 +25,8 @@ public class LR0Parser extends SyntaxAnalyser {
 
     private void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
-            if(invalidNonTerminals.contains(nonTerminal)) {
-                throw new RuntimeException("Reserved name " + nonTerminal.getName() + "Please use a different name for this non-terminal");
+            if(nonTerminal.getName().equals(null)) {
+                throw new RuntimeException("Grammar cannot include a null non-terminal");
             }
         }
     }
@@ -59,61 +54,80 @@ public class LR0Parser extends SyntaxAnalyser {
     private void generateTables() {
         states = new HashSet<>();
 
-        NonTerminal start = new NonTerminal("Start");
+        NonTerminal start = null;
         LexicalElement[] startProductionSequence = new LexicalElement[] { sentinel };
         ProductionRule startProduction = new ProductionRule(start, startProductionSequence);
 
         GrammarPosition startPosition = new GrammarPosition(startProduction, 0);
 
-        createNewState(null, List.of(new GrammarPosition[] {startPosition}));
+        createState(null, List.of(new GrammarPosition[] {startPosition}), null);
     }
 
-    private State createNewState(State parentState, List<GrammarPosition> startPositions) {
-        List<GrammarPosition> positions = expandPositions(startPositions);
-        Set<Route> graphBranches = new HashSet<>();
+    private State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
+        List<GrammarPosition> currentPositions = expandPositions(startPositions);
 
-        for(int i = positions.size() - 1; i >= 0; i--) {
-            GrammarPosition currentPosition = positions.get(i);
-            State foundState = getStateContainingPosition(currentPosition);
-
-            if(foundState != null) {
-                graphBranches.add(new Route(foundState, currentPosition.getNextElement()));
-                positions.remove(currentPosition);
-            }
+        if(elemantTraversed != null) {
+            currentPositions = createParentGraphBranches(parentState, elemantTraversed, currentPositions);
         }
 
-        //All graphBranches and positions for the new state are found
-        State newState = new State(new HashSet<>(positions), parentState);
-        states.add(newState);
+        if(currentPositions.size() == 0) { return null; }
 
-        graphBranches.forEach((branch) -> newState.addGraphBranch(branch));
+        State currentState = new State(new HashSet<>(currentPositions), parentState);
+        states.add(currentState);
 
         List<LexicalElement> elementsUsed = new ArrayList<>();
 
-        for (GrammarPosition position : positions) {
+        for (GrammarPosition position : currentPositions) {
             if(position.isClosed()) { continue; }
 
             LexicalElement nextElement = position.getNextElement();
 
             if(elementsUsed.contains(nextElement)) { continue; }
 
-            List<GrammarPosition> nextPositions = new ArrayList<>();
-
-            for (GrammarPosition currentPosition : positions) {
-                if(currentPosition.isClosed()) { continue; }
-
-                if(nextElement.equals(currentPosition.getNextElement())) {
-                    nextPositions.add(currentPosition.getNextPosition());
-                }
-            }
-
+            List<GrammarPosition> nextPositions = getNextPositionsTraversingElement(currentPositions, nextElement);
             elementsUsed.add(nextElement);
 
-            State createdState = createNewState(newState, nextPositions);
-            newState.addTreeBranch(new Route(createdState, nextElement));
+            State createdState = createState(currentState, nextPositions, nextElement);
+
+            if(createdState != null) {
+                currentState.addBranch(new Route(createdState, nextElement));
+            }
         }
 
-        return newState;
+        return currentState;
+    }
+
+    private List<GrammarPosition> getNextPositionsTraversingElement(List<GrammarPosition> currentPositions, LexicalElement nextElement) {
+        List<GrammarPosition> nextPositions = new ArrayList<>();
+
+        for (GrammarPosition currentPosition : currentPositions) {
+            if(currentPosition.isClosed()) { continue; }
+
+            if(nextElement.equals(currentPosition.getNextElement())) {
+                nextPositions.add(currentPosition.getNextPosition());
+            }
+        }
+        return nextPositions;
+    }
+
+    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elemantTraversed, List<GrammarPosition> currentPositions) {
+        for(int i = currentPositions.size() - 1; i >= 0; i--) {
+            GrammarPosition position = currentPositions.get(i);
+
+            LexicalElement lastElement = position.getLastElementRead();
+            if(lastElement == null) { continue; }
+            
+            if(lastElement.equals(elemantTraversed)) {
+                State stateFound = getStateContainingPosition(position);
+
+                if(stateFound != null) {
+                    parentState.addBranch(new Route(stateFound, elemantTraversed));
+                    currentPositions.remove(i);
+                }
+            }
+        }
+
+        return currentPositions;
     }
 
     private State getStateContainingPosition(GrammarPosition position) {

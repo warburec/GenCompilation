@@ -109,13 +109,4 @@ public class StateTests {
         assertTrue(set.contains(s2));
     }
 
-    @Test
-    public void nestedStates() {
-        //TODO
-    }
-
-    @Test
-    public void recursiveStates() {
-        //TODO
-    }
 }

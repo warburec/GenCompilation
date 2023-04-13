@@ -2,7 +2,6 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,17 +12,15 @@ import org.junit.Test;
 
 import GrammarObjects.*;
 import syntaxAnalyser.*;
-import tests.testAids.*;
-import tests.testAids.GrammarGenerator.Grammar;
 
 public class LR0ParserTests {
     
     @Test
-    public void nonTerminalStart() {
+    public void nonTerminalNull() {
         Token[] tokens = new Token[] {};
-        NonTerminal sentinal = new NonTerminal("Start");
+        NonTerminal sentinal = null;
         NonTerminal[] nonTerminals = new NonTerminal[] {
-            new NonTerminal("Start")
+            null
         };
         ProductionRule[] productionRules = new ProductionRule[] {};
 
@@ -108,6 +105,8 @@ public class LR0ParserTests {
         expectedStates.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[1], 2),
+                new GrammarPosition(productionRules[3], 0),
+                new GrammarPosition(productionRules[4], 0),
             }),
             expectedStates.get(1)
         ));
@@ -120,6 +119,8 @@ public class LR0ParserTests {
         expectedStates.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[0], 2),
+                new GrammarPosition(productionRules[3], 0),
+                new GrammarPosition(productionRules[4], 0),
             }),
             expectedStates.get(1)
         ));
@@ -150,38 +151,38 @@ public class LR0ParserTests {
 
         //Tree branches
         expectedStates.get(0)
-            .addTreeBranch(new Route(expectedStates.get(1), new NonTerminal("E")))
-            .addTreeBranch(new Route(expectedStates.get(6), new NonTerminal("B")))
-            .addTreeBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addTreeBranch(new Route(expectedStates.get(8), new Token("1")));
+            .addBranch(new Route(expectedStates.get(1), new NonTerminal("E")))
+            .addBranch(new Route(expectedStates.get(6), new NonTerminal("B")))
+            .addBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addBranch(new Route(expectedStates.get(8), new Token("1")));
         expectedStates.get(1)
-            .addTreeBranch(new Route(expectedStates.get(4), new Token("+")))
-            .addTreeBranch(new Route(expectedStates.get(2), new Token("*")));
+            .addBranch(new Route(expectedStates.get(4), new Token("+")))
+            .addBranch(new Route(expectedStates.get(2), new Token("*")));
         expectedStates.get(2)
-            .addTreeBranch(new Route(expectedStates.get(3), new NonTerminal("B")));
+            .addBranch(new Route(expectedStates.get(3), new NonTerminal("B")));
         expectedStates.get(4)
-            .addTreeBranch(new Route(expectedStates.get(5), new NonTerminal("B")));
+            .addBranch(new Route(expectedStates.get(5), new NonTerminal("B")));
 
         //Graph branches
         expectedStates.get(2)
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("0")))
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("1")));
+            .addBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addBranch(new Route(expectedStates.get(8), new Token("1")));
         expectedStates.get(4)
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("0")))
-            .addGraphBranch(new Route(expectedStates.get(0), new Token("1")));
+            .addBranch(new Route(expectedStates.get(7), new Token("0")))
+            .addBranch(new Route(expectedStates.get(8), new Token("1")));
 
         Set<State> expectedStateSet = new HashSet<>(expectedStates);
-        
+
         assertEquals(expectedStateSet, generatedStates);
     }
 
-    @Test
-    public void basicGrammar() {
-        GrammarParts parts = GrammarGenerator.generateParts(Grammar.IntegerComputation);
-        SyntaxAnalyser syntaxAnalyser = new syntaxAnalyser.LR0Parser(parts.tokens(),
-                                                                    parts.nonTerminals(),
-                                                                    parts.productionRules(),
-                                                                    parts.sentinal());
-        assertTrue(false);
-    }
+    // @Test
+    // public void basicGrammar() {
+    //     GrammarParts parts = GrammarGenerator.generateParts(Grammar.IntegerComputation);
+    //     SyntaxAnalyser syntaxAnalyser = new syntaxAnalyser.LR0Parser(parts.tokens(),
+    //                                                                 parts.nonTerminals(),
+    //                                                                 parts.productionRules(),
+    //                                                                 parts.sentinal());
+    //     assertTrue(false);
+    // }
 }
