@@ -3,6 +3,7 @@ package tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -53,9 +54,9 @@ public class LR0ParserTests {
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
-        Map<> generatedActionTable = syntaxAnalyser.getActionTable();
+        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<> expectedActionTable = grammar.getActionTable();
+        Map<State, Action> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -68,9 +69,9 @@ public class LR0ParserTests {
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
-        Map<> generatedGotoTable = syntaxAnalyser.getGotoTable();
+        Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
-        Map<> expectedGotoTable = grammar.getGotoTable();
+        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 

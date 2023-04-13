@@ -1,20 +1,26 @@
 package tests.testAids.GrammarGenerators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import GrammarObjects.Action;
 import GrammarObjects.GrammarPosition;
 import GrammarObjects.LexicalElement;
 import GrammarObjects.NonTerminal;
 import GrammarObjects.ProductionRule;
 import GrammarObjects.Route;
+import GrammarObjects.Shift;
 import GrammarObjects.State;
 import GrammarObjects.Token;
 
 public class TestGrammar extends Grammar {
     
+    List<State> states = new ArrayList<>();
+
     public TestGrammar() {
         tokens = new Token[] {
             new Token("0"),
@@ -55,13 +61,10 @@ public class TestGrammar extends Grammar {
                                 new Token("1")
                             })
         };
-    }
 
-    public Set<State> getStates() {
         ProductionRule extraRootRule = new ProductionRule(null, new LexicalElement[] {sentinal});
 
-        List<State> expectedStates = new ArrayList<>();
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
                 new GrammarPosition(productionRules[1], 0),
@@ -72,93 +75,110 @@ public class TestGrammar extends Grammar {
             }),
             null
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 1),
                 new GrammarPosition(productionRules[1], 1),
                 new GrammarPosition(productionRules[0], 1),
             }),
-            expectedStates.get(0)
+            states.get(0)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[1], 2),
                 new GrammarPosition(productionRules[3], 0),
                 new GrammarPosition(productionRules[4], 0),
             }),
-            expectedStates.get(1)
+            states.get(1)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[1], 3),
             }),
-            expectedStates.get(2)
+            states.get(2)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[0], 2),
                 new GrammarPosition(productionRules[3], 0),
                 new GrammarPosition(productionRules[4], 0),
             }),
-            expectedStates.get(1)
+            states.get(1)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[0], 3),
             }),
-            expectedStates.get(3)
+            states.get(3)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[2], 1),
             }),
-            expectedStates.get(0)
+            states.get(0)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[3], 1),
             }),
-            expectedStates.get(0)
+            states.get(0)
         ));
-        expectedStates.add(new State(
+        states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(productionRules[4], 1),
             }),
-            expectedStates.get(0)
+            states.get(0)
         ));
 
         //Tree branches
-        expectedStates.get(0)
-            .addBranch(new Route(expectedStates.get(1), new NonTerminal("E")))
-            .addBranch(new Route(expectedStates.get(6), new NonTerminal("B")))
-            .addBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addBranch(new Route(expectedStates.get(8), new Token("1")));
-        expectedStates.get(1)
-            .addBranch(new Route(expectedStates.get(4), new Token("+")))
-            .addBranch(new Route(expectedStates.get(2), new Token("*")));
-        expectedStates.get(2)
-            .addBranch(new Route(expectedStates.get(3), new NonTerminal("B")));
-        expectedStates.get(4)
-            .addBranch(new Route(expectedStates.get(5), new NonTerminal("B")));
+        states.get(0)
+            .addBranch(new Route(states.get(1), new NonTerminal("E")))
+            .addBranch(new Route(states.get(6), new NonTerminal("B")))
+            .addBranch(new Route(states.get(7), new Token("0")))
+            .addBranch(new Route(states.get(8), new Token("1")));
+        states.get(1)
+            .addBranch(new Route(states.get(4), new Token("+")))
+            .addBranch(new Route(states.get(2), new Token("*")));
+        states.get(2)
+            .addBranch(new Route(states.get(3), new NonTerminal("B")));
+        states.get(4)
+            .addBranch(new Route(states.get(5), new NonTerminal("B")));
 
         //Graph branches, links to existing states
-        expectedStates.get(2)
-            .addBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addBranch(new Route(expectedStates.get(8), new Token("1")));
-        expectedStates.get(4)
-            .addBranch(new Route(expectedStates.get(7), new Token("0")))
-            .addBranch(new Route(expectedStates.get(8), new Token("1")));
-
-        return new HashSet<>(expectedStates);
+        states.get(2)
+            .addBranch(new Route(states.get(7), new Token("0")))
+            .addBranch(new Route(states.get(8), new Token("1")));
+        states.get(4)
+            .addBranch(new Route(states.get(7), new Token("0")))
+            .addBranch(new Route(states.get(8), new Token("1")));
     }
 
-    public Map<> getActionTable() {
-        return new Map<State, Action>();
-        //Action(ActionOperation)
-        //ActionOperation -> Shift(Map<Token, State>)
+    public Set<State> getStates() {
+        return new HashSet<>(states);
     }
 
-    public Map<> getGotoTable() {
-        return new Map<State, Map<NonTerminal, State>>();
+    public Map<State, Action> getActionTable() {
+        Map<State, Action> actionMap = new HashMap<State, Action>();
+        Map<Token, State> currentStateActions = new HashMap<>();
+
+        currentStateActions.put(new Token("0"), states.get(7));
+        currentStateActions.put(new Token("1"), states.get(8));
+        actionMap.put(states.get(0), new Action(new Shift(currentStateActions)));
+        currentStateActions.clear();
+
+        //TODO: All actions, ensure they're cleared
+
+        return actionMap;
+    }
+
+    public Map<State, Map<NonTerminal, State>> getGotoTable() {
+        Map<State, Map<NonTerminal, State>> gotoMap = new HashMap<>();
+
+        gotoMap.put(states.get(0), Map.of(new NonTerminal("E"), states.get(2)));
+        gotoMap.put(states.get(0), Map.of(new NonTerminal("B"), states.get(6)));
+
+        //TODO: All goto states
+
+        return gotoMap;
     }
 }
