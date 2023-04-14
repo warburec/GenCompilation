@@ -200,7 +200,7 @@ public class TestGrammar extends Grammar {
         Map<State, Map<NonTerminal, State>> gotoMap = new HashMap<>();
         Map<NonTerminal, State> currentGotoActions = new HashMap<>();
 
-        currentGotoActions.put(new NonTerminal("E"), states.get(2));
+        currentGotoActions.put(new NonTerminal("E"), states.get(1));
         currentGotoActions.put(new NonTerminal("B"), states.get(6));
         gotoMap.put(states.get(0), new HashMap<>(currentGotoActions));
         currentGotoActions.clear();
@@ -209,7 +209,7 @@ public class TestGrammar extends Grammar {
         gotoMap.put(states.get(4), new HashMap<>(currentGotoActions));
         currentGotoActions.clear();
 
-        currentGotoActions.put(new NonTerminal("E"), states.get(3));
+        currentGotoActions.put(new NonTerminal("B"), states.get(3));
         gotoMap.put(states.get(2), new HashMap<>(currentGotoActions));
         currentGotoActions.clear();
 

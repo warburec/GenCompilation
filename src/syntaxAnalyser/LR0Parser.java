@@ -233,7 +233,6 @@ public class LR0Parser extends SyntaxAnalyser {
     @Override
     @SuppressWarnings("unchecked")
     public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
 }
