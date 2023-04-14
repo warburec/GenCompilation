@@ -1,7 +1,6 @@
 package GrammarObjects;
 
-import org.junit.Rule;
 
-public record Reduce(Rule reductionRule) implements ActionOperation {
+public record Reduce(ProductionRule reductionRule) implements ActionOperation {
     
 }
