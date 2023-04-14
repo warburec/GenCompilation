@@ -72,7 +72,7 @@ public class LR0ParserTests {
         Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
         Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
-        assertEquals(expectedActionTable, generatedActionTable);
+        assertEquals(expectedGotoTable, generatedGotoTable);
     }
 
     // @Test

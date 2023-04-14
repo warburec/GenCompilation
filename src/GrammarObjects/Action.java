@@ -1,5 +1,5 @@
 package GrammarObjects;
 
-public record Action(ActionOperation operation) {
+public interface Action {
     
 }

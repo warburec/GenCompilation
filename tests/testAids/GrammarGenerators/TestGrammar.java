@@ -164,34 +164,34 @@ public class TestGrammar extends Grammar {
 
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(0), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(0), new Shift(currentStateActions));
         currentStateActions.clear();
 
         currentStateActions.put(new Token("*"), states.get(2));
         currentStateActions.put(new Token("+"), states.get(4));
         // currentStateActions.put(new Token(null), states.get()); //TODO: Decide how Accept should be handled
-        actionMap.put(states.get(1), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(1), new Shift(currentStateActions));
         currentStateActions.clear();
         
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(2), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(2), new Shift(currentStateActions));
         currentStateActions.clear();
         
-        actionMap.put(states.get(3), new Action(new Reduce(productionRules[1])));
+        actionMap.put(states.get(3), new Reduce(productionRules[1]));
         
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(4), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(4), new Shift(currentStateActions));
         currentStateActions.clear();
         
-        actionMap.put(states.get(5), new Action(new Reduce(productionRules[0])));
+        actionMap.put(states.get(5), new Reduce(productionRules[0]));
         
-        actionMap.put(states.get(6), new Action(new Reduce(productionRules[2])));
+        actionMap.put(states.get(6), new Reduce(productionRules[2]));
 
-        actionMap.put(states.get(7), new Action(new Reduce(productionRules[3])));
+        actionMap.put(states.get(7), new Reduce(productionRules[3]));
 
-        actionMap.put(states.get(8), new Action(new Reduce(productionRules[4])));
+        actionMap.put(states.get(8), new Reduce(productionRules[4]));
 
         return actionMap;
     }
