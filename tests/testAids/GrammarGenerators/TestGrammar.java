@@ -164,25 +164,25 @@ public class TestGrammar extends Grammar {
 
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(0), new Shift(currentStateActions));
+        actionMap.put(states.get(0), new Shift(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
 
         currentStateActions.put(new Token("*"), states.get(2));
         currentStateActions.put(new Token("+"), states.get(4));
         // currentStateActions.put(new Token(null), states.get()); //TODO: Decide how Accept should be handled
-        actionMap.put(states.get(1), new Shift(currentStateActions));
+        actionMap.put(states.get(1), new Shift(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(2), new Shift(currentStateActions));
+        actionMap.put(states.get(2), new Shift(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
         actionMap.put(states.get(3), new Reduce(productionRules[1]));
         
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(4), new Shift(currentStateActions));
+        actionMap.put(states.get(4), new Shift(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
         actionMap.put(states.get(5), new Reduce(productionRules[0]));
