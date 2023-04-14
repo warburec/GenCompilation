@@ -198,13 +198,20 @@ public class TestGrammar extends Grammar {
 
     public Map<State, Map<NonTerminal, State>> getGotoTable() {
         Map<State, Map<NonTerminal, State>> gotoMap = new HashMap<>();
+        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
 
-        gotoMap.put(states.get(0), Map.of(new NonTerminal("E"), states.get(2)));
-        gotoMap.put(states.get(0), Map.of(new NonTerminal("B"), states.get(6)));
+        currentGotoActions.put(new NonTerminal("E"), states.get(2));
+        currentGotoActions.put(new NonTerminal("B"), states.get(6));
+        gotoMap.put(states.get(0), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
 
-        gotoMap.put(states.get(4), Map.of(new NonTerminal("B"), states.get(5)));
+        currentGotoActions.put(new NonTerminal("B"), states.get(5));
+        gotoMap.put(states.get(4), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
 
-        gotoMap.put(states.get(2), Map.of(new NonTerminal("E"), states.get(3)));
+        currentGotoActions.put(new NonTerminal("E"), states.get(3));
+        gotoMap.put(states.get(2), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
 
         return gotoMap;
     }
