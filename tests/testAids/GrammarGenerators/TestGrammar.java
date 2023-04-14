@@ -162,37 +162,36 @@ public class TestGrammar extends Grammar {
         Map<State, Action> actionMap = new HashMap<State, Action>();
         Map<Token, State> currentStateActions = new HashMap<>();
 
-        //TODO: Ensure these are in the correct order and for the correct states (only the state from which the action should be taken will be wrong)
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
         actionMap.put(states.get(0), new Action(new Shift(currentStateActions)));
         currentStateActions.clear();
 
-        actionMap.put(states.get(1), new Action(new Reduce(productionRules[3])));
-
-        actionMap.put(states.get(2), new Action(new Reduce(productionRules[4])));
-
         currentStateActions.put(new Token("*"), states.get(2));
         currentStateActions.put(new Token("+"), states.get(4));
         // currentStateActions.put(new Token(null), states.get()); //TODO: Decide how Accept should be handled
-        actionMap.put(states.get(3), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(1), new Action(new Shift(currentStateActions)));
         currentStateActions.clear();
-
-        actionMap.put(states.get(4), new Action(new Reduce(productionRules[2])));
-
+        
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(5), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(2), new Action(new Shift(currentStateActions)));
         currentStateActions.clear();
-
+        
+        actionMap.put(states.get(3), new Action(new Reduce(productionRules[1])));
+        
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(6), new Action(new Shift(currentStateActions)));
+        actionMap.put(states.get(4), new Action(new Shift(currentStateActions)));
         currentStateActions.clear();
+        
+        actionMap.put(states.get(5), new Action(new Reduce(productionRules[0])));
+        
+        actionMap.put(states.get(6), new Action(new Reduce(productionRules[2])));
 
-        actionMap.put(states.get(7), new Action(new Reduce(productionRules[0])));
+        actionMap.put(states.get(7), new Action(new Reduce(productionRules[3])));
 
-        actionMap.put(states.get(8), new Action(new Reduce(productionRules[1])));
+        actionMap.put(states.get(8), new Action(new Reduce(productionRules[4])));
 
         return actionMap;
     }
@@ -200,13 +199,12 @@ public class TestGrammar extends Grammar {
     public Map<State, Map<NonTerminal, State>> getGotoTable() {
         Map<State, Map<NonTerminal, State>> gotoMap = new HashMap<>();
 
-        //TODO: Ensure these are in the correct order and for the correct states (only the state from which the goto should be taken will be wrong)
         gotoMap.put(states.get(0), Map.of(new NonTerminal("E"), states.get(2)));
         gotoMap.put(states.get(0), Map.of(new NonTerminal("B"), states.get(6)));
 
-        gotoMap.put(states.get(5), Map.of(new NonTerminal("B"), states.get(5)));
+        gotoMap.put(states.get(4), Map.of(new NonTerminal("B"), states.get(5)));
 
-        gotoMap.put(states.get(6), Map.of(new NonTerminal("E"), states.get(3)));
+        gotoMap.put(states.get(2), Map.of(new NonTerminal("E"), states.get(3)));
 
         return gotoMap;
     }
