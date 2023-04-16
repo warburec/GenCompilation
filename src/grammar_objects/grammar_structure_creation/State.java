@@ -1,4 +1,4 @@
-package GrammarObjects.GrammarStructureCreation;
+package grammar_objects.grammar_structure_creation;
 
 import java.util.*;
 

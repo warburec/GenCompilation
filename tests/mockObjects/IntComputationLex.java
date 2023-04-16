@@ -1,6 +1,6 @@
 package tests.mockObjects;
 
-import lexicalAnalyser.LexicalAnalyser;
+import lexical_analysis.LexicalAnalyser;
 
 public class IntComputationLex implements LexicalAnalyser {
     

@@ -1,17 +1,21 @@
-package syntaxAnalyser;
+package syntax_analysis;
 
 import java.util.*;
 
-import GrammarObjects.GrammarStructure;
-import GrammarObjects.Fundamentals.*;
-import GrammarObjects.GrammarStructureCreation.*;
+import grammar_objects.GrammarStructure;
+import grammar_objects.fundamentals.*;
+import grammar_objects.grammar_structure_creation.*;
+import grammar_objects.parsing.*;
 
 public class LR0Parser extends SyntaxAnalyser {
 
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
+    protected State rootState;
     protected Map<State, Action> actionTable;
     protected Map<State, Map<NonTerminal, State>> gotoTable;
+
+    protected static final Token EOF = new Token(null);
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -67,7 +71,7 @@ public class LR0Parser extends SyntaxAnalyser {
 
         GrammarPosition startPosition = new GrammarPosition(startProduction, 0);
 
-        createState(null, List.of(new GrammarPosition[] {startPosition}), null);
+        rootState = createState(null, List.of(new GrammarPosition[] {startPosition}), null);
     }
 
     private State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
@@ -239,7 +243,26 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     public boolean analyse(Token[] inputTokens) {
-        //TODO
-        return false;
+        Iterator<Token> input = Arrays.stream(inputTokens).iterator();
+        boolean accepted = false;
+        Stack<ParseState> parseStates = new Stack<>();
+
+        parseStates.add(new ShiftedState(rootState, null));
+        Token currentToken = getNextToken(input);
+
+        while(!accepted) {
+            
+        }
+
+        return accepted;
+    }
+
+    private Token getNextToken(Iterator<Token> input) {
+        try {
+            return input.next();
+        }
+        catch(NoSuchElementException e) {
+            return EOF;
+        }
     }
 }

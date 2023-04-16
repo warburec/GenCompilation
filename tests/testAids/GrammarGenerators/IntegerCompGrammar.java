@@ -1,6 +1,6 @@
 package tests.testAids.GrammarGenerators;
 
-import GrammarObjects.Fundamentals.*;
+import grammar_objects.fundamentals.*;
 
 public class IntegerCompGrammar extends Grammar {
 

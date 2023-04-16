@@ -1,4 +1,4 @@
-package GrammarObjects.Fundamentals;
+package grammar_objects.fundamentals;
 
 public abstract class LexicalElement {
     private String name;

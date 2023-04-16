@@ -1,9 +1,9 @@
-package syntaxAnalyser;
+package syntax_analysis;
 
 import java.util.*;
 
-import GrammarObjects.GrammarStructure;
-import GrammarObjects.Fundamentals.*;
+import grammar_objects.GrammarStructure;
+import grammar_objects.fundamentals.*;
 
 public abstract class SyntaxAnalyser {
     

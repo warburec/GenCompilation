@@ -1,4 +1,4 @@
-package GrammarObjects;
+package grammar_objects;
 
 /**
  * A general interface for any grammar structures

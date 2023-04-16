@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.junit.Test;
 
-import GrammarObjects.Fundamentals.NonTerminal;
+import grammar_objects.fundamentals.NonTerminal;
 
 public class NonTerminalTests {
     

@@ -1,6 +1,6 @@
-package GrammarObjects.GrammarStructureCreation;
+package grammar_objects.grammar_structure_creation;
 
-import GrammarObjects.Fundamentals.*;
+import grammar_objects.fundamentals.*;
 
 public record GrammarPosition(ProductionRule rule, int position) {
     

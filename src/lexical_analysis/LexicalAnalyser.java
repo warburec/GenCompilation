@@ -1,4 +1,4 @@
-package lexicalAnalyser;
+package lexical_analysis;
 
 public interface LexicalAnalyser {
     //TODO
