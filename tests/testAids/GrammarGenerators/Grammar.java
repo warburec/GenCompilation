@@ -2,7 +2,7 @@ package tests.testAids.GrammarGenerators;
 
 import java.util.*;
 
-import GrammarObjects.*;
+import GrammarObjects.Fundamentals.*;
 import tests.testAids.GrammarParts;
 
 public abstract class Grammar {

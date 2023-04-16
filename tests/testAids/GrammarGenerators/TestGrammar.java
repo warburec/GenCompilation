@@ -1,22 +1,9 @@
 package tests.testAids.GrammarGenerators;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import GrammarObjects.Action;
-import GrammarObjects.GrammarPosition;
-import GrammarObjects.LexicalElement;
-import GrammarObjects.NonTerminal;
-import GrammarObjects.ProductionRule;
-import GrammarObjects.Reduce;
-import GrammarObjects.Route;
-import GrammarObjects.Shift;
-import GrammarObjects.State;
-import GrammarObjects.Token;
+import GrammarObjects.Fundamentals.*;
+import GrammarObjects.GrammarStructureCreation.*;
 
 public class TestGrammar extends Grammar {
     
@@ -164,34 +151,34 @@ public class TestGrammar extends Grammar {
 
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(0), new Shift(new HashMap<>(currentStateActions)));
+        actionMap.put(states.get(0), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
 
         currentStateActions.put(new Token("*"), states.get(2));
         currentStateActions.put(new Token("+"), states.get(4));
         // currentStateActions.put(new Token(null), states.get()); //TODO: Decide how Accept should be handled
-        actionMap.put(states.get(1), new Shift(new HashMap<>(currentStateActions)));
+        actionMap.put(states.get(1), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(2), new Shift(new HashMap<>(currentStateActions)));
+        actionMap.put(states.get(2), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
-        actionMap.put(states.get(3), new Reduce(productionRules[1]));
+        actionMap.put(states.get(3), new ReduceAction(productionRules[1]));
         
         currentStateActions.put(new Token("0"), states.get(7));
         currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(4), new Shift(new HashMap<>(currentStateActions)));
+        actionMap.put(states.get(4), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
-        actionMap.put(states.get(5), new Reduce(productionRules[0]));
+        actionMap.put(states.get(5), new ReduceAction(productionRules[0]));
         
-        actionMap.put(states.get(6), new Reduce(productionRules[2]));
+        actionMap.put(states.get(6), new ReduceAction(productionRules[2]));
 
-        actionMap.put(states.get(7), new Reduce(productionRules[3]));
+        actionMap.put(states.get(7), new ReduceAction(productionRules[3]));
 
-        actionMap.put(states.get(8), new Reduce(productionRules[4]));
+        actionMap.put(states.get(8), new ReduceAction(productionRules[4]));
 
         return actionMap;
     }

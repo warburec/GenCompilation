@@ -1,4 +1,4 @@
-package GrammarObjects;
+package GrammarObjects.Fundamentals;
 
 public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productionSequence) {
     

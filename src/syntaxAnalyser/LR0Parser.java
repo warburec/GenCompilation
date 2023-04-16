@@ -2,7 +2,9 @@ package syntaxAnalyser;
 
 import java.util.*;
 
-import GrammarObjects.*;
+import GrammarObjects.GrammarStructure;
+import GrammarObjects.Fundamentals.*;
+import GrammarObjects.GrammarStructureCreation.*;
 
 public class LR0Parser extends SyntaxAnalyser {
 
@@ -192,7 +194,7 @@ public class LR0Parser extends SyntaxAnalyser {
             //Reductions
             for(GrammarPosition position : state.getPositions()) {
                 if(position.isClosed()) {
-                    actionTable.put(state, new Reduce(position.rule()));
+                    actionTable.put(state, new ReduceAction(position.rule()));
                     continue;
                 }
             }
@@ -213,7 +215,7 @@ public class LR0Parser extends SyntaxAnalyser {
             }
 
             if(shiftActions.size() > 0) {
-                actionTable.put(state, new Shift(shiftActions));
+                actionTable.put(state, new ShiftAction(shiftActions));
             }
             if(gotoActions.size() > 0) {
                 gotoTable.put(state, gotoActions);

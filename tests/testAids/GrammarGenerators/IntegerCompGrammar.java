@@ -1,8 +1,6 @@
 package tests.testAids.GrammarGenerators;
 
-import GrammarObjects.NonTerminal;
-import GrammarObjects.ProductionRule;
-import GrammarObjects.Token;
+import GrammarObjects.Fundamentals.*;
 
 public class IntegerCompGrammar extends Grammar {
 

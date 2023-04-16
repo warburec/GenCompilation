@@ -1,20 +1,13 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Test;
 
-import GrammarObjects.GrammarPosition;
-import GrammarObjects.LexicalElement;
-import GrammarObjects.NonTerminal;
-import GrammarObjects.ProductionRule;
-import GrammarObjects.State;
-import GrammarObjects.Token;
+import GrammarObjects.Fundamentals.*;
+import GrammarObjects.GrammarStructureCreation.*;
 
 public class StateTests {
 

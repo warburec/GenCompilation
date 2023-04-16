@@ -1,4 +1,4 @@
-package GrammarObjects;
+package GrammarObjects.Fundamentals;
 
 public class NonTerminal extends LexicalElement {
 
