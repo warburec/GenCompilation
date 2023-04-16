@@ -2,25 +2,31 @@ package syntaxAnalyser;
 
 import java.util.*;
 
-import GrammarObjects.*;
+import GrammarObjects.GrammarStructure;
+import GrammarObjects.Fundamentals.*;
+import GrammarObjects.GrammarStructureCreation.*;
 
 public class LR0Parser extends SyntaxAnalyser {
 
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
+    protected Map<State, Action> actionTable;
+    protected Map<State, Map<NonTerminal, State>> gotoTable;
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
         generateProductionMap();
-        generateTables();
+        generatedStates();
+        generatedActionAndGotoTables();
     }
 
     public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
         generateProductionMap();
-        generateTables();
+        generatedStates();
+        generatedActionAndGotoTables();
     }
 
     private void checkForInvalidNonTerminals() {
@@ -51,7 +57,8 @@ public class LR0Parser extends SyntaxAnalyser {
         }
     }
 
-    private void generateTables() {
+
+    private void generatedStates() {
         states = new HashSet<>();
 
         NonTerminal start = null;
@@ -173,15 +180,66 @@ public class LR0Parser extends SyntaxAnalyser {
 
         return positionsList;
     }
+    
+    public Set<State> getStates() {
+        return states;
+    }
+
+
+    private void generatedActionAndGotoTables() {
+        actionTable = new HashMap<>();
+        gotoTable = new HashMap<>();
+
+        for(State state : states) {
+            //Reductions
+            for(GrammarPosition position : state.getPositions()) {
+                if(position.isClosed()) {
+                    actionTable.put(state, new ReduceAction(position.rule()));
+                    continue;
+                }
+            }
+
+            //Shifts and goto
+            Map<Token, State> shiftActions = new HashMap<>();
+            Map<NonTerminal, State> gotoActions = new HashMap<>();
+
+            for(Route route : state.getBranches()) {
+                if(route.elementTraversed() instanceof Token) {
+                    //Shift action
+                    shiftActions.put((Token)route.elementTraversed(), route.gotoState());
+                }
+                else if(route.elementTraversed() instanceof NonTerminal) {
+                    //Goto actions
+                    gotoActions.put((NonTerminal)route.elementTraversed(), route.gotoState());
+                }
+            }
+
+            if(shiftActions.size() > 0) {
+                actionTable.put(state, new ShiftAction(shiftActions));
+            }
+            if(gotoActions.size() > 0) {
+                gotoTable.put(state, gotoActions);
+            } 
+        }
+    }
+
+    public Map<State, Action> getActionTable() {
+        return actionTable;
+    }
+
+    public Map<State, Map<NonTerminal, State>> getGotoTable() {
+        return gotoTable;
+    }
+
 
     @Override
     @SuppressWarnings("unchecked")
     public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
-    
-    public Set<State> getStates() {
-        return states;
+
+    public boolean analyse(Token[] inputTokens) {
+        //TODO
+        return false;
     }
 }

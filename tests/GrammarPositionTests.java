@@ -2,18 +2,12 @@ package tests;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Test;
 
-import GrammarObjects.GrammarPosition;
-import GrammarObjects.LexicalElement;
-import GrammarObjects.NonTerminal;
-import GrammarObjects.ProductionRule;
-import GrammarObjects.Token;
+import GrammarObjects.Fundamentals.*;
+import GrammarObjects.GrammarStructureCreation.*;
 
 public class GrammarPositionTests {
     

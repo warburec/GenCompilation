@@ -1,4 +1,4 @@
-package GrammarObjects;
+package GrammarObjects.Fundamentals;
 
 public class Token extends LexicalElement{
 

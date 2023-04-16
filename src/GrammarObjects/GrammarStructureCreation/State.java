@@ -1,4 +1,4 @@
-package GrammarObjects;
+package GrammarObjects.GrammarStructureCreation;
 
 import java.util.*;
 
@@ -45,7 +45,6 @@ public class State {
             if(!otherState.getPositions().contains(position)) { return false; }
         }
 
-        Set<Route> branches = getBranches();
         if(branches.size() != otherState.getBranches().size()) { return false; }
         for(Route branch : branches) {
             if(!otherState.getBranches().contains(branch)) { return false; }
