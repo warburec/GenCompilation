@@ -2,8 +2,12 @@ package tests.testAids.GrammarGenerators;
 
 import java.util.*;
 
-import grammar_objects.fundamentals.*;
-import grammar_objects.grammar_structure_creation.*;
+import grammar_objects.LexicalElement;
+import grammar_objects.NonTerminal;
+import grammar_objects.ProductionRule;
+import grammar_objects.Token;
+import grammar_objects.*;
+import syntax_analysis.grammar_structure_creation.*;
 
 public class TestGrammar extends Grammar {
     

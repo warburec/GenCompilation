@@ -1,6 +1,7 @@
-package grammar_objects.grammar_structure_creation;
+package syntax_analysis.grammar_structure_creation;
 
-import grammar_objects.fundamentals.*;
+import grammar_objects.LexicalElement;
+import grammar_objects.ProductionRule;
 
 public record GrammarPosition(ProductionRule rule, int position) {
     

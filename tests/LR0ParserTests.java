@@ -6,8 +6,8 @@ import java.util.*;
 
 import org.junit.Test;
 
-import grammar_objects.fundamentals.*;
-import grammar_objects.grammar_structure_creation.*;
+import grammar_objects.*;
+import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.*;
 import tests.testAids.GrammarParts;
 import tests.testAids.GrammarGenerators.TestGrammar;

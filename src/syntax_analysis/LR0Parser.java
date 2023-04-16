@@ -3,9 +3,13 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.GrammarStructure;
-import grammar_objects.fundamentals.*;
-import grammar_objects.grammar_structure_creation.*;
-import grammar_objects.parsing.*;
+import grammar_objects.LexicalElement;
+import grammar_objects.NonTerminal;
+import grammar_objects.ProductionRule;
+import grammar_objects.Token;
+import grammar_objects.*;
+import syntax_analysis.grammar_structure_creation.*;
+import syntax_analysis.parsing.*;
 
 public class LR0Parser extends SyntaxAnalyser {
 
@@ -250,9 +254,9 @@ public class LR0Parser extends SyntaxAnalyser {
         parseStates.add(new ShiftedState(rootState, null));
         Token currentToken = getNextToken(input);
 
-        while(!accepted) {
+        // while(!accepted) {
             
-        }
+        // }
 
         return accepted;
     }

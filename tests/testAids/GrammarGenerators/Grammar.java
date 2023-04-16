@@ -2,7 +2,10 @@ package tests.testAids.GrammarGenerators;
 
 import java.util.*;
 
-import grammar_objects.fundamentals.*;
+import grammar_objects.NonTerminal;
+import grammar_objects.ProductionRule;
+import grammar_objects.Token;
+import grammar_objects.*;
 import tests.testAids.GrammarParts;
 
 public abstract class Grammar {

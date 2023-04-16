@@ -3,7 +3,10 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.GrammarStructure;
-import grammar_objects.fundamentals.*;
+import grammar_objects.NonTerminal;
+import grammar_objects.ProductionRule;
+import grammar_objects.Token;
+import grammar_objects.*;
 
 public abstract class SyntaxAnalyser {
     
