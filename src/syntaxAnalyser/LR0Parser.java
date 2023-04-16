@@ -235,4 +235,9 @@ public class LR0Parser extends SyntaxAnalyser {
     public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
+
+    public boolean analyse(Token[] inputTokens) {
+        //TODO
+        return false;
+    }
 }

@@ -1,10 +1,8 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -73,6 +71,49 @@ public class LR0ParserTests {
 
         Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
+    }
+
+    @Test
+    public void parsingTestGrammarCompleteSentence() {
+        TestGrammar grammar = new TestGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        //1+0*1
+        Token[] inputTokens = new Token[] {
+            new Token("1"),
+            new Token("+"),
+            new Token("0"),
+            new Token("*"),
+            new Token("1")
+        };
+        
+        boolean parseStatus = syntaxAnalyser.analyse(inputTokens);
+
+        assertTrue(parseStatus);
+    }
+
+    @Test
+    public void parsingTestGrammarIncompleteSentence() {
+        TestGrammar grammar = new TestGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        //1+0*
+        Token[] inputTokens = new Token[] {
+            new Token("1"),
+            new Token("+"),
+            new Token("0"),
+            new Token("*")
+        };
+        
+        boolean parseStatus = syntaxAnalyser.analyse(inputTokens);
+
+        assertFalse(parseStatus);
     }
 
     // @Test
