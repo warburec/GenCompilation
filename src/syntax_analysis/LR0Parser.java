@@ -2,11 +2,6 @@ package syntax_analysis;
 
 import java.util.*;
 
-import grammar_objects.GrammarStructure;
-import grammar_objects.LexicalElement;
-import grammar_objects.NonTerminal;
-import grammar_objects.ProductionRule;
-import grammar_objects.Token;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
@@ -254,9 +249,37 @@ public class LR0Parser extends SyntaxAnalyser {
         parseStates.add(new ShiftedState(rootState, null));
         Token currentToken = getNextToken(input);
 
-        // while(!accepted) {
+        while(!accepted) {
+
+            Action action = actionTable.get(parseStates.peek().state());
+
+            if(action instanceof ShiftAction) {
+                ShiftAction shiftAction = (ShiftAction)action;
+
+                parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
+
+                currentToken = getNextToken(input);
+            }
+            else if (action instanceof ReduceAction) {
+                ReduceAction reduceAction = (ReduceAction)action;
+
+                int stackSize = parseStates.size();
+                int numOfElements = reduceAction.reductionRule().productionSequence().length;
+                List<ParseState> statesToReduce = parseStates.subList(stackSize - 1 - numOfElements, stackSize - 1);
+
+                for(int i = 0; i < numOfElements; i++) {
+                    parseStates.remove(i);
+                }
+
+                State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
+
+                parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
+
+                //TODO: If reduced by the accept rule and EOF read, accept the grammar
+            }
+            else { throw new RuntimeException("Action time " + action.getClass().getTypeName()); }
             
-        // }
+        }
 
         return accepted;
     }
