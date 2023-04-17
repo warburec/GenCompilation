@@ -257,10 +257,14 @@ public class LR0Parser extends SyntaxAnalyser {
                 if(action instanceof ShiftAction) {
                     ShiftAction shiftAction = (ShiftAction)action;
 
-                    if(currentToken.equals(EOF) && 
-                        parseStates.peek().state().getPositions()
-                        .contains(new GrammarPosition(acceptRule, 1))) { //Test for accept
-                        return parseStates.pop();
+                    if(currentToken.equals(EOF)) {
+                        if(parseStates.peek().state().getPositions()
+                            .contains(new GrammarPosition(acceptRule, 1))) { //Accept
+                            return parseStates.pop();
+                        }
+                        else {
+                            throw new IncompleteParseException();
+                        }
                     }
 
                     parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
