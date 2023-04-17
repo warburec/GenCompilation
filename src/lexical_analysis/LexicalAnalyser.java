@@ -1,5 +1,6 @@
 package lexical_analysis;
 
 public interface LexicalAnalyser {
-    //TODO
+    //TODO: Tokenise by largest possible matching token
+    //Allow RegEx input to apply rules for delimiters etc.
 }
