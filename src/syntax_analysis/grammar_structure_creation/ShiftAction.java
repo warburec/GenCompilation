@@ -4,12 +4,7 @@ import java.util.Map;
 
 import grammar_objects.Token;
 
-public class ShiftAction implements Action {
-    private Map<Token, State> shifts;
-
-    public ShiftAction(Map<Token, State> shifts) {
-        this.shifts = shifts;
-    }
+public record ShiftAction(Map<Token, State> shifts) implements Action {
 
     public State getState(Token token) {
         State stateFound = shifts.get(token);
