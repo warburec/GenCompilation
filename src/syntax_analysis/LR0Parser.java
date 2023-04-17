@@ -257,6 +257,12 @@ public class LR0Parser extends SyntaxAnalyser {
                 if(action instanceof ShiftAction) {
                     ShiftAction shiftAction = (ShiftAction)action;
 
+                    if(currentToken.equals(EOF) && 
+                        parseStates.peek().state().getPositions()
+                        .contains(new GrammarPosition(acceptRule, 1))) { //Test for accept
+                        return parseStates.pop();
+                    }
+
                     parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
 
                     currentToken = getNextToken(input);
@@ -266,22 +272,16 @@ public class LR0Parser extends SyntaxAnalyser {
 
                     int stackSize = parseStates.size();
                     int numOfElements = reduceAction.reductionRule().productionSequence().length;
-                    List<ParseState> statesToReduce = parseStates.subList(stackSize - 1 - numOfElements, stackSize - 1);
+                    List<ParseState> statesToReduce = new ArrayList<>(parseStates.subList(stackSize - numOfElements, stackSize));
 
                     for(int i = 0; i < numOfElements; i++) {
-                        parseStates.remove(i);
-                    }
-
-                    reduceAction.reductionRule().equals(acceptRule);
-                    if(currentToken.equals(EOF) && reduceAction.reductionRule().equals(acceptRule)) { 
-                        accepted = true;
-                        continue;
+                        parseStates.remove(stackSize - 1 - i);
                     }
 
                     State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
                     parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
                 }
-                else { 
+                else {
                     throw new UnsupportedActionException(action, parseStates.peek().state());
                 }   
             }
@@ -289,8 +289,6 @@ public class LR0Parser extends SyntaxAnalyser {
         catch(Exception e) {
             throw new ParseFailedException(e);
         }
-
-        if(parseStates.size() > 1) { throw new RuntimeException("Parseing resulted in more than one root state"); }
 
         return parseStates.pop();
     }
