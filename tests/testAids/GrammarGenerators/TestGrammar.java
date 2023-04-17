@@ -4,6 +4,8 @@ import java.util.*;
 
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
+import syntax_analysis.parsing.ParseState;
+import syntax_analysis.parsing.ReducedState;
 
 public class TestGrammar extends Grammar {
     
@@ -202,4 +204,34 @@ public class TestGrammar extends Grammar {
 
         return gotoMap;
     }
+
+    /**
+     * Gets the root parse state (and contained parse tree) for a given sentence
+     * @param sentence The sentence to be parsed
+     * @return The root ParseState of the parse tree
+     */
+    public ParseState getParseRoot(String sentence) {
+        switch(sentence) {
+            case "1+0*1":
+                return parseTree0();
+            
+            default:
+                throw new UnsupportedTestSentenceException(sentence);
+        }
+    }
+
+    private ParseState parseTree0() {
+        //TODO
+        return new ReducedState(null, null);
+    }
+
+
+    public class UnsupportedTestSentenceException extends RuntimeException {
+
+        public UnsupportedTestSentenceException(String givenSentence) {
+            super("There is no supported test parse tree for the sentence \"" + givenSentence + "\"");
+        }
+
+    }
+
 }

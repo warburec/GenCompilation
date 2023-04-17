@@ -2,10 +2,8 @@ package syntax_analysis;
 
 import java.util.*;
 
-import grammar_objects.GrammarStructure;
-import grammar_objects.NonTerminal;
-import grammar_objects.ProductionRule;
-import grammar_objects.Token;
+import grammar_objects.*;
+import syntax_analysis.parsing.ParseFailedException;
 
 public abstract class SyntaxAnalyser {
     
@@ -30,5 +28,5 @@ public abstract class SyntaxAnalyser {
         this.sentinel = sentinel;
     }
     
-    public abstract <T extends GrammarStructure> T analyse(T grammarStructure);
+    public abstract GrammarStructure analyse(Token[] inputTokens) throws ParseFailedException;
 }

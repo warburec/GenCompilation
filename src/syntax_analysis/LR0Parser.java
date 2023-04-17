@@ -236,13 +236,13 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
-        throw new UnsupportedOperationException("Unimplemented method 'analyse'");
-    }
+    // @Override
+    // @SuppressWarnings("unchecked")
+    // public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
+    //     throw new UnsupportedOperationException("Unimplemented method 'analyse'");
+    // }
 
-    public ParseState analyse(Token[] inputTokens) {
+    public ParseState analyse(Token[] inputTokens) throws ParseFailedException {
         Iterator<Token> input = Arrays.stream(inputTokens).iterator();
         boolean accepted = false;
         Stack<ParseState> parseStates = new Stack<>();
@@ -250,39 +250,44 @@ public class LR0Parser extends SyntaxAnalyser {
         parseStates.add(new ShiftedState(rootState, null));
         Token currentToken = getNextToken(input);
 
-        while(!accepted) {
-            Action action = actionTable.get(parseStates.peek().state());
+        try {
+            while(!accepted) {
+                Action action = actionTable.get(parseStates.peek().state());
 
-            if(action instanceof ShiftAction) {
-                ShiftAction shiftAction = (ShiftAction)action;
+                if(action instanceof ShiftAction) {
+                    ShiftAction shiftAction = (ShiftAction)action;
 
-                parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
+                    parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
 
-                currentToken = getNextToken(input);
-            }
-            else if (action instanceof ReduceAction) {
-                ReduceAction reduceAction = (ReduceAction)action;
-
-                int stackSize = parseStates.size();
-                int numOfElements = reduceAction.reductionRule().productionSequence().length;
-                List<ParseState> statesToReduce = parseStates.subList(stackSize - 1 - numOfElements, stackSize - 1);
-
-                for(int i = 0; i < numOfElements; i++) {
-                    parseStates.remove(i);
+                    currentToken = getNextToken(input);
                 }
+                else if (action instanceof ReduceAction) {
+                    ReduceAction reduceAction = (ReduceAction)action;
 
-                reduceAction.reductionRule().equals(acceptRule);
-                if(currentToken.equals(EOF) && reduceAction.reductionRule().equals(acceptRule)) { 
-                    accepted = true;
-                    continue;
+                    int stackSize = parseStates.size();
+                    int numOfElements = reduceAction.reductionRule().productionSequence().length;
+                    List<ParseState> statesToReduce = parseStates.subList(stackSize - 1 - numOfElements, stackSize - 1);
+
+                    for(int i = 0; i < numOfElements; i++) {
+                        parseStates.remove(i);
+                    }
+
+                    reduceAction.reductionRule().equals(acceptRule);
+                    if(currentToken.equals(EOF) && reduceAction.reductionRule().equals(acceptRule)) { 
+                        accepted = true;
+                        continue;
+                    }
+
+                    State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
+                    parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
                 }
-
-                State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
-                parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
+                else { 
+                    throw new UnsupportedActionException(action, parseStates.peek().state());
+                }   
             }
-            else { 
-                throw new RuntimeException("Action type " + action.getClass().getTypeName() + " not supported for the current state"); //TODO better errors 
-            }   
+        }
+        catch(Exception e) {
+            throw new ParseFailedException(e);
         }
 
         if(parseStates.size() > 1) { throw new RuntimeException("Parseing resulted in more than one root state"); }
@@ -296,6 +301,27 @@ public class LR0Parser extends SyntaxAnalyser {
         }
         catch(NoSuchElementException e) {
             return EOF;
+        }
+    }
+
+    //TODO: Exceptions could be more helpful for users (line number, character number, reason)
+    public class UnsupportedActionException extends Exception {
+        private Action attemptedAction;
+        private State currentState;
+
+        public UnsupportedActionException(Action attemptedAction, State currentState) {
+            super("Action type " + attemptedAction.getClass().getTypeName() + " not supported for the current state");
+
+            this.attemptedAction = attemptedAction;
+            this.currentState = currentState;
+        }
+
+        public Action getAttemptedAction() {
+            return attemptedAction;
+        }
+
+        public State getCurrentState() {
+            return currentState;
         }
     }
 }
