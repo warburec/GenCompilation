@@ -14,7 +14,8 @@ public class LR0Parser extends SyntaxAnalyser {
     protected Map<State, Action> actionTable;
     protected Map<State, Map<NonTerminal, State>> gotoTable;
 
-    protected static final Token EOF = new Token(null);
+    public static final Token EOF = new Token(null);
+    public static final ProductionRule acceptRule = new ProductionRule(null, null); //TODO Set production sequence to contain the sentinel element
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -241,7 +242,7 @@ public class LR0Parser extends SyntaxAnalyser {
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
 
-    public boolean analyse(Token[] inputTokens) {
+    public ParseState analyse(Token[] inputTokens) {
         Iterator<Token> input = Arrays.stream(inputTokens).iterator();
         boolean accepted = false;
         Stack<ParseState> parseStates = new Stack<>();
@@ -250,7 +251,6 @@ public class LR0Parser extends SyntaxAnalyser {
         Token currentToken = getNextToken(input);
 
         while(!accepted) {
-
             Action action = actionTable.get(parseStates.peek().state());
 
             if(action instanceof ShiftAction) {
@@ -271,17 +271,23 @@ public class LR0Parser extends SyntaxAnalyser {
                     parseStates.remove(i);
                 }
 
+                reduceAction.reductionRule().equals(acceptRule);
+                if(currentToken.equals(EOF) && reduceAction.reductionRule().equals(acceptRule)) { 
+                    accepted = true;
+                    continue;
+                }
+
                 State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
-
                 parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
-
-                //TODO: If reduced by the accept rule and EOF read, accept the grammar
             }
-            else { throw new RuntimeException("Action time " + action.getClass().getTypeName()); }
-            
+            else { 
+                throw new RuntimeException("Action type " + action.getClass().getTypeName() + " not supported for the current state"); //TODO better errors 
+            }   
         }
 
-        return accepted;
+        if(parseStates.size() > 1) { throw new RuntimeException("Parseing resulted in more than one root state"); }
+
+        return parseStates.pop();
     }
 
     private Token getNextToken(Iterator<Token> input) {
