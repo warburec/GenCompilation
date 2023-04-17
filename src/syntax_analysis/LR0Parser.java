@@ -13,9 +13,9 @@ public class LR0Parser extends SyntaxAnalyser {
     protected State rootState;
     protected Map<State, Action> actionTable;
     protected Map<State, Map<NonTerminal, State>> gotoTable;
+    protected ProductionRule acceptRule;
 
     public static final Token EOF = new Token(null);
-    public static final ProductionRule acceptRule = new ProductionRule(null, null); //TODO Set production sequence to contain the sentinel element
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -67,9 +67,9 @@ public class LR0Parser extends SyntaxAnalyser {
 
         NonTerminal start = null;
         LexicalElement[] startProductionSequence = new LexicalElement[] { sentinel };
-        ProductionRule startProduction = new ProductionRule(start, startProductionSequence);
+        acceptRule = new ProductionRule(start, startProductionSequence);
 
-        GrammarPosition startPosition = new GrammarPosition(startProduction, 0);
+        GrammarPosition startPosition = new GrammarPosition(acceptRule, 0);
 
         rootState = createState(null, List.of(new GrammarPosition[] {startPosition}), null);
     }
