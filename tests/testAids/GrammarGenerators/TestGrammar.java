@@ -228,36 +228,38 @@ public class TestGrammar extends Grammar {
 
         parseStates.add(new ShiftedState(states.get(8), new Token("1")));
 
+
         parseStates.add(new ReducedState(states.get(6), productionRules[4], Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(0)
-                                                                                                    })));
-
+                                                                                                    })));                                                                                            
         parseStates.add(new ShiftedState(states.get(7), new Token("0")));
 
+        
         parseStates.add(new ReducedState(states.get(1), productionRules[2], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(2)
+                                                                                                        parseStates.get(1)
                                                                                                     })));
         parseStates.add(new ShiftedState(states.get(4), new Token("+")));
         parseStates.add(new ReducedState(states.get(5), productionRules[3], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(1)
+                                                                                                        parseStates.get(2)
                                                                                                     })));
-
         parseStates.add(new ShiftedState(states.get(8), new Token("1")));
 
+
         parseStates.add(new ReducedState(states.get(1), productionRules[0], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(5),
+                                                                                                        parseStates.get(3),
                                                                                                         parseStates.get(4),
-                                                                                                        parseStates.get(3)
+                                                                                                        parseStates.get(5)
                                                                                                     })));
         parseStates.add(new ShiftedState(states.get(2), new Token("*")));
         parseStates.add(new ReducedState(states.get(3), productionRules[4], Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(6)
                                                                                                     })));
 
+
         parseStates.add(new ReducedState(states.get(1), productionRules[1], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(9),
+                                                                                                        parseStates.get(7),
                                                                                                         parseStates.get(8),
-                                                                                                        parseStates.get(7)
+                                                                                                        parseStates.get(9)
                                                                                                     })));
 
         return parseStates.get(parseStates.size() - 1);
