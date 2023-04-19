@@ -2,12 +2,9 @@ package tests.testAids.GrammarGenerators;
 
 import java.util.*;
 
-import grammar_objects.LexicalElement;
-import grammar_objects.NonTerminal;
-import grammar_objects.ProductionRule;
-import grammar_objects.Token;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
+import syntax_analysis.parsing.*;
 
 public class TestGrammar extends Grammar {
     
@@ -206,4 +203,75 @@ public class TestGrammar extends Grammar {
 
         return gotoMap;
     }
+
+    /**
+     * Gets the root parse state (and contained parse tree) for a given sentence
+     * @param sentence The sentence to be parsed
+     * @return The root ParseState of the parse tree
+     */
+    public ParseState getParseRoot(String sentence) {
+        switch(sentence) {
+            case "1+0*1":
+                return parseTree0();
+            
+            default:
+                throw new UnsupportedTestSentenceException(sentence);
+        }
+    }
+
+    /**
+     * Parse tree for the sentence "1+0*1"
+     * @return The root ParseState of the tree
+     */
+    private ParseState parseTree0() {
+        List<ParseState> parseStates = new ArrayList<>();
+
+        parseStates.add(new ShiftedState(states.get(8), new Token("1")));
+
+
+        parseStates.add(new ReducedState(states.get(6), productionRules[4], Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(0)
+                                                                                                    })));                                                                                            
+        parseStates.add(new ShiftedState(states.get(7), new Token("0")));
+
+        
+        parseStates.add(new ReducedState(states.get(1), productionRules[2], Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(1)
+                                                                                                    })));
+        parseStates.add(new ShiftedState(states.get(4), new Token("+")));
+        parseStates.add(new ReducedState(states.get(5), productionRules[3], Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(2)
+                                                                                                    })));
+        parseStates.add(new ShiftedState(states.get(8), new Token("1")));
+
+
+        parseStates.add(new ReducedState(states.get(1), productionRules[0], Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(3),
+                                                                                                        parseStates.get(4),
+                                                                                                        parseStates.get(5)
+                                                                                                    })));
+        parseStates.add(new ShiftedState(states.get(2), new Token("*")));
+        parseStates.add(new ReducedState(states.get(3), productionRules[4], Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(6)
+                                                                                                    })));
+
+
+        parseStates.add(new ReducedState(states.get(1), productionRules[1], Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(7),
+                                                                                                        parseStates.get(8),
+                                                                                                        parseStates.get(9)
+                                                                                                    })));
+
+        return parseStates.get(parseStates.size() - 1);
+    }
+
+
+    public class UnsupportedTestSentenceException extends RuntimeException {
+
+        public UnsupportedTestSentenceException(String givenSentence) {
+            super("There is no supported test parse tree for the sentence \"" + givenSentence + "\"");
+        }
+
+    }
+
 }

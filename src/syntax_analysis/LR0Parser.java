@@ -2,11 +2,6 @@ package syntax_analysis;
 
 import java.util.*;
 
-import grammar_objects.GrammarStructure;
-import grammar_objects.LexicalElement;
-import grammar_objects.NonTerminal;
-import grammar_objects.ProductionRule;
-import grammar_objects.Token;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
@@ -18,8 +13,9 @@ public class LR0Parser extends SyntaxAnalyser {
     protected State rootState;
     protected Map<State, Action> actionTable;
     protected Map<State, Map<NonTerminal, State>> gotoTable;
+    protected ProductionRule acceptRule;
 
-    protected static final Token EOF = new Token(null);
+    public static final Token EOF = new Token(null);
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
@@ -71,9 +67,9 @@ public class LR0Parser extends SyntaxAnalyser {
 
         NonTerminal start = null;
         LexicalElement[] startProductionSequence = new LexicalElement[] { sentinel };
-        ProductionRule startProduction = new ProductionRule(start, startProductionSequence);
+        acceptRule = new ProductionRule(start, startProductionSequence);
 
-        GrammarPosition startPosition = new GrammarPosition(startProduction, 0);
+        GrammarPosition startPosition = new GrammarPosition(acceptRule, 0);
 
         rootState = createState(null, List.of(new GrammarPosition[] {startPosition}), null);
     }
@@ -240,13 +236,13 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
-        throw new UnsupportedOperationException("Unimplemented method 'analyse'");
-    }
+    // @Override
+    // @SuppressWarnings("unchecked")
+    // public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
+    //     throw new UnsupportedOperationException("Unimplemented method 'analyse'");
+    // }
 
-    public boolean analyse(Token[] inputTokens) {
+    public ParseState analyse(Token[] inputTokens) throws ParseFailedException {
         Iterator<Token> input = Arrays.stream(inputTokens).iterator();
         boolean accepted = false;
         Stack<ParseState> parseStates = new Stack<>();
@@ -254,11 +250,51 @@ public class LR0Parser extends SyntaxAnalyser {
         parseStates.add(new ShiftedState(rootState, null));
         Token currentToken = getNextToken(input);
 
-        // while(!accepted) {
-            
-        // }
+        try {
+            while(!accepted) {
+                Action action = actionTable.get(parseStates.peek().state());
 
-        return accepted;
+                if(action instanceof ShiftAction) {
+                    ShiftAction shiftAction = (ShiftAction)action;
+
+                    if(currentToken.equals(EOF)) {
+                        if(parseStates.peek().state().getPositions()
+                            .contains(new GrammarPosition(acceptRule, 1))) { //Accept
+                            return parseStates.pop();
+                        }
+                        else {
+                            throw new IncompleteParseException();
+                        }
+                    }
+
+                    parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
+
+                    currentToken = getNextToken(input);
+                }
+                else if (action instanceof ReduceAction) {
+                    ReduceAction reduceAction = (ReduceAction)action;
+
+                    int stackSize = parseStates.size();
+                    int numOfElements = reduceAction.reductionRule().productionSequence().length;
+                    List<ParseState> statesToReduce = new ArrayList<>(parseStates.subList(stackSize - numOfElements, stackSize));
+
+                    for(int i = 0; i < numOfElements; i++) {
+                        parseStates.remove(stackSize - 1 - i);
+                    }
+
+                    State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
+                    parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
+                }
+                else {
+                    throw new UnsupportedActionException(action, parseStates.peek().state());
+                }   
+            }
+        }
+        catch(Exception e) {
+            throw new ParseFailedException(e);
+        }
+
+        return parseStates.pop();
     }
 
     private Token getNextToken(Iterator<Token> input) {
@@ -267,6 +303,27 @@ public class LR0Parser extends SyntaxAnalyser {
         }
         catch(NoSuchElementException e) {
             return EOF;
+        }
+    }
+
+    //TODO: Exceptions could be more helpful for users (line number, character number, reason)
+    public class UnsupportedActionException extends Exception {
+        private Action attemptedAction;
+        private State currentState;
+
+        public UnsupportedActionException(Action attemptedAction, State currentState) {
+            super("Action type " + attemptedAction.getClass().getTypeName() + " not supported for the current state");
+
+            this.attemptedAction = attemptedAction;
+            this.currentState = currentState;
+        }
+
+        public Action getAttemptedAction() {
+            return attemptedAction;
+        }
+
+        public State getCurrentState() {
+            return currentState;
         }
     }
 }

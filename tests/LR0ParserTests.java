@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
+import syntax_analysis.parsing.*;
 import syntax_analysis.*;
 import tests.testAids.GrammarParts;
 import tests.testAids.GrammarGenerators.TestGrammar;
@@ -75,7 +76,7 @@ public class LR0ParserTests {
     }
 
     @Test
-    public void parsingTestGrammarCompleteSentence() {
+    public void parsingTestGrammarCompleteSentence() throws ParseFailedException {
         TestGrammar grammar = new TestGrammar();
         GrammarParts grammarParts = grammar.getParts();
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -91,9 +92,10 @@ public class LR0ParserTests {
             new Token("1")
         };
         
-        boolean parseStatus = syntaxAnalyser.analyse(inputTokens);
+        ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
 
-        assertTrue(parseStatus);
+        ParseState expectedParseState = grammar.getParseRoot("1+0*1");
+        assertEquals(expectedParseState, generatedParseRoot);
     }
 
     @Test
@@ -112,9 +114,8 @@ public class LR0ParserTests {
             new Token("*")
         };
         
-        boolean parseStatus = syntaxAnalyser.analyse(inputTokens);
-
-        assertFalse(parseStatus);
+        ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
+        assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
 
     // @Test
