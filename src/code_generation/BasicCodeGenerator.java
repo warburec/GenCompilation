@@ -21,7 +21,7 @@ public class BasicCodeGenerator implements CodeGenerator {
         return null;
     }
 
-    public String produceString(GenerationState generationState) {
+    private String produceString(GenerationState generationState) {
         ParseState parseState = generationState.parseState;
         
         if(parseState instanceof ShiftedState) {

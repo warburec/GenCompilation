@@ -2,6 +2,7 @@ package tests.testAids.GrammarGenerators;
 
 import java.util.*;
 
+import code_generation.Generator;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
@@ -9,21 +10,38 @@ import syntax_analysis.parsing.*;
 public class TestGrammar extends Grammar {
     
     List<State> states = new ArrayList<>();
+    Map<String, Map<String, String>> codeGenerations;           //Language, <Sentence, Code>
+    Map<String, Map<ProductionRule, Generator>> ruleConvertors; //Sentence, ruleConverterMap
+    Map<String, String[]> generationBookends;                   //Sentence, {preGeneration, postGeneration}
 
     public TestGrammar() {
+        setUpTokens();
+        setUpNonTerminalsAndSentinal();
+        setUpProductionRules();
+        setUpStates();
+        setUpRuleConvertors();
+        setUpCodeGenerations();
+        setUpGenerationBookends();
+    }
+
+    private void setUpTokens() {
         tokens = new Token[] {
             new Token("0"),
             new Token("1"),
             new Token("*"),
             new Token("+")
         };
+    }
 
+    private void setUpNonTerminalsAndSentinal() {
         sentinal = new NonTerminal("E");
         nonTerminals = new NonTerminal[] {
             new NonTerminal("E"),
             new NonTerminal("B")
         };
+    }
 
+    private void setUpProductionRules() {
         productionRules = new ProductionRule[] {
             new ProductionRule(new NonTerminal("E"),
                             new LexicalElement[] {
@@ -50,7 +68,10 @@ public class TestGrammar extends Grammar {
                                 new Token("1")
                             })
         };
+    }
+    
 
+    private void setUpStates() {
         ProductionRule extraRootRule = new ProductionRule(null, new LexicalElement[] {sentinal});
 
         states.add(new State(
@@ -146,6 +167,7 @@ public class TestGrammar extends Grammar {
         return new HashSet<>(states);
     }
 
+
     public Map<State, Action> getActionTable() {
         Map<State, Action> actionMap = new HashMap<State, Action>();
         Map<Token, State> currentStateActions = new HashMap<>();
@@ -204,6 +226,7 @@ public class TestGrammar extends Grammar {
         return gotoMap;
     }
 
+
     /**
      * Gets the root parse state (and contained parse tree) for a given sentence
      * @param sentence The sentence to be parsed
@@ -215,7 +238,7 @@ public class TestGrammar extends Grammar {
                 return parseTree0();
             
             default:
-                throw new UnsupportedTestSentenceException(sentence);
+                throw new UnsupportedSentenceException("parse tree", sentence);
         }
     }
 
@@ -265,13 +288,71 @@ public class TestGrammar extends Grammar {
         return parseStates.get(parseStates.size() - 1);
     }
 
+    private void setUpGenerationBookends() {
+        generationBookends = new HashMap<>();
 
-    public class UnsupportedTestSentenceException extends RuntimeException {
+        generationBookends.put("1+0*1", new String[] {
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tSystem.out.println(",
 
-        public UnsupportedTestSentenceException(String givenSentence) {
-            super("There is no supported test parse tree for the sentence \"" + givenSentence + "\"");
+            ");" +
+            "\t}" +
+            "}"
+        });
+    }
+
+    public String[] getGenerationBookends(String sentence) {
+        String[] bookends = generationBookends.get(sentence);
+
+        if(bookends == null) { 
+            throw new UnsupportedSentenceException("generation bookends", sentence);
         }
 
+        return bookends;
+    }
+
+    private void setUpRuleConvertors() {
+        ruleConvertors = new HashMap<>();
+
+        //TODO
+        //HashMap<ProductionRule, Generator> ruleConvertor = HashMap<>();
+        //ruleConvertor.add(ProductionRule, (elements) -> { return String; })
+        //ruleConvertors.add(sentence, ruleConvertor);
+    }
+
+    public Map<ProductionRule, Generator> getRuleConvertor(String sentence) {
+        return null;
+    }
+
+    private void setUpCodeGenerations() {
+        codeGenerations = new HashMap<>();
+
+        codeGenerations.put("Java", new HashMap<>());
+        codeGenerations.get("Java").put("1+0*1",
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tSystem.out.println(1+0*1);" +
+            "\t}" +
+            "}"
+        );
+    }
+
+    public String getGeneratedCode(String sentence, String language) {
+        String generatedCode = null;
+
+        try {
+            generatedCode = codeGenerations.get(language).get(sentence);
+        }
+        catch (NullPointerException e) {
+            throw new UnsupportedSentenceException("langage and code generation", sentence);
+        }
+
+        if(generatedCode == null) {
+            throw new UnsupportedSentenceException("code generation", sentence);
+        }
+
+        return generatedCode;
     }
 
 }

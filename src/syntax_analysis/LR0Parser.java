@@ -235,13 +235,6 @@ public class LR0Parser extends SyntaxAnalyser {
         return gotoTable;
     }
 
-
-    // @Override
-    // @SuppressWarnings("unchecked")
-    // public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
-    //     throw new UnsupportedOperationException("Unimplemented method 'analyse'");
-    // }
-
     public ParseState analyse(Token[] inputTokens) throws ParseFailedException {
         Iterator<Token> input = Arrays.stream(inputTokens).iterator();
         boolean accepted = false;

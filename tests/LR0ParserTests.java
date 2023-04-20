@@ -117,14 +117,5 @@ public class LR0ParserTests {
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
         assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
-
-    // @Test
-    // public void basicGrammar() {
-    //     GrammarParts parts = GrammarGenerator.generateParts(Grammar.IntegerComputation);
-    //     SyntaxAnalyser syntaxAnalyser = new syntaxAnalyser.LR0Parser(parts.tokens(),
-    //                                                                 parts.nonTerminals(),
-    //                                                                 parts.productionRules(),
-    //                                                                 parts.sentinal());
-    //     assertTrue(false);
-    // }
+    
 }
