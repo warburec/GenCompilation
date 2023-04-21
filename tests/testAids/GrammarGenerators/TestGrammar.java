@@ -315,14 +315,24 @@ public class TestGrammar extends Grammar {
     private void setUpRuleConvertors() {
         ruleConvertors = new HashMap<>();
 
-        //TODO
-        //HashMap<ProductionRule, Generator> ruleConvertor = HashMap<>();
-        //ruleConvertor.add(ProductionRule, (elements) -> { return String; })
-        //ruleConvertors.add(sentence, ruleConvertor);
+        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
+        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " + " + elements[1]; }); //E->E+B
+        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " * " + elements[1]; }); //E->E*B
+        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(productionRules[3], (elements) -> { return "0"; }); //B->0
+        ruleConvertor.put(productionRules[4], (elements) -> { return "1"; }); //B->1
+
+        ruleConvertors.put("1+0*1", ruleConvertor);
     }
 
     public Map<ProductionRule, Generator> getRuleConvertor(String sentence) {
-        return null;
+        Map<ProductionRule, Generator> ruleConvertor = ruleConvertors.get(sentence);
+
+        if(ruleConvertor == null) {
+            throw new UnsupportedSentenceException("rule convertor", sentence);
+        }
+
+        return ruleConvertor;
     }
 
     private void setUpCodeGenerations() {
