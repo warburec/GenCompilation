@@ -11,8 +11,8 @@ public class TestGrammar extends Grammar {
     
     List<State> states = new ArrayList<>();
     Map<String, Map<String, String>> codeGenerations;           //Language, <Sentence, Code>
-    Map<String, Map<ProductionRule, Generator>> ruleConvertors; //Sentence, ruleConverterMap
-    Map<String, String[]> generationBookends;                   //Sentence, {preGeneration, postGeneration}
+    Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap; //Language, <Sentence, ruleConverterMap>
+    Map<String, Map<String, String[]>> generationBookendMap;                   //Language, <Sentence, {preGeneration, postGeneration}>
 
     public TestGrammar() {
         setUpTokens();
@@ -289,9 +289,10 @@ public class TestGrammar extends Grammar {
     }
 
     private void setUpGenerationBookends() {
-        generationBookends = new HashMap<>();
+        generationBookendMap = new HashMap<>();
 
-        generationBookends.put("1+0*1", new String[] {
+        generationBookendMap.put("Java", new HashMap<>());
+        generationBookendMap.get("Java").put("1+0*1", new String[] {
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
             "\t\tSystem.out.println(",
@@ -300,12 +301,30 @@ public class TestGrammar extends Grammar {
             "\t}\n" +
             "}"
         });
+
+        generationBookendMap.put("C", new HashMap<>());
+        generationBookendMap.get("C").put("1+0*1", new String[] {
+            "#include <stdio.h>\n" +
+            "\n" +  
+            "main()\n" +
+            "\tprintf(",
+
+            ");\n" +
+            "}"
+        });
     }
 
-    public String[] getGenerationBookends(String sentence) {
-        String[] bookends = generationBookends.get(sentence);
+    public String[] getGenerationBookends(String sentence, String language) {
+        String[] bookends = null;
 
-        if(bookends == null) { 
+        try {
+            bookends = generationBookendMap.get(language).get(sentence);
+        }
+        catch (NullPointerException e) {
+            throw new UnsupportedSentenceException("langage and generation bookends", sentence);
+        }
+
+        if(bookends == null) {
             throw new UnsupportedSentenceException("generation bookends", sentence);
         }
 
@@ -313,7 +332,9 @@ public class TestGrammar extends Grammar {
     }
 
     private void setUpRuleConvertors() {
-        ruleConvertors = new HashMap<>();
+        ruleConvertorMap = new HashMap<>();
+
+        ruleConvertorMap.put("Java", new HashMap<>());
 
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
         ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
@@ -321,12 +342,29 @@ public class TestGrammar extends Grammar {
         ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
         ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
         ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertorMap.get("Java").put("1+0*1", ruleConvertor);
 
-        ruleConvertors.put("1+0*1", ruleConvertor);
+
+        ruleConvertorMap.put("C", new HashMap<>());
+
+        ruleConvertor = new HashMap<>();
+        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertorMap.get("C").put("1+0*1", ruleConvertor);
     }
 
-    public Map<ProductionRule, Generator> getRuleConvertor(String sentence) {
-        Map<ProductionRule, Generator> ruleConvertor = ruleConvertors.get(sentence);
+    public Map<ProductionRule, Generator> getRuleConvertor(String sentence, String language) {
+        Map<ProductionRule, Generator> ruleConvertor = null;
+
+        try {
+            ruleConvertor = ruleConvertorMap.get(language).get(sentence);
+        }
+        catch (NullPointerException e) {
+            throw new UnsupportedSentenceException("langage and rule convertor", sentence);
+        }
 
         if(ruleConvertor == null) {
             throw new UnsupportedSentenceException("rule convertor", sentence);
@@ -344,6 +382,15 @@ public class TestGrammar extends Grammar {
             "\tpublic static void main(String[] args) {\n" +
             "\t\tSystem.out.println(1 + 0 * 1);\n" +
             "\t}\n" +
+            "}"
+        );
+
+        codeGenerations.put("C", new HashMap<>());
+        codeGenerations.get("C").put("1+0*1",
+            "#include <stdio.h>\n" +
+            "\n" +  
+            "main()\n" +
+            "\tprintf(1 + 0 * 1);\n" +
             "}"
         );
     }
