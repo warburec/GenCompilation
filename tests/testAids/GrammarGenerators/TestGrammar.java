@@ -237,6 +237,9 @@ public class TestGrammar extends Grammar {
             case "1+0*1":
                 return parseTree0();
             
+            case "1":
+                return parseTree1();
+            
             default:
                 throw new UnsupportedSentenceException("parse tree", sentence);
         }
@@ -288,11 +291,32 @@ public class TestGrammar extends Grammar {
         return parseStates.get(parseStates.size() - 1);
     }
 
+    /**
+     * Parse tree for the sentence "1"
+     * @return The root ParseState of the tree
+     */
+    private ParseState parseTree1() {
+        List<ParseState> parseStates = new ArrayList<>();
+
+        parseStates.add(new ShiftedState(states.get(8), new Token("1")));
+
+        return parseStates.get(parseStates.size() - 1);
+    }
+
     private void setUpGenerationBookends() {
         generationBookendMap = new HashMap<>();
 
         generationBookendMap.put("Java", new HashMap<>());
         generationBookendMap.get("Java").put("1+0*1", new String[] {
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tSystem.out.println(",
+
+            ");\n" +
+            "\t}\n" +
+            "}"
+        });
+        generationBookendMap.get("Java").put("1", new String[] {
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
             "\t\tSystem.out.println(",
@@ -344,6 +368,13 @@ public class TestGrammar extends Grammar {
         ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
         ruleConvertorMap.get("Java").put("1+0*1", ruleConvertor);
 
+        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertorMap.get("Java").put("1", ruleConvertor);
+
 
         ruleConvertorMap.put("C", new HashMap<>());
 
@@ -381,6 +412,13 @@ public class TestGrammar extends Grammar {
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
             "\t\tSystem.out.println(1 + 0 * 1);\n" +
+            "\t}\n" +
+            "}"
+        );
+        codeGenerations.get("Java").put("1",
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tSystem.out.println(1);\n" +
             "\t}\n" +
             "}"
         );

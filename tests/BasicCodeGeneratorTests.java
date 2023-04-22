@@ -45,4 +45,19 @@ public class BasicCodeGeneratorTests {
         assertEquals(expectedCode, resultingCode);
     }
 
+    @Test
+    public void testGrammarSigleDigitJavaGeneration() {
+        TestGrammar grammar = new TestGrammar();
+        String sentence = "1";
+        String language = "Java";
+        Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
+        String[] bookends = grammar.getGenerationBookends(sentence, language);
+        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor, bookends[0], bookends[1]);
+        ParseState rootParseState = grammar.getParseRoot(sentence);
+
+        String resultingCode = codeGenerator.generate(rootParseState);
+
+        String expectedCode = grammar.getGeneratedCode(sentence, language);
+        assertEquals(expectedCode, resultingCode);
+    }
 }

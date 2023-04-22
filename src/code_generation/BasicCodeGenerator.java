@@ -30,8 +30,10 @@ public class BasicCodeGenerator implements CodeGenerator {
                     
                 states.pop();
 
-                GenerationState parentState = states.peek();
-                parentState.addCodeElement(currentlyBuiltCode);
+                if(!states.isEmpty()) {
+                    GenerationState parentState = states.peek();
+                    parentState.addCodeElement(currentlyBuiltCode);
+                }
             }
             else if(currentState.getParseState() instanceof ReducedState) {
                 ReducedState reduction = (ReducedState)currentState.getParseState();
