@@ -16,13 +16,15 @@ public class BasicCodeGeneratorTests {
     @Test
     public void testGrammarJavaGeneration() {
         TestGrammar grammar = new TestGrammar();
-        Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor("1+0*1");
-        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor);
-        ParseState rootParseState = grammar.getParseRoot("1+0*1");
+        String sentence = "1+0*1";
+        Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence);
+        String[] bookends = grammar.getGenerationBookends(sentence);
+        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor, bookends[0], bookends[1]);
+        ParseState rootParseState = grammar.getParseRoot(sentence);
 
         String resultingCode = codeGenerator.generate(rootParseState);
 
-        String expectedCode = grammar.getGeneratedCode("1+0*1", "Java");
+        String expectedCode = grammar.getGeneratedCode(sentence, "Java");
         assertEquals(expectedCode, resultingCode);
     }
 
