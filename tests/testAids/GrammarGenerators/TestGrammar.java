@@ -240,6 +240,9 @@ public class TestGrammar extends Grammar {
             case "1":
                 return parseTree1();
             
+            case "emptyReduce":
+                return parseTree2();
+            
             default:
                 throw new UnsupportedSentenceException("parse tree", sentence);
         }
@@ -303,6 +306,22 @@ public class TestGrammar extends Grammar {
         return parseStates.get(parseStates.size() - 1);
     }
 
+    /**
+     * Parse tree for the sentence "emptyReduce"
+     * @return The root ParseState of the tree
+     */
+    private ParseState parseTree2() {
+        List<ParseState> parseStates = new ArrayList<>();
+
+        parseStates.add(new ReducedState(states.get(1), productionRules[1], Arrays.asList(new ParseState[] {
+            null,
+            null,
+            null
+        })));
+
+        return parseStates.get(parseStates.size() - 1);
+    }
+
     private void setUpGenerationBookends() {
         generationBookendMap = new HashMap<>();
 
@@ -317,6 +336,15 @@ public class TestGrammar extends Grammar {
             "}"
         });
         generationBookendMap.get("Java").put("1", new String[] {
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tSystem.out.println(",
+
+            ");\n" +
+            "\t}\n" +
+            "}"
+        });
+        generationBookendMap.get("Java").put("emptyReduce", new String[] {
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
             "\t\tSystem.out.println(",
@@ -375,6 +403,12 @@ public class TestGrammar extends Grammar {
         ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
         ruleConvertorMap.get("Java").put("1", ruleConvertor);
 
+        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertorMap.get("Java").put("emptyReduce", ruleConvertor);
 
         ruleConvertorMap.put("C", new HashMap<>());
 
@@ -419,6 +453,13 @@ public class TestGrammar extends Grammar {
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
             "\t\tSystem.out.println(1);\n" +
+            "\t}\n" +
+            "}"
+        );
+        codeGenerations.get("Java").put("emptyReduce",
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tSystem.out.println();\n" +
             "\t}\n" +
             "}"
         );

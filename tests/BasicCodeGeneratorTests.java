@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import code_generation.*;
+import code_generation.BasicCodeGenerator.IncompleteReductionException;
 import grammar_objects.ProductionRule;
 import syntax_analysis.parsing.ParseState;
 import tests.testAids.GrammarGenerators.TestGrammar;
@@ -59,5 +60,18 @@ public class BasicCodeGeneratorTests {
 
         String expectedCode = grammar.getGeneratedCode(sentence, language);
         assertEquals(expectedCode, resultingCode);
+    }
+
+    @Test
+    public void testGrammarEmptyReduceJavaGeneration() {
+        TestGrammar grammar = new TestGrammar();
+        String sentence = "emptyReduce";
+        String language = "Java";
+        Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
+        String[] bookends = grammar.getGenerationBookends(sentence, language);
+        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor, bookends[0], bookends[1]);
+        ParseState rootParseState = grammar.getParseRoot(sentence);
+
+        assertThrows(IncompleteReductionException.class, () -> codeGenerator.generate(rootParseState));
     }
 }

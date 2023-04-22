@@ -55,8 +55,11 @@ public class BasicCodeGenerator implements CodeGenerator {
                 }
             }
             else {
-                //TODO make custom exception
-                throw new RuntimeException("A parse state was found with the unrecognised type " + currentState.getParseState().getClass());
+                if(currentState.getParseState() == null) {
+                    throw new IncompleteReductionException();
+                }
+
+                throw new UnrecognisedParseStateException(currentState.getParseState());
             }
         }
 
@@ -79,6 +82,14 @@ public class BasicCodeGenerator implements CodeGenerator {
 
         Generator generator = ruleConvertor.get(reduction.reductionRule());
         return generator.generateCode(reductionGeneration.getCodeElements());
+    }
+
+
+    public class IncompleteReductionException extends RuntimeException {
+        public IncompleteReductionException() {
+            super("Code generation for a reduction with incomplete elements was attempted, check the parse tree is correctly generated");
+            //TODO: More descriptive message, highlight the state with issues
+        }
     }
 
     private class GenerationState {
