@@ -197,8 +197,23 @@ public class SelfReferentialGrammar extends TestGrammar {
 
     @Override
     protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGotoTable'");
+        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+
+        currentGotoActions.put(new NonTerminal("H"), getState(1));
+        gotoTable.put(getState(0), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
+
+        currentGotoActions.put(new NonTerminal("A"), getState(3));
+        gotoTable.put(getState(2), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
+
+        currentGotoActions.put(new NonTerminal("L"), getState(5));
+        gotoTable.put(getState(4), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
+
+        currentGotoActions.put(new NonTerminal("L"), getState(7));
+        gotoTable.put(getState(7), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
     }
 
     @Override
