@@ -165,8 +165,34 @@ public class SelfReferentialGrammar extends TestGrammar {
 
     @Override
     protected void setUpActionTable(Map<State, Action> actionTable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpActionTable'");
+        Map<Token, State> currentStateActions = new HashMap<>();
+
+        currentStateActions.put(new Token("h"), getState(2));
+        actionTable.put(getState(0), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        //Accept EOF at state 1
+
+        currentStateActions.put(new Token("a"), getState(4));
+        actionTable.put(getState(2), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        actionTable.put(getState(3), new ReduceAction(getRule(0)));
+
+        currentStateActions.put(new Token("l"), getState(6));
+        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        actionTable.put(getState(5), new ReduceAction(getRule(1)));
+
+        currentStateActions.put(new Token("l"), getState(6));
+        currentStateActions.put(new Token("o"), getState(8));
+        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        actionTable.put(getState(7), new ReduceAction(getRule(2)));
+
+        actionTable.put(getState(8), new ReduceAction(getRule(3)));
     }
 
     @Override
