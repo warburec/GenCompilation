@@ -118,4 +118,13 @@ public class LR0ParserTests {
         assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
     
+    //TODO: Test with grammar with a state that references itself
+    /*
+        H → h A
+        A → a L
+        L → l L //Self-referential
+        L → o
+     */
+
+    //TODO: Add identifiers
 }
