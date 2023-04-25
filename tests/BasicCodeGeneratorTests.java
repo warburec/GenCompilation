@@ -10,13 +10,13 @@ import code_generation.*;
 import code_generation.BasicCodeGenerator.IncompleteReductionException;
 import grammar_objects.ProductionRule;
 import syntax_analysis.parsing.ParseState;
-import tests.testAids.GrammarGenerators.TestGrammar;
+import tests.testAids.GrammarGenerators.SmallTestGrammar;
 
 public class BasicCodeGeneratorTests {
     
     @Test
     public void testGrammarJavaGeneration() {
-        TestGrammar grammar = new TestGrammar();
+        SmallTestGrammar grammar = new SmallTestGrammar();
         String sentence = "1+0*1";
         String language = "Java";
         Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
@@ -32,7 +32,7 @@ public class BasicCodeGeneratorTests {
 
     @Test
     public void testGrammarCGeneration() {
-        TestGrammar grammar = new TestGrammar();
+        SmallTestGrammar grammar = new SmallTestGrammar();
         String sentence = "1+0*1";
         String language = "C";
         Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
@@ -48,7 +48,7 @@ public class BasicCodeGeneratorTests {
 
     @Test
     public void testGrammarSigleDigitJavaGeneration() {
-        TestGrammar grammar = new TestGrammar();
+        SmallTestGrammar grammar = new SmallTestGrammar();
         String sentence = "1";
         String language = "Java";
         Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
@@ -64,7 +64,7 @@ public class BasicCodeGeneratorTests {
 
     @Test
     public void testGrammarEmptyReduceJavaGeneration() {
-        TestGrammar grammar = new TestGrammar();
+        SmallTestGrammar grammar = new SmallTestGrammar();
         String sentence = "emptyReduce";
         String language = "Java";
         Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);

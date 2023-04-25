@@ -11,7 +11,7 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import syntax_analysis.*;
 import tests.testAids.GrammarParts;
-import tests.testAids.GrammarGenerators.TestGrammar;
+import tests.testAids.GrammarGenerators.*;
 
 public class LR0ParserTests {
     
@@ -32,7 +32,7 @@ public class LR0ParserTests {
 
     @Test
     public void smallTestGrammarStates() {
-        TestGrammar grammar = new TestGrammar();
+        TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -41,13 +41,13 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getStates();
+        Set<State> expectedStateSet = grammar.getGetState();
         assertEquals(expectedStateSet, generatedStates);
     }
 
     @Test
     public void smallTestGrammarAction() {
-        TestGrammar grammar = new TestGrammar();
+        TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -62,7 +62,7 @@ public class LR0ParserTests {
 
     @Test
     public void smallTestGrammarGoto() {
-        TestGrammar grammar = new TestGrammar();
+        TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -77,7 +77,7 @@ public class LR0ParserTests {
 
     @Test
     public void parsingTestGrammarCompleteSentence() throws ParseFailedException {
-        TestGrammar grammar = new TestGrammar();
+        TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -100,7 +100,7 @@ public class LR0ParserTests {
 
     @Test
     public void parsingTestGrammarIncompleteSentence() {
-        TestGrammar grammar = new TestGrammar();
+        TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -117,14 +117,21 @@ public class LR0ParserTests {
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
         assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
-    
-    //TODO: Test with grammar with a state that references itself
-    /*
-        H → h A
-        A → a L
-        L → l L //Self-referential
-        L → o
-    */
+
+    // @Test
+    // public void selfReferentialGrammarStates() {
+    //     TestGrammar grammar = new SelfReferentialGrammar();
+    //     GrammarParts grammarParts = grammar.getParts();
+
+    //     LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+    //                                             grammarParts.nonTerminals(),
+    //                                             grammarParts.productionRules(),
+    //                                             grammarParts.sentinal());
+    //     Set<State> generatedStates = syntaxAnalyser.getStates();
+
+    //     Set<State> expectedStateSet = grammar.getGetState();
+    //     assertEquals(expectedStateSet, generatedStates);
+    // }
 
     //TODO: Add identifiers
 }

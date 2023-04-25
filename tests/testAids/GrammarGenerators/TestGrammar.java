@@ -7,223 +7,57 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-public class TestGrammar extends Grammar {
-    
-    List<State> states = new ArrayList<>();
-    Map<String, Map<String, String>> codeGenerations;           //Language, <Sentence, Code>
-    Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap; //Language, <Sentence, ruleConverterMap>
-    Map<String, Map<String, String[]>> generationBookendMap;                   //Language, <Sentence, {preGeneration, postGeneration}>
+public abstract class TestGrammar extends Grammar {
+    private List<State> getState = new ArrayList<>();
+    private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
+    private Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap = new HashMap<>(); //Language, <Sentence, ruleConverterMap>
+    private Map<String, Map<String, String[]>> generationBookendMap = new HashMap<>();                   //Language, <Sentence, {preGeneration, postGeneration}>
+
+    private Map<State, Action> actionTable = new HashMap<>();
+    private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
 
     public TestGrammar() {
-        setUpTokens();
-        setUpNonTerminalsAndSentinal();
-        setUpProductionRules();
-        setUpStates();
-        setUpRuleConvertors();
-        setUpCodeGenerations();
-        setUpGenerationBookends();
+        tokens = setUpTokens();
+        nonTerminals = setUpNonTerminals();
+        sentinal = setUpSentinal();
+        productionRules = setUpProductionRules();
+
+        setUpStates(getState, new ProductionRule(null, new LexicalElement[] {sentinal}));
+        setUpActionTable(actionTable);
+        setUpGotoTable(gotoTable);
+
+        setUpRuleConvertors(ruleConvertorMap);
+        setUpCodeGenerations(codeGenerations);
+        setUpGenerationBookends(generationBookendMap);
     }
 
-    private void setUpTokens() {
-        tokens = new Token[] {
-            new Token("0"),
-            new Token("1"),
-            new Token("*"),
-            new Token("+")
-        };
-    }
-
-    private void setUpNonTerminalsAndSentinal() {
-        sentinal = new NonTerminal("E");
-        nonTerminals = new NonTerminal[] {
-            new NonTerminal("E"),
-            new NonTerminal("B")
-        };
-    }
-
-    private void setUpProductionRules() {
-        productionRules = new ProductionRule[] {
-            new ProductionRule(new NonTerminal("E"),
-                            new LexicalElement[] {
-                                new NonTerminal("E"),
-                                new Token("+"),
-                                new NonTerminal("B")
-                            }),
-            new ProductionRule(new NonTerminal("E"),
-                            new LexicalElement[] {
-                                new NonTerminal("E"),
-                                new Token("*"),
-                                new NonTerminal("B")
-                            }),
-            new ProductionRule(new NonTerminal("E"),
-                            new LexicalElement[] {
-                                new NonTerminal("B")
-                            }),
-            new ProductionRule(new NonTerminal("B"),
-                            new LexicalElement[] {
-                                new Token("0")
-                            }),
-            new ProductionRule(new NonTerminal("B"),
-                            new LexicalElement[] {
-                                new Token("1")
-                            })
-        };
-    }
+    protected abstract Token[] setUpTokens();
+    protected abstract NonTerminal setUpSentinal();
+    protected abstract NonTerminal[] setUpNonTerminals();
+    protected abstract ProductionRule[] setUpProductionRules();
     
 
-    private void setUpStates() {
-        ProductionRule extraRootRule = new ProductionRule(null, new LexicalElement[] {sentinal});
+    protected abstract void setUpStates(List<State> states, ProductionRule extraRootRule);
 
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(extraRootRule, 0),
-                new GrammarPosition(productionRules[1], 0),
-                new GrammarPosition(productionRules[0], 0),
-                new GrammarPosition(productionRules[2], 0),
-                new GrammarPosition(productionRules[3], 0),
-                new GrammarPosition(productionRules[4], 0),
-            }),
-            null
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(extraRootRule, 1),
-                new GrammarPosition(productionRules[1], 1),
-                new GrammarPosition(productionRules[0], 1),
-            }),
-            states.get(0)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[1], 2),
-                new GrammarPosition(productionRules[3], 0),
-                new GrammarPosition(productionRules[4], 0),
-            }),
-            states.get(1)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[1], 3),
-            }),
-            states.get(2)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[0], 2),
-                new GrammarPosition(productionRules[3], 0),
-                new GrammarPosition(productionRules[4], 0),
-            }),
-            states.get(1)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[0], 3),
-            }),
-            states.get(3)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[2], 1),
-            }),
-            states.get(0)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[3], 1),
-            }),
-            states.get(0)
-        ));
-        states.add(new State(
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[4], 1),
-            }),
-            states.get(0)
-        ));
-
-        //Tree branches
-        states.get(0)
-            .addBranch(new Route(states.get(1), new NonTerminal("E")))
-            .addBranch(new Route(states.get(6), new NonTerminal("B")))
-            .addBranch(new Route(states.get(7), new Token("0")))
-            .addBranch(new Route(states.get(8), new Token("1")));
-        states.get(1)
-            .addBranch(new Route(states.get(4), new Token("+")))
-            .addBranch(new Route(states.get(2), new Token("*")));
-        states.get(2)
-            .addBranch(new Route(states.get(3), new NonTerminal("B")));
-        states.get(4)
-            .addBranch(new Route(states.get(5), new NonTerminal("B")));
-
-        //Graph branches, links to existing states
-        states.get(2)
-            .addBranch(new Route(states.get(7), new Token("0")))
-            .addBranch(new Route(states.get(8), new Token("1")));
-        states.get(4)
-            .addBranch(new Route(states.get(7), new Token("0")))
-            .addBranch(new Route(states.get(8), new Token("1")));
+    public Set<State> getGetState() {
+        return new HashSet<>(getState);
     }
 
-    public Set<State> getStates() {
-        return new HashSet<>(states);
+    protected State getState(int index) {
+        return getState.get(index);
     }
 
+
+    protected abstract void setUpActionTable(Map<State, Action> actionTable);
 
     public Map<State, Action> getActionTable() {
-        Map<State, Action> actionMap = new HashMap<State, Action>();
-        Map<Token, State> currentStateActions = new HashMap<>();
-
-        currentStateActions.put(new Token("0"), states.get(7));
-        currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(0), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
-
-        currentStateActions.put(new Token("*"), states.get(2));
-        currentStateActions.put(new Token("+"), states.get(4));
-        // currentStateActions.put(new Token(null), states.get()); //TODO: Decide how Accept should be handled
-        actionMap.put(states.get(1), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
-        
-        currentStateActions.put(new Token("0"), states.get(7));
-        currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(2), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
-        
-        actionMap.put(states.get(3), new ReduceAction(productionRules[1]));
-        
-        currentStateActions.put(new Token("0"), states.get(7));
-        currentStateActions.put(new Token("1"), states.get(8));
-        actionMap.put(states.get(4), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
-        
-        actionMap.put(states.get(5), new ReduceAction(productionRules[0]));
-        
-        actionMap.put(states.get(6), new ReduceAction(productionRules[2]));
-
-        actionMap.put(states.get(7), new ReduceAction(productionRules[3]));
-
-        actionMap.put(states.get(8), new ReduceAction(productionRules[4]));
-
-        return actionMap;
+        return actionTable;
     }
 
+    protected abstract void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable);
+
     public Map<State, Map<NonTerminal, State>> getGotoTable() {
-        Map<State, Map<NonTerminal, State>> gotoMap = new HashMap<>();
-        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
-
-        currentGotoActions.put(new NonTerminal("E"), states.get(1));
-        currentGotoActions.put(new NonTerminal("B"), states.get(6));
-        gotoMap.put(states.get(0), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-
-        currentGotoActions.put(new NonTerminal("B"), states.get(5));
-        gotoMap.put(states.get(4), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-
-        currentGotoActions.put(new NonTerminal("B"), states.get(3));
-        gotoMap.put(states.get(2), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-
-        return gotoMap;
+        return gotoTable;
     }
 
 
@@ -232,139 +66,10 @@ public class TestGrammar extends Grammar {
      * @param sentence The sentence to be parsed
      * @return The root ParseState of the parse tree
      */
-    public ParseState getParseRoot(String sentence) {
-        switch(sentence) {
-            case "1+0*1":
-                return parseTree0();
-            
-            case "1":
-                return parseTree1();
-            
-            case "emptyReduce":
-                return parseTree2();
-            
-            default:
-                throw new UnsupportedSentenceException("parse tree", sentence);
-        }
-    }
-
-    /**
-     * Parse tree for the sentence "1+0*1"
-     * @return The root ParseState of the tree
-     */
-    private ParseState parseTree0() {
-        List<ParseState> parseStates = new ArrayList<>();
-
-        parseStates.add(new ShiftedState(states.get(8), new Token("1")));
+    public abstract ParseState getParseRoot(String sentence);
 
 
-        parseStates.add(new ReducedState(states.get(6), productionRules[4], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(0)
-                                                                                                    })));                                                                                            
-        parseStates.add(new ShiftedState(states.get(7), new Token("0")));
-
-        
-        parseStates.add(new ReducedState(states.get(1), productionRules[2], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(1)
-                                                                                                    })));
-        parseStates.add(new ShiftedState(states.get(4), new Token("+")));
-        parseStates.add(new ReducedState(states.get(5), productionRules[3], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(2)
-                                                                                                    })));
-        parseStates.add(new ShiftedState(states.get(8), new Token("1")));
-
-
-        parseStates.add(new ReducedState(states.get(1), productionRules[0], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(3),
-                                                                                                        parseStates.get(4),
-                                                                                                        parseStates.get(5)
-                                                                                                    })));
-        parseStates.add(new ShiftedState(states.get(2), new Token("*")));
-        parseStates.add(new ReducedState(states.get(3), productionRules[4], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(6)
-                                                                                                    })));
-
-
-        parseStates.add(new ReducedState(states.get(1), productionRules[1], Arrays.asList(new ParseState[] {
-                                                                                                        parseStates.get(7),
-                                                                                                        parseStates.get(8),
-                                                                                                        parseStates.get(9)
-                                                                                                    })));
-
-        return parseStates.get(parseStates.size() - 1);
-    }
-
-    /**
-     * Parse tree for the sentence "1"
-     * @return The root ParseState of the tree
-     */
-    private ParseState parseTree1() {
-        List<ParseState> parseStates = new ArrayList<>();
-
-        parseStates.add(new ShiftedState(states.get(8), new Token("1")));
-
-        return parseStates.get(parseStates.size() - 1);
-    }
-
-    /**
-     * Parse tree for the sentence "emptyReduce"
-     * @return The root ParseState of the tree
-     */
-    private ParseState parseTree2() {
-        List<ParseState> parseStates = new ArrayList<>();
-
-        parseStates.add(new ReducedState(states.get(1), productionRules[1], Arrays.asList(new ParseState[] {
-            null,
-            null,
-            null
-        })));
-
-        return parseStates.get(parseStates.size() - 1);
-    }
-
-    private void setUpGenerationBookends() {
-        generationBookendMap = new HashMap<>();
-
-        generationBookendMap.put("Java", new HashMap<>());
-        generationBookendMap.get("Java").put("1+0*1", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-        generationBookendMap.get("Java").put("1", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-        generationBookendMap.get("Java").put("emptyReduce", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-
-        generationBookendMap.put("C", new HashMap<>());
-        generationBookendMap.get("C").put("1+0*1", new String[] {
-            "#include <stdio.h>\n" +
-            "\n" +  
-            "main()\n" +
-            "\tprintf(",
-
-            ");\n" +
-            "}"
-        });
-    }
+    protected abstract void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap);
 
     public String[] getGenerationBookends(String sentence, String language) {
         String[] bookends = null;
@@ -383,43 +88,8 @@ public class TestGrammar extends Grammar {
         return bookends;
     }
 
-    private void setUpRuleConvertors() {
-        ruleConvertorMap = new HashMap<>();
 
-        ruleConvertorMap.put("Java", new HashMap<>());
-
-        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
-        ruleConvertorMap.get("Java").put("1+0*1", ruleConvertor);
-
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
-        ruleConvertorMap.get("Java").put("1", ruleConvertor);
-
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
-        ruleConvertorMap.get("Java").put("emptyReduce", ruleConvertor);
-
-        ruleConvertorMap.put("C", new HashMap<>());
-
-        ruleConvertor = new HashMap<>();
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
-        ruleConvertorMap.get("C").put("1+0*1", ruleConvertor);
-    }
+    protected abstract void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap);
 
     public Map<ProductionRule, Generator> getRuleConvertor(String sentence, String language) {
         Map<ProductionRule, Generator> ruleConvertor = null;
@@ -438,41 +108,8 @@ public class TestGrammar extends Grammar {
         return ruleConvertor;
     }
 
-    private void setUpCodeGenerations() {
-        codeGenerations = new HashMap<>();
 
-        codeGenerations.put("Java", new HashMap<>());
-        codeGenerations.get("Java").put("1+0*1",
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(1 + 0 * 1);\n" +
-            "\t}\n" +
-            "}"
-        );
-        codeGenerations.get("Java").put("1",
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(1);\n" +
-            "\t}\n" +
-            "}"
-        );
-        codeGenerations.get("Java").put("emptyReduce",
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println();\n" +
-            "\t}\n" +
-            "}"
-        );
-
-        codeGenerations.put("C", new HashMap<>());
-        codeGenerations.get("C").put("1+0*1",
-            "#include <stdio.h>\n" +
-            "\n" +  
-            "main()\n" +
-            "\tprintf(1 + 0 * 1);\n" +
-            "}"
-        );
-    }
+    protected abstract void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations);
 
     public String getGeneratedCode(String sentence, String language) {
         String generatedCode = null;
@@ -490,5 +127,4 @@ public class TestGrammar extends Grammar {
 
         return generatedCode;
     }
-
 }
