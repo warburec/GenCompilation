@@ -158,8 +158,12 @@ public class SelfReferentialGrammar extends TestGrammar {
             .addBranch(new Route(getState(8), new Token("o")));
         
         //Graph branches, links to existing states
+        getState(4)
+            .addBranch(new Route(getState(8), new Token("o")));
+        
         getState(6)
             .addBranch(new Route(getState(6), new Token("l")));
+
 
     }
 
@@ -225,19 +229,16 @@ public class SelfReferentialGrammar extends TestGrammar {
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGenerationBookends'");
     }
 
     @Override
     protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpRuleConvertors'");
     }
 
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpCodeGenerations'");
     }
     
 }

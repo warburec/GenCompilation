@@ -118,20 +118,20 @@ public class LR0ParserTests {
         assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
 
-    // @Test
-    // public void selfReferentialGrammarStates() {
-    //     TestGrammar grammar = new SelfReferentialGrammar();
-    //     GrammarParts grammarParts = grammar.getParts();
+    @Test
+    public void selfReferentialGrammarStates() {
+        TestGrammar grammar = new SelfReferentialGrammar();
+        GrammarParts grammarParts = grammar.getParts();
 
-    //     LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
-    //                                             grammarParts.nonTerminals(),
-    //                                             grammarParts.productionRules(),
-    //                                             grammarParts.sentinal());
-    //     Set<State> generatedStates = syntaxAnalyser.getStates();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
 
-    //     Set<State> expectedStateSet = grammar.getGetState();
-    //     assertEquals(expectedStateSet, generatedStates);
-    // }
+        Set<State> expectedStateSet = grammar.getGetState();
+        assertEquals(expectedStateSet, generatedStates);
+    }
 
     //TODO: Add identifiers
 }
