@@ -7,6 +7,7 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
+//TODO: Add helper methods and classes to make creation easier (Some may be best put in the Grammar class), use composite pattern to allow .add().add().add().etc
 public abstract class TestGrammar extends Grammar {
     private List<State> getState = new ArrayList<>();
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
@@ -17,10 +18,10 @@ public abstract class TestGrammar extends Grammar {
     private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
 
     public TestGrammar() {
-        tokens = setUpTokens();
-        nonTerminals = setUpNonTerminals();
+        setUpTokens(tokens);
         sentinal = setUpSentinal();
-        productionRules = setUpProductionRules();
+        setUpNonTerminals(nonTerminals);
+        setUpProductionRules(productionRules);
 
         setUpStates(getState, new ProductionRule(null, new LexicalElement[] {sentinal}));
         setUpActionTable(actionTable);
@@ -31,11 +32,18 @@ public abstract class TestGrammar extends Grammar {
         setUpGenerationBookends(generationBookendMap);
     }
 
-    protected abstract Token[] setUpTokens();
+
+    protected abstract void setUpTokens(List<Token> tokens);
     protected abstract NonTerminal setUpSentinal();
-    protected abstract NonTerminal[] setUpNonTerminals();
-    protected abstract ProductionRule[] setUpProductionRules();
+    protected abstract void setUpNonTerminals(List<NonTerminal> nonTerminals);
     
+
+    protected abstract void setUpProductionRules(List<ProductionRule> productionRules);
+    
+    public ProductionRule getRule(int index) {
+        return productionRules.get(index);
+    }
+
 
     protected abstract void setUpStates(List<State> states, ProductionRule extraRootRule);
 

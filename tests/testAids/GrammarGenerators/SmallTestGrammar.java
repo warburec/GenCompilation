@@ -7,16 +7,21 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
+/**
+ * E->E+B
+ * E->E*B
+ * E->B
+ * B->0
+ * B->1
+ */
 public class SmallTestGrammar extends TestGrammar {
 
     @Override
-    protected Token[] setUpTokens() {
-        return  new Token[] {
-            new Token("0"),
-            new Token("1"),
-            new Token("*"),
-            new Token("+")
-        };
+    protected  void setUpTokens(List<Token> tokens) {
+        tokens.add(new Token("0"));
+        tokens.add(new Token("1"));
+        tokens.add(new Token("*"));
+        tokens.add(new Token("+"));
     }
 
     @Override
@@ -25,41 +30,51 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
     @Override
-    protected NonTerminal[] setUpNonTerminals() {
-        return new NonTerminal[] {
-            new NonTerminal("E"),
-            new NonTerminal("B")
-        };
+    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
+        nonTerminals.add(new NonTerminal("E"));
+        nonTerminals.add(new NonTerminal("B"));
     }
 
     @Override
-    protected ProductionRule[] setUpProductionRules() {
-        return new ProductionRule[] {
-            new ProductionRule(new NonTerminal("E"),
-                            new LexicalElement[] {
-                                new NonTerminal("E"),
-                                new Token("+"),
-                                new NonTerminal("B")
-                            }),
-            new ProductionRule(new NonTerminal("E"),
-                            new LexicalElement[] {
-                                new NonTerminal("E"),
-                                new Token("*"),
-                                new NonTerminal("B")
-                            }),
-            new ProductionRule(new NonTerminal("E"),
-                            new LexicalElement[] {
-                                new NonTerminal("B")
-                            }),
-            new ProductionRule(new NonTerminal("B"),
-                            new LexicalElement[] {
-                                new Token("0")
-                            }),
-            new ProductionRule(new NonTerminal("B"),
-                            new LexicalElement[] {
-                                new Token("1")
-                            })
-        };
+    protected void setUpProductionRules(List<ProductionRule> productionRules) {
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("E"),
+                new LexicalElement[] {
+                    new NonTerminal("E"),
+                    new Token("+"),
+                    new NonTerminal("B")
+                }));
+
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("E"),
+                new LexicalElement[] {
+                    new NonTerminal("E"),
+                    new Token("*"),
+                    new NonTerminal("B")
+                }));
+
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("E"),
+                new LexicalElement[] {
+                    new NonTerminal("B")
+                }));
+
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("B"),
+                new LexicalElement[] {
+                    new Token("0")
+                }));
+
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("B"),
+                new LexicalElement[] {
+                    new Token("1")
+                }));
     }
 
     @Override
@@ -67,65 +82,73 @@ public class SmallTestGrammar extends TestGrammar {
         states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
-                new GrammarPosition(productionRules[1], 0),
-                new GrammarPosition(productionRules[0], 0),
-                new GrammarPosition(productionRules[2], 0),
-                new GrammarPosition(productionRules[3], 0),
-                new GrammarPosition(productionRules[4], 0),
+                new GrammarPosition(getRule(1), 0),
+                new GrammarPosition(getRule(0), 0),
+                new GrammarPosition(getRule(2), 0),
+                new GrammarPosition(getRule(3), 0),
+                new GrammarPosition(getRule(4), 0),
             }),
             null
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 1),
-                new GrammarPosition(productionRules[1], 1),
-                new GrammarPosition(productionRules[0], 1),
+                new GrammarPosition(getRule(1), 1),
+                new GrammarPosition(getRule(0), 1),
             }),
             getState(0)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[1], 2),
-                new GrammarPosition(productionRules[3], 0),
-                new GrammarPosition(productionRules[4], 0),
+                new GrammarPosition(getRule(1), 2),
+                new GrammarPosition(getRule(3), 0),
+                new GrammarPosition(getRule(4), 0),
             }),
             getState(1)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[1], 3),
+                new GrammarPosition(getRule(1), 3),
             }),
             getState(2)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[0], 2),
-                new GrammarPosition(productionRules[3], 0),
-                new GrammarPosition(productionRules[4], 0),
+                new GrammarPosition(getRule(0), 2),
+                new GrammarPosition(getRule(3), 0),
+                new GrammarPosition(getRule(4), 0),
             }),
             getState(1)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[0], 3),
+                new GrammarPosition(getRule(0), 3),
             }),
             getState(3)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[2], 1),
+                new GrammarPosition(getRule(2), 1),
             }),
             getState(0)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[3], 1),
+                new GrammarPosition(getRule(3), 1),
             }),
             getState(0)
         ));
+
         states.add(new State(
             Set.of(new GrammarPosition[] {
-                new GrammarPosition(productionRules[4], 1),
+                new GrammarPosition(getRule(4), 1),
             }),
             getState(0)
         ));
@@ -136,11 +159,14 @@ public class SmallTestGrammar extends TestGrammar {
             .addBranch(new Route(getState(6), new NonTerminal("B")))
             .addBranch(new Route(getState(7), new Token("0")))
             .addBranch(new Route(getState(8), new Token("1")));
+
         getState(1)
             .addBranch(new Route(getState(4), new Token("+")))
             .addBranch(new Route(getState(2), new Token("*")));
+
         getState(2)
             .addBranch(new Route(getState(3), new NonTerminal("B")));
+
         getState(4)
             .addBranch(new Route(getState(5), new NonTerminal("B")));
 
@@ -148,6 +174,7 @@ public class SmallTestGrammar extends TestGrammar {
         getState(2)
             .addBranch(new Route(getState(7), new Token("0")))
             .addBranch(new Route(getState(8), new Token("1")));
+            
         getState(4)
             .addBranch(new Route(getState(7), new Token("0")))
             .addBranch(new Route(getState(8), new Token("1")));
@@ -172,20 +199,20 @@ public class SmallTestGrammar extends TestGrammar {
         actionTable.put(getState(2), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
-        actionTable.put(getState(3), new ReduceAction(productionRules[1]));
+        actionTable.put(getState(3), new ReduceAction(getRule(1)));
         
         currentStateActions.put(new Token("0"), getState(7));
         currentStateActions.put(new Token("1"), getState(8));
         actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
         
-        actionTable.put(getState(5), new ReduceAction(productionRules[0]));
+        actionTable.put(getState(5), new ReduceAction(getRule(0)));
         
-        actionTable.put(getState(6), new ReduceAction(productionRules[2]));
+        actionTable.put(getState(6), new ReduceAction(getRule(2)));
 
-        actionTable.put(getState(7), new ReduceAction(productionRules[3]));
+        actionTable.put(getState(7), new ReduceAction(getRule(3)));
 
-        actionTable.put(getState(8), new ReduceAction(productionRules[4]));
+        actionTable.put(getState(8), new ReduceAction(getRule(4)));
 
     }
 
@@ -208,11 +235,6 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
 
-    /**
-     * Gets the root parse state (and contained parse tree) for a given sentence
-     * @param sentence The sentence to be parsed
-     * @return The root ParseState of the parse tree
-     */
     public ParseState getParseRoot(String sentence) {
         switch(sentence) {
             case "1+0*1":
@@ -239,34 +261,34 @@ public class SmallTestGrammar extends TestGrammar {
         parseStates.add(new ShiftedState(getState(8), new Token("1")));
 
 
-        parseStates.add(new ReducedState(getState(6), productionRules[4], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(6), getRule(4), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(0)
                                                                                                     })));                                                                                            
         parseStates.add(new ShiftedState(getState(7), new Token("0")));
 
         
-        parseStates.add(new ReducedState(getState(1), productionRules[2], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(1), getRule(2), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(1)
                                                                                                     })));
         parseStates.add(new ShiftedState(getState(4), new Token("+")));
-        parseStates.add(new ReducedState(getState(5), productionRules[3], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(5), getRule(3), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(2)
                                                                                                     })));
         parseStates.add(new ShiftedState(getState(8), new Token("1")));
 
 
-        parseStates.add(new ReducedState(getState(1), productionRules[0], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(1), getRule(0), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(3),
                                                                                                         parseStates.get(4),
                                                                                                         parseStates.get(5)
                                                                                                     })));
         parseStates.add(new ShiftedState(getState(2), new Token("*")));
-        parseStates.add(new ReducedState(getState(3), productionRules[4], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(3), getRule(4), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(6)
                                                                                                     })));
 
 
-        parseStates.add(new ReducedState(getState(1), productionRules[1], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(1), getRule(1), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(7),
                                                                                                         parseStates.get(8),
                                                                                                         parseStates.get(9)
@@ -294,7 +316,7 @@ public class SmallTestGrammar extends TestGrammar {
     private ParseState parseTree2() {
         List<ParseState> parseStates = new ArrayList<>();
 
-        parseStates.add(new ReducedState(getState(1), productionRules[1], Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(getState(1), getRule(1), Arrays.asList(new ParseState[] {
             null,
             null,
             null
@@ -302,7 +324,8 @@ public class SmallTestGrammar extends TestGrammar {
 
         return parseStates.get(parseStates.size() - 1);
     }
-    
+
+
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
         generationBookendMap.put("Java", new HashMap<>());
@@ -351,35 +374,35 @@ public class SmallTestGrammar extends TestGrammar {
         ruleConvertorMap.put("Java", new HashMap<>());
 
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0]; }); //B->1
         ruleConvertorMap.get("Java").put("1+0*1", ruleConvertor);
 
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0]; }); //B->1
         ruleConvertorMap.get("Java").put("1", ruleConvertor);
 
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0]; }); //B->1
         ruleConvertorMap.get("Java").put("emptyReduce", ruleConvertor);
 
         ruleConvertorMap.put("C", new HashMap<>());
 
         ruleConvertor = new HashMap<>();
-        ruleConvertor.put(productionRules[0], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
-        ruleConvertor.put(productionRules[1], (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
-        ruleConvertor.put(productionRules[2], (elements) -> { return elements[0]; }); //E->B
-        ruleConvertor.put(productionRules[3], (elements) -> { return elements[0]; }); //B->0
-        ruleConvertor.put(productionRules[4], (elements) -> { return elements[0]; }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0] + " " + elements[1] + " " + elements[2]; }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0]; }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0]; }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0]; }); //B->1
         ruleConvertorMap.get("C").put("1+0*1", ruleConvertor);
     }
 

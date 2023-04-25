@@ -10,7 +10,7 @@ import syntax_analysis.parsing.ParseState;
 public class SelfReferentialGrammar extends TestGrammar {
 
     @Override
-    protected Token[] setUpTokens() {
+    protected void setUpTokens(List<Token> tokens) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setUpTokens'");
     }
@@ -22,16 +22,15 @@ public class SelfReferentialGrammar extends TestGrammar {
     }
 
     @Override
-    protected NonTerminal[] setUpNonTerminals() {
+    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setUpNonTerminals'");
     }
 
     @Override
-    protected ProductionRule[] setUpProductionRules() {
+    protected void setUpProductionRules(List<ProductionRule> productionRules) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setUpProductionRules'");
-
         /*
             H → h A
             A → a L
