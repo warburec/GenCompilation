@@ -124,7 +124,7 @@ public class LR0ParserTests {
         A → a L
         L → l L //Self-referential
         L → o
-     */
+    */
 
     //TODO: Add identifiers
 }
