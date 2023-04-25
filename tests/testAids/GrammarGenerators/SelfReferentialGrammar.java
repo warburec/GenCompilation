@@ -7,42 +7,160 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 
+/**
+ * H → h A
+ * A → a L
+ * L → l L //Self-referential
+ * L → o
+ */
 public class SelfReferentialGrammar extends TestGrammar {
 
     @Override
     protected void setUpTokens(List<Token> tokens) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpTokens'");
+        tokens.add(new Token("h"));
+        tokens.add(new Token("a"));
+        tokens.add(new Token("l"));
+        tokens.add(new Token("o"));
     }
 
     @Override
     protected NonTerminal setUpSentinal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpSentinal'");
+        return new NonTerminal("H");
     }
 
     @Override
     protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpNonTerminals'");
+        nonTerminals.add(new NonTerminal("H"));
+        nonTerminals.add(new NonTerminal("A"));
+        nonTerminals.add(new NonTerminal("L"));
     }
 
     @Override
     protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpProductionRules'");
-        /*
-            H → h A
-            A → a L
-            L → l L //Self-referential
-            L → o
-        */
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("H"),
+                new LexicalElement[] {
+                    new Token("h"),
+                    new NonTerminal("H")
+                }));
+        
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("A"),
+                new LexicalElement[] {
+                    new Token("a"),
+                    new NonTerminal("L")
+                }));
+        
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("L"),
+                new LexicalElement[] {
+                    new Token("l"),
+                    new NonTerminal("L")
+                }));
+        
+        productionRules.add(
+            new ProductionRule(
+                new NonTerminal("L"),
+                new LexicalElement[] {
+                    new Token("o")
+                }));
     }
 
     @Override
     protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpStates'");
+        states.add(new State( //0
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(extraRootRule, 0),
+                new GrammarPosition(getRule(0), 0)
+            }),
+            null
+        ));
+
+        states.add(new State( //1
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(extraRootRule, 1),
+            }),
+            getState(0)
+        ));
+
+        states.add(new State( //2
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(0), 1),
+                new GrammarPosition(getRule(1), 0)
+            }),
+            getState(0)
+        ));
+
+        states.add(new State( //3
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(0), 2),
+            }),
+            getState(2)
+        ));
+
+        states.add(new State( //4
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(1), 1),
+                new GrammarPosition(getRule(2), 0),
+                new GrammarPosition(getRule(3), 0)
+            }),
+            getState(2)
+        ));
+
+        states.add(new State( //5
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(1), 2)
+            }),
+            getState(4)
+        ));
+
+        states.add(new State( //6
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 1),
+                new GrammarPosition(getRule(2), 0),
+                new GrammarPosition(getRule(3), 0)
+            }),
+            getState(4)
+        ));
+
+        states.add(new State( //7
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 2)
+            }),
+            getState(6)
+        ));
+
+        states.add(new State( //8
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(3), 1)
+            }),
+            getState(6)
+        ));
+
+        //Tree branches
+        getState(0)
+            .addBranch(new Route(getState(1), new NonTerminal("H")))
+            .addBranch(new Route(getState(2), new Token("h")));
+        
+        getState(2)
+            .addBranch(new Route(getState(3), new NonTerminal("A")))
+            .addBranch(new Route(getState(4), new Token("a")));
+        
+        getState(4)
+            .addBranch(new Route(getState(5), new NonTerminal("L")))
+            .addBranch(new Route(getState(6), new Token("l")));
+        
+        getState(6)
+            .addBranch(new Route(getState(7), new NonTerminal("L")))
+            .addBranch(new Route(getState(8), new Token("o")));
+        
+        //Graph branches, links to existing states
+        getState(6)
+            .addBranch(new Route(getState(6), new Token("l")));
+
     }
 
     @Override

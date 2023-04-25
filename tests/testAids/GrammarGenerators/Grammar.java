@@ -7,10 +7,10 @@ import tests.testAids.GrammarParts;
 
 public abstract class Grammar {
     
-    List<Token> tokens = new ArrayList<>();
-    List<NonTerminal> nonTerminals = new ArrayList<>();
-    List<ProductionRule> productionRules = new ArrayList<>();
-    NonTerminal sentinal;
+    protected List<Token> tokens = new ArrayList<>();
+    protected List<NonTerminal> nonTerminals = new ArrayList<>();
+    protected List<ProductionRule> productionRules = new ArrayList<>();
+    protected NonTerminal sentinal;
     
     public Grammar() {}
 
