@@ -184,7 +184,7 @@ public class SelfReferentialGrammar extends TestGrammar {
         actionTable.put(getState(3), new ReduceAction(getRule(0)));
 
         currentStateActions.put(new Token("l"), getState(6));
-        currentStateActions.put(new Token("l"), getState(8));
+        currentStateActions.put(new Token("o"), getState(8));
         actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
 
@@ -192,7 +192,7 @@ public class SelfReferentialGrammar extends TestGrammar {
 
         currentStateActions.put(new Token("l"), getState(6));
         currentStateActions.put(new Token("o"), getState(8));
-        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
+        actionTable.put(getState(6), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
 
         actionTable.put(getState(7), new ReduceAction(getRule(2)));

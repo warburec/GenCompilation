@@ -21,16 +21,16 @@ public class LR0Parser extends SyntaxAnalyser {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
         generateProductionMap();
-        generatedStates();
-        generatedActionAndGotoTables();
+        generateStates();
+        generateActionAndGotoTables();
     }
 
     public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
         generateProductionMap();
-        generatedStates();
-        generatedActionAndGotoTables();
+        generateStates();
+        generateActionAndGotoTables();
     }
 
     private void checkForInvalidNonTerminals() {
@@ -62,7 +62,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generatedStates() {
+    private void generateStates() {
         states = new HashSet<>();
 
         NonTerminal start = null;
@@ -192,7 +192,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generatedActionAndGotoTables() {
+    private void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 
@@ -200,8 +200,11 @@ public class LR0Parser extends SyntaxAnalyser {
             //Reductions
             for(GrammarPosition position : state.getPositions()) {
                 if(position.isClosed()) {
+                    if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
+                        continue;
+                    }
+
                     actionTable.put(state, new ReduceAction(position.rule()));
-                    continue;
                 }
             }
 
