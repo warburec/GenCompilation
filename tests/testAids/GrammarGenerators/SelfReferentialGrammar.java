@@ -217,7 +217,7 @@ public class SelfReferentialGrammar extends TestGrammar {
         currentGotoActions.clear();
 
         currentGotoActions.put(new NonTerminal("L"), getState(7));
-        gotoTable.put(getState(7), new HashMap<>(currentGotoActions));
+        gotoTable.put(getState(6), new HashMap<>(currentGotoActions));
         currentGotoActions.clear();
     }
 

@@ -133,5 +133,34 @@ public class LR0ParserTests {
         assertEquals(expectedStateSet, generatedStates);
     }
 
+    @Test
+    public void selfReferentialGrammarAction() {
+        TestGrammar grammar = new SelfReferentialGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
+
+        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        assertEquals(expectedActionTable, generatedActionTable);
+    }
+
+    @Test
+    public void selfReferentialGrammarGoto() {
+        TestGrammar grammar = new SelfReferentialGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
+
+        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        assertEquals(expectedGotoTable, generatedGotoTable);
+    }
     //TODO: Add identifiers
 }
