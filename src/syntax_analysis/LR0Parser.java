@@ -75,13 +75,15 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
-        List<GrammarPosition> currentPositions = expandPositions(startPositions);
+        List<GrammarPosition> currentPositions = startPositions;
 
         if(elemantTraversed != null) {
             currentPositions = createParentGraphBranches(parentState, elemantTraversed, currentPositions);
         }
 
         if(currentPositions.size() == 0) { return null; }
+
+        currentPositions = expandPositions(startPositions);
 
         State currentState = new State(new HashSet<>(currentPositions), parentState);
         states.add(currentState);
@@ -126,7 +128,7 @@ public class LR0Parser extends SyntaxAnalyser {
             GrammarPosition position = currentPositions.get(i);
 
             LexicalElement lastElement = position.getLastElementRead();
-            if(lastElement == null) { continue; }
+            if(lastElement == null) { continue; } //TODO: Remove these element checks, no longer needed as rules will all have traversed the element (if not yet expanded)
             
             if(lastElement.equals(elemantTraversed)) {
                 State stateFound = getStateContainingPosition(position);

@@ -42,7 +42,7 @@ public class SelfReferentialGrammar extends TestGrammar {
                 new NonTerminal("H"),
                 new LexicalElement[] {
                     new Token("h"),
-                    new NonTerminal("H")
+                    new NonTerminal("A")
                 }));
         
         productionRules.add(
