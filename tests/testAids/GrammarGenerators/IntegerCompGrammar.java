@@ -6,17 +6,17 @@ import grammar_objects.Token;
 
 public class IntegerCompGrammar extends Grammar {
 
-    public IntegerCompGrammar() {
-        //TODO
-        tokens = new Token[] {
-        };
+    // public IntegerCompGrammar() {
+    //     //TODO
+    //     tokens = new Token[] {
+    //     };
 
-        sentinal = new NonTerminal("TEMP");
-        nonTerminals = new NonTerminal[] {
-        };
+    //     sentinal = new NonTerminal("TEMP");
+    //     nonTerminals = new NonTerminal[] {
+    //     };
 
-        productionRules = new ProductionRule[] {
-        };
-    }
+    //     productionRules = new ProductionRule[] {
+    //     };
+    // }
 
 }
