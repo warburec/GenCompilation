@@ -47,8 +47,20 @@ public class State {
 
         if(branches.size() != otherState.getBranches().size()) { return false; }
         for(Route branch : branches) {
-            if(!otherState.getBranches().contains(branch)) { return false; }
+            boolean matchFound = false;
+
+            for (Route otherBranch : otherState.getBranches()) {
+                if(branch.elementTraversed().equals(otherBranch.elementTraversed())) { 
+                    matchFound = true; 
+                    break;
+                }
+            }
+
+            if(!matchFound) { return false; }
+            
+            //if(!otherState.getBranches().contains(branch)) { return false; } //TODO: Check how branches are handled for equality, this was an old and failing recursive check
         }
+        //TODO handle self referential states
 
         return true;
     }

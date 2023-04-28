@@ -21,16 +21,16 @@ public class LR0Parser extends SyntaxAnalyser {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
         generateProductionMap();
-        generatedStates();
-        generatedActionAndGotoTables();
+        generateStates();
+        generateActionAndGotoTables();
     }
 
     public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
         generateProductionMap();
-        generatedStates();
-        generatedActionAndGotoTables();
+        generateStates();
+        generateActionAndGotoTables();
     }
 
     private void checkForInvalidNonTerminals() {
@@ -62,7 +62,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generatedStates() {
+    private void generateStates() {
         states = new HashSet<>();
 
         NonTerminal start = null;
@@ -75,13 +75,15 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
-        List<GrammarPosition> currentPositions = expandPositions(startPositions);
+        List<GrammarPosition> currentPositions = startPositions;
 
         if(elemantTraversed != null) {
             currentPositions = createParentGraphBranches(parentState, elemantTraversed, currentPositions);
         }
 
         if(currentPositions.size() == 0) { return null; }
+
+        currentPositions = expandPositions(startPositions);
 
         State currentState = new State(new HashSet<>(currentPositions), parentState);
         states.add(currentState);
@@ -126,7 +128,7 @@ public class LR0Parser extends SyntaxAnalyser {
             GrammarPosition position = currentPositions.get(i);
 
             LexicalElement lastElement = position.getLastElementRead();
-            if(lastElement == null) { continue; }
+            if(lastElement == null) { continue; } //TODO: Remove these element checks, no longer needed as rules will all have traversed the element (if not yet expanded)
             
             if(lastElement.equals(elemantTraversed)) {
                 State stateFound = getStateContainingPosition(position);
@@ -190,7 +192,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generatedActionAndGotoTables() {
+    private void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 
@@ -198,8 +200,11 @@ public class LR0Parser extends SyntaxAnalyser {
             //Reductions
             for(GrammarPosition position : state.getPositions()) {
                 if(position.isClosed()) {
+                    if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
+                        continue;
+                    }
+
                     actionTable.put(state, new ReduceAction(position.rule()));
-                    continue;
                 }
             }
 
@@ -234,13 +239,6 @@ public class LR0Parser extends SyntaxAnalyser {
     public Map<State, Map<NonTerminal, State>> getGotoTable() {
         return gotoTable;
     }
-
-
-    // @Override
-    // @SuppressWarnings("unchecked")
-    // public GrammarStructure analyse(GrammarStructure grammarStructure) { //TODO change input/return types
-    //     throw new UnsupportedOperationException("Unimplemented method 'analyse'");
-    // }
 
     public ParseState analyse(Token[] inputTokens) throws ParseFailedException {
         Iterator<Token> input = Arrays.stream(inputTokens).iterator();
