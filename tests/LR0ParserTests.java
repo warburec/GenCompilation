@@ -9,9 +9,9 @@ import org.junit.Test;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import tests.test_aids.GrammarParts;
+import tests.test_aids.grammar_generators.*;
 import syntax_analysis.*;
-import tests.testAids.GrammarParts;
-import tests.testAids.GrammarGenerators.*;
 
 public class LR0ParserTests {
     

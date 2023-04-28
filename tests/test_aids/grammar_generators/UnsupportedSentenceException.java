@@ -1,4 +1,4 @@
-package tests.testAids.GrammarGenerators;
+package tests.test_aids.grammar_generators;
 
 public class UnsupportedSentenceException extends RuntimeException {
 

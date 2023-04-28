@@ -10,7 +10,7 @@ import code_generation.*;
 import code_generation.BasicCodeGenerator.IncompleteReductionException;
 import grammar_objects.ProductionRule;
 import syntax_analysis.parsing.ParseState;
-import tests.testAids.GrammarGenerators.SmallTestGrammar;
+import tests.test_aids.grammar_generators.SmallTestGrammar;
 
 public class BasicCodeGeneratorTests {
     

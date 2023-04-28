@@ -1,6 +1,6 @@
-package tests.testAids;
+package tests.test_aids;
 
-import tests.testAids.GrammarGenerators.IntegerCompGrammar;
+import tests.test_aids.grammar_generators.IntegerCompGrammar;
 
 public class GrammarGenerator {
     

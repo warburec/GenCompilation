@@ -1,9 +1,12 @@
-package tests.testAids.GrammarGenerators;
+package tests.test_aids.grammar_generators;
 
 import java.util.List;
 import java.util.Map;
 
 import code_generation.Generator;
+import grammar_objects.Identifier;
+import grammar_objects.LexicalElement;
+import grammar_objects.Literal;
 import grammar_objects.NonTerminal;
 import grammar_objects.ProductionRule;
 import grammar_objects.Token;
@@ -11,30 +14,72 @@ import syntax_analysis.grammar_structure_creation.Action;
 import syntax_analysis.grammar_structure_creation.State;
 import syntax_analysis.parsing.ParseState;
 
-public class IntegerCompGrammar extends TestGrammar {
+/**
+ * <statement list> := <statement> |
+ *                     <statement list> <statement>
+ * <statement> := identifier = <element> + <element>;
+ * <element> := identifier | number
+ */
+public class BasicIdentifierGrammar extends TestGrammar {
 
     @Override
     protected void setUpTokens(List<Token> tokens) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpTokens'");
+        tokens.add(new Token("="));
+        tokens.add(new Token("+"));
+        tokens.add(new Token(";"));
+        tokens.add(new Identifier("identifier")); //TODO
+        tokens.add(new Literal("number"));
     }
 
     @Override
     protected NonTerminal setUpSentinal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpSentinal'");
+        return new NonTerminal("statement list");
     }
 
     @Override
     protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpNonTerminals'");
+        nonTerminals.add(new NonTerminal("statement list"));
+        nonTerminals.add(new NonTerminal("statement"));
+        nonTerminals.add(new NonTerminal("element"));
     }
 
     @Override
     protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpProductionRules'");
+        productionRules.add(new ProductionRule(
+            new NonTerminal("statement list"),
+            new LexicalElement[] {
+                new NonTerminal("statement")
+            }));
+        
+        productionRules.add(new ProductionRule(
+            new NonTerminal("statement list"),
+            new LexicalElement[] {
+                new NonTerminal("statement list"),
+                new NonTerminal("statement")
+            }));
+        
+        productionRules.add(new ProductionRule(
+            new NonTerminal("statement"),
+            new LexicalElement[] {
+                new Identifier("identifier"),
+                new Token("="),
+                new NonTerminal("element"),
+                new Token("+"),
+                new NonTerminal("element"),
+                new Token(";")
+            }));
+
+        productionRules.add(new ProductionRule(
+            new NonTerminal("element"),
+            new LexicalElement[] {
+                new Identifier("identifier")
+            }));
+        
+        productionRules.add(new ProductionRule(
+            new NonTerminal("element"),
+            new LexicalElement[] {
+                new Literal("number")
+            }));
     }
 
     @Override

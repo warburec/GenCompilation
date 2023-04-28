@@ -1,4 +1,4 @@
-package tests.testAids;
+package tests.test_aids;
 
 public class UnknownGrammarException extends RuntimeException {
     public UnknownGrammarException() {
