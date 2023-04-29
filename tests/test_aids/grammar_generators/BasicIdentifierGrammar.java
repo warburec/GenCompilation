@@ -114,18 +114,34 @@ public class BasicIdentifierGrammar extends TestGrammar {
         currentStateActions.clear();
 
         actionTable.put(getState(7), new ReduceAction(getRule(2)));
-        
+
         actionTable.put(getState(8), new ReduceAction(getRule(3)));
-        
+
         actionTable.put(getState(9), new ReduceAction(getRule(4)));
-        
+
         actionTable.put(getState(10), new ReduceAction(getRule(0)));
     }
 
     @Override
     protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGotoTable'");
+        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+
+        currentGotoActions.put(new NonTerminal("statement list"), getState(1));
+        currentGotoActions.put(new NonTerminal("statement"), getState(10));
+        gotoTable.put(getState(0), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
+
+        currentGotoActions.put(new NonTerminal("statement"), getState(2));
+        gotoTable.put(getState(1), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
+
+        currentGotoActions.put(new NonTerminal("element"), getState(5));
+        gotoTable.put(getState(4), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
+
+        currentGotoActions.put(new NonTerminal("element"), getState(7));
+        gotoTable.put(getState(6), new HashMap<>(currentGotoActions));
+        currentGotoActions.clear();
     }
 
     @Override
