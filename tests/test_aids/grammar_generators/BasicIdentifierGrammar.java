@@ -1,17 +1,10 @@
 package tests.test_aids.grammar_generators;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import code_generation.Generator;
-import grammar_objects.Identifier;
-import grammar_objects.LexicalElement;
-import grammar_objects.Literal;
-import grammar_objects.NonTerminal;
-import grammar_objects.ProductionRule;
-import grammar_objects.Token;
-import syntax_analysis.grammar_structure_creation.Action;
-import syntax_analysis.grammar_structure_creation.State;
+import grammar_objects.*;
+import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 
 /**
@@ -90,8 +83,43 @@ public class BasicIdentifierGrammar extends TestGrammar {
 
     @Override
     protected void setUpActionTable(Map<State, Action> actionTable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpActionTable'");
+        Map<Token, State> currentStateActions = new HashMap<>();
+
+        currentStateActions.put(new Identifier("identifier"), getState(3));
+        actionTable.put(getState(0), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        currentStateActions.put(new Identifier("identifier"), getState(3));
+        actionTable.put(getState(1), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        actionTable.put(getState(2), new ReduceAction(getRule(1)));
+
+        currentStateActions.put(new Token("="), getState(4));
+        actionTable.put(getState(3), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        currentStateActions.put(new Identifier("identifier"), getState(8));
+        currentStateActions.put(new Literal("number"), getState(9));
+        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        currentStateActions.put(new Token("+"), getState(6));
+        actionTable.put(getState(5), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        currentStateActions.put(new Identifier("identifier"), getState(8));
+        currentStateActions.put(new Literal("number"), getState(9));
+        actionTable.put(getState(6), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
+
+        actionTable.put(getState(7), new ReduceAction(getRule(2)));
+        
+        actionTable.put(getState(8), new ReduceAction(getRule(3)));
+        
+        actionTable.put(getState(9), new ReduceAction(getRule(4)));
+        
+        actionTable.put(getState(10), new ReduceAction(getRule(0)));
     }
 
     @Override

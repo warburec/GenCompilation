@@ -1,14 +1,10 @@
 package tests.test_aids.grammar_generators;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import code_generation.Generator;
-import grammar_objects.NonTerminal;
-import grammar_objects.ProductionRule;
-import grammar_objects.Token;
-import syntax_analysis.grammar_structure_creation.Action;
-import syntax_analysis.grammar_structure_creation.State;
+import grammar_objects.*;
+import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 
 public class IntegerCompGrammar extends TestGrammar {
