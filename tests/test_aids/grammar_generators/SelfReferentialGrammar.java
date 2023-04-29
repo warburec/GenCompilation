@@ -164,7 +164,6 @@ public class SelfReferentialGrammar extends TestGrammar {
         getState(6)
             .addBranch(new Route(getState(6), new Token("l")));
 
-
     }
 
     @Override
