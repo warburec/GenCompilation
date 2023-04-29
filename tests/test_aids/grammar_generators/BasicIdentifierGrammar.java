@@ -163,6 +163,13 @@ public class BasicIdentifierGrammar extends TestGrammar {
             getState(0)
         ));
 
+        states.add(new State( //11
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 6)
+            }),
+            getState(7)
+        ));
+
         //Branches
         getState(0)
             .addBranch(new Route(getState(1), new NonTerminal("statement list")))
@@ -188,6 +195,9 @@ public class BasicIdentifierGrammar extends TestGrammar {
             .addBranch(new Route(getState(7), new NonTerminal("element")))
             .addBranch(new Route(getState(8), new Identifier("identifier")))
             .addBranch(new Route(getState(9), new Literal("number")));
+        
+        getState(7)
+            .addBranch(new Route(getState(11), new Token(";")));
     }
 
     @Override
@@ -222,13 +232,17 @@ public class BasicIdentifierGrammar extends TestGrammar {
         actionTable.put(getState(6), new ShiftAction(new HashMap<>(currentStateActions)));
         currentStateActions.clear();
 
-        actionTable.put(getState(7), new ReduceAction(getRule(2)));
+        currentStateActions.put(new Token(";"), getState(11));
+        actionTable.put(getState(7), new ShiftAction(new HashMap<>(currentStateActions)));
+        currentStateActions.clear();
 
         actionTable.put(getState(8), new ReduceAction(getRule(3)));
 
         actionTable.put(getState(9), new ReduceAction(getRule(4)));
 
         actionTable.put(getState(10), new ReduceAction(getRule(0)));
+
+        actionTable.put(getState(11), new ReduceAction(getRule(2)));
     }
 
     @Override
@@ -256,25 +270,22 @@ public class BasicIdentifierGrammar extends TestGrammar {
     @Override
     public ParseState getParseRoot(String sentence) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
+        return null;
     }
 
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGenerationBookends'");
     }
 
     @Override
     protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpRuleConvertors'");
     }
 
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpCodeGenerations'");
     }
 
 }

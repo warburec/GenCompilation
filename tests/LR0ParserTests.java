@@ -162,5 +162,50 @@ public class LR0ParserTests {
         Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
+
     //TODO: Add identifiers
+    @Test
+    public void basicIdentifierGrammarStates() {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
+
+        Set<State> expectedStateSet = grammar.getGetState();
+        assertEquals(expectedStateSet, generatedStates);
+    }
+
+    @Test
+    public void basicIdentifierGrammarAction() {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
+
+        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        assertEquals(expectedActionTable, generatedActionTable);
+    }
+
+    @Test
+    public void basicIdentifierGrammarGoto() {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
+
+        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        assertEquals(expectedGotoTable, generatedGotoTable);
+    }
 }
