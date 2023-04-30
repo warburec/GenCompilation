@@ -20,7 +20,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
         tokens.add(new Token("="));
         tokens.add(new Token("+"));
         tokens.add(new Token(";"));
-        tokens.add(new Identifier("identifier")); //TODO
+        tokens.add(new Identifier("identifier"));
         tokens.add(new Literal("number"));
     }
 
@@ -382,7 +382,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
         
         parseStates.add(new ReducedState(
             getState(7), 
-            getRule(4), /////////////////////////////////////////////////////
+            getRule(4),
             Arrays.asList(new ParseState[] {
                 parseStates.get(10)
             })));
@@ -396,7 +396,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
         
         parseStates.add(new ReducedState(
             getState(7), 
-            getRule(4),  ////////////////////////////////////////////////////
+            getRule(4),
             Arrays.asList(new ParseState[] {
                 parseStates.get(16)
             })));
@@ -469,17 +469,45 @@ public class BasicIdentifierGrammar extends TestGrammar {
 
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
-        // TODO Auto-generated method stub
+        generationBookendMap.put("Java", new HashMap<>());
+        generationBookendMap.get("Java").put("XToYToX", new String[] {
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n",
+
+            "\t\tSystem.out.println(x);\n" +
+            "\t}\n" +
+            "}"
+        });
     }
 
     @Override
     protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
-        // TODO Auto-generated method stub
+        ruleConvertorMap.put("Java", new HashMap<>());
+
+        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0]; }); //<statement list> := <statement>
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0] + elements[1]; }); //<statement list> := <statement list> <statement>
+        ruleConvertor.put(getRule(2), (elements) -> {
+            return "\t\t" + elements[0] + " " + elements[1] + " " + elements[2] + " " + elements[3] + " " + elements[4] + elements[5] + "\n"; 
+        });  //<statement> := identifier = <element> + <element>;
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0]; }); //<element> := identifier
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0]; }); //<element> := number
+        ruleConvertorMap.get("Java").put("XToYToX", ruleConvertor);
     }
 
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
-        // TODO Auto-generated method stub
+        codeGenerations.put("Java", new HashMap<>());
+        codeGenerations.get("Java").put("XToYToX",
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tint x = 1 + 2;\n" +
+            "\t\tint y = x + 3;\n" +
+            "\t\tx = y + 0;\n" +
+            "\t\tSystem.out.println(x);\n" +
+            "\t}\n" +
+            "}"
+        );
     }
 
 }
