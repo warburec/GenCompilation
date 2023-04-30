@@ -327,7 +327,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
             new Token("+")));
         
         parseStates.add(new ShiftedState(
-            getState(8), 
+            getState(9), 
             new Literal("number", "3")));
         
         parseStates.add(new ShiftedState(
@@ -351,7 +351,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
             new Token("+")));
         
         parseStates.add(new ShiftedState(
-            getState(8), 
+            getState(9), 
             new Literal("number", "0")));
         
         parseStates.add(new ShiftedState(
