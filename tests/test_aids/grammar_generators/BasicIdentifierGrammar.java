@@ -5,7 +5,7 @@ import java.util.*;
 import code_generation.Generator;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
-import syntax_analysis.parsing.ParseState;
+import syntax_analysis.parsing.*;
 
 /**
  * <statement list> := <statement> |
@@ -267,11 +267,197 @@ public class BasicIdentifierGrammar extends TestGrammar {
         currentGotoActions.clear();
     }
 
+
     @Override
     public ParseState getParseRoot(String sentence) {
-        // TODO Auto-generated method stub
-        return null;
+        switch(sentence) {
+            case "XToYToX":
+                return parseTree0();
+            
+            default:
+                throw new UnsupportedSentenceException("parse tree", sentence);
+        }
     }
+
+    /**
+     * Parse tree for the sentence "XToYToX"
+     * @return The root ParseState of the tree
+     */
+    private ParseState parseTree0() {
+        List<ParseState> parseStates = new ArrayList<>();
+
+        parseStates.add(new ShiftedState(
+            getState(3), 
+            new Identifier("identifier", "integer", "x"))); //TODO: Check useage of types
+
+        parseStates.add(new ShiftedState(
+            getState(4), 
+            new Token("=")));
+        
+        parseStates.add(new ShiftedState(
+            getState(9), 
+            new Literal("number", "1")));
+        
+        parseStates.add(new ShiftedState(
+            getState(6), 
+            new Token("+")));
+        
+        parseStates.add(new ShiftedState(
+            getState(9), 
+            new Literal("number", "2")));
+        
+        parseStates.add(new ShiftedState(
+            getState(11), 
+            new Token(";")));
+        
+        parseStates.add(new ShiftedState(
+            getState(3), 
+            new Identifier("identifier", null, "y")));
+        
+        parseStates.add(new ShiftedState(
+            getState(4), 
+            new Token("=")));
+        
+        parseStates.add(new ShiftedState(
+            getState(8), 
+            new Identifier("identifier", null, "x")));
+        
+        parseStates.add(new ShiftedState(
+            getState(6), 
+            new Token("+")));
+        
+        parseStates.add(new ShiftedState(
+            getState(8), 
+            new Literal("number", "3")));
+        
+        parseStates.add(new ShiftedState(
+            getState(11), 
+            new Token(";")));
+        
+        parseStates.add(new ShiftedState(
+            getState(3), 
+            new Identifier("identifier", null, "x")));
+        
+        parseStates.add(new ShiftedState(
+            getState(4), 
+            new Token("=")));
+        
+        parseStates.add(new ShiftedState(
+            getState(8), 
+            new Identifier("identifier", null, "y")));
+        
+        parseStates.add(new ShiftedState(
+            getState(6), 
+            new Token("+")));
+        
+        parseStates.add(new ShiftedState(
+            getState(8), 
+            new Literal("number", "0")));
+        
+        parseStates.add(new ShiftedState(
+            getState(11), 
+            new Token(";")));
+            
+
+        parseStates.add(new ReducedState(
+            getState(5), 
+            getRule(4), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(2)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(7), 
+            getRule(4), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(4)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(5), 
+            getRule(3), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(8)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(7), 
+            getRule(3), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(10)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(5), 
+            getRule(3), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(14)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(7), 
+            getRule(3), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(16)
+            })));
+
+        
+        parseStates.add(new ReducedState(
+            getState(10), 
+            getRule(2), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(0),
+                parseStates.get(1),
+                parseStates.get(18),
+                parseStates.get(3),
+                parseStates.get(19),
+                parseStates.get(5)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(2), 
+            getRule(2), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(6),
+                parseStates.get(7),
+                parseStates.get(20),
+                parseStates.get(9),
+                parseStates.get(21),
+                parseStates.get(11)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(2), 
+            getRule(2), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(12),
+                parseStates.get(13),
+                parseStates.get(22),
+                parseStates.get(15),
+                parseStates.get(23),
+                parseStates.get(17)
+            })));
+        
+        
+        parseStates.add(new ReducedState(
+            getState(1), 
+            getRule(1), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(27),
+                parseStates.get(25)
+            })));
+        
+        parseStates.add(new ReducedState(
+            getState(1), 
+            getRule(1), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(28),
+                parseStates.get(26)
+            })));
+        
+        return parseStates.get(parseStates.size() - 1);
+    }
+
 
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
