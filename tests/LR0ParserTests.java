@@ -208,4 +208,39 @@ public class LR0ParserTests {
         Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
+
+    @Test
+    public void XToYToXGrammarCompleteSentence() throws ParseFailedException {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Token[] inputTokens = new Token[] {
+            new Identifier("identifier", null, "x"),
+            new Token("="),
+            new Literal("number", "1"),
+            new Token("+"),
+            new Literal("number", "2"),
+            new Token(";"),
+            new Identifier("identifier", null, "y"),
+            new Token("="),
+            new Identifier("identifier", null, "x"),
+            new Token("+"),
+            new Literal("number", "3"),
+            new Token(";"),
+            new Identifier("identifier", null, "x"),
+            new Token("="),
+            new Identifier("identifier", null, "y"),
+            new Token("+"),
+            new Literal("number", "0"),
+            new Token(";")
+        };
+        
+        ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
+
+        ParseState expectedParseState = grammar.getParseRoot("XToYToX");
+        assertEquals(expectedParseState, generatedParseRoot);
+    }
 }

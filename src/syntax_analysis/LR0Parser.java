@@ -289,7 +289,7 @@ public class LR0Parser extends SyntaxAnalyser {
             }
         }
         catch(Exception e) {
-            throw new ParseFailedException(e);
+            throw new ParseFailedException(e); //TODO: Add which input token the fail occurred on
         }
 
         return parseStates.pop();

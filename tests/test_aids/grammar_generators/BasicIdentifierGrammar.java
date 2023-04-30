@@ -382,7 +382,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
         
         parseStates.add(new ReducedState(
             getState(7), 
-            getRule(3), 
+            getRule(4), /////////////////////////////////////////////////////
             Arrays.asList(new ParseState[] {
                 parseStates.get(10)
             })));
@@ -396,7 +396,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
         
         parseStates.add(new ReducedState(
             getState(7), 
-            getRule(3), 
+            getRule(4),  ////////////////////////////////////////////////////
             Arrays.asList(new ParseState[] {
                 parseStates.get(16)
             })));
@@ -438,6 +438,14 @@ public class BasicIdentifierGrammar extends TestGrammar {
                 parseStates.get(17)
             })));
         
+        
+        parseStates.add(new ReducedState(
+            getState(1), 
+            getRule(0), 
+            Arrays.asList(new ParseState[] {
+                parseStates.get(24)
+            })));
+
         
         parseStates.add(new ReducedState(
             getState(1), 

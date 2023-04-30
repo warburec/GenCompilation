@@ -32,14 +32,32 @@ public class Identifier extends Token {
         return identifierName;
     }
     
+
+    /**
+     * Grammatical equality, based on grammatical qualities, not identfier name and type
+     */
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof Identifier)) { return false; }
 
-        boolean grammaticallyEqual = super.equals(obj);
+        return grammaticallyEquals((Identifier)obj);
+    }
+
+    /**
+     * Grammatical equality, based on grammatical qualities, not identfier name and type
+     */
+    public boolean grammaticallyEquals(Identifier otherIdentifier) {
+        boolean grammaticallyEqual = super.equals(otherIdentifier);
         if(!grammaticallyEqual) { return false; }
 
-        Identifier otherIdentifier = (Identifier)obj;
+        return true;
+    }
+
+    /**
+     * Exact equality, including identfier name and type, useful for semantic evaluation
+     */
+    public boolean exactlyEquals(Identifier otherIdentifier) {
+        if(!grammaticallyEquals(otherIdentifier)) { return false; }
 
         if(identifierName != null) {
             if(!identifierName.equals(otherIdentifier.getIdentifierName())) { return false; }
@@ -51,6 +69,7 @@ public class Identifier extends Token {
 
         return true;
     }
+
 
     public class ConflictingTypesException extends RuntimeException {
         public ConflictingTypesException(String type1, String type2) {
