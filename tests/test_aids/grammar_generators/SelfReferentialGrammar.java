@@ -222,23 +222,22 @@ public class SelfReferentialGrammar extends TestGrammar {
 
     @Override
     public ParseState getParseRoot(String sentence) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
     }
 
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
-        // TODO Auto-generated method stub
+        
     }
 
     @Override
     protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
-        // TODO Auto-generated method stub
+
     }
 
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
-        // TODO Auto-generated method stub
+        
     }
     
 }

@@ -163,7 +163,6 @@ public class LR0ParserTests {
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
 
-    //TODO: Add identifiers
     @Test
     public void basicIdentifierGrammarStates() {
         TestGrammar grammar = new BasicIdentifierGrammar();

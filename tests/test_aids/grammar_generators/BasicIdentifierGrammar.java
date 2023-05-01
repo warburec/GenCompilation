@@ -531,7 +531,7 @@ public class BasicIdentifierGrammar extends TestGrammar {
         ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
         ruleConvertor.put(getRule(2), (elements) -> {
             String identifierType = "";
-            IdentifierGeneration identifier = (IdentifierGeneration)elements[0]; //TODO
+            IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
             if(!typeChecker.isDeclared(identifier)) {
                 identifierType = identifier.getType() + " ";
                 typeChecker.setDeclared(identifier);

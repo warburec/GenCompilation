@@ -127,16 +127,11 @@ public class LR0Parser extends SyntaxAnalyser {
         for(int i = currentPositions.size() - 1; i >= 0; i--) {
             GrammarPosition position = currentPositions.get(i);
 
-            LexicalElement lastElement = position.getLastElementRead();
-            if(lastElement == null) { continue; } //TODO: Remove these element checks, no longer needed as rules will all have traversed the element (if not yet expanded)
-            
-            if(lastElement.equals(elemantTraversed)) {
-                State stateFound = getStateContainingPosition(position);
+            State stateFound = getStateContainingPosition(position);
 
-                if(stateFound != null) {
-                    parentState.addBranch(new Route(stateFound, elemantTraversed));
-                    currentPositions.remove(i);
-                }
+            if(stateFound != null) {
+                parentState.addBranch(new Route(stateFound, elemantTraversed));
+                currentPositions.remove(i);
             }
         }
 
