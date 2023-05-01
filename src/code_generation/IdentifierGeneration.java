@@ -5,7 +5,6 @@ import grammar_objects.Identifier;
 public class IdentifierGeneration implements CodeElement {
 
     private Identifier identifier;
-    private boolean declared = false;
 
     public IdentifierGeneration(Identifier identifier) {
         this.identifier = identifier;
@@ -23,12 +22,17 @@ public class IdentifierGeneration implements CodeElement {
         
         return identifier.getType();
     }
-    
-    public boolean isDeclared() {
-        return declared;
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof IdentifierGeneration)) { return false; }
+
+        IdentifierGeneration otherGeneration = (IdentifierGeneration)obj;
+        return identifier.exactlyEquals(otherGeneration.identifier);
     }
 
-    public void setDeclared() {
-        declared = true;
+    @Override
+    public int hashCode() {
+        return identifier.hashCode();
     }
 }

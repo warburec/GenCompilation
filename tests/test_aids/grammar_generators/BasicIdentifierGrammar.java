@@ -485,14 +485,14 @@ public class BasicIdentifierGrammar extends TestGrammar {
         ruleConvertorMap.put("Java", new HashMap<>());
 
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
-        ruleConvertor.put(getRule(2), (elements) -> {
+        ruleConvertor.put(getRule(0), (generator, elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
+        ruleConvertor.put(getRule(1), (generator, elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
+        ruleConvertor.put(getRule(2), (generator, elements) -> {
             String identifierType = "";
             IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
-            if(!identifier.isDeclared()) {
+            if(!generator.isDeclared(identifier)) {
                 identifierType = identifier.getType() + " ";
-                identifier.setDeclared();
+                generator.setDeclared(identifier);
             }
 
             return "\t\t" + identifierType + elements[0].getGeneration() + " " + 
@@ -500,8 +500,8 @@ public class BasicIdentifierGrammar extends TestGrammar {
             elements[3].getGeneration() + " " + elements[4].getGeneration() + 
             elements[5].getGeneration() + "\n"; 
         });  //<statement> := identifier = <element> + <element>;
-        ruleConvertor.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
-        ruleConvertor.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
+        ruleConvertor.put(getRule(3), (generator, elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
+        ruleConvertor.put(getRule(4), (generator, elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
         ruleConvertorMap.get("Java").put("XToYToX", ruleConvertor);
     }
 

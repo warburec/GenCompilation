@@ -1,5 +1,5 @@
 package code_generation;
 
 public interface Generator {
-    public String generateCode(CodeElement[] elements);
+    public String generateCode(CodeGenerator generator, CodeElement[] elements);
 }
