@@ -369,35 +369,35 @@ public class SmallTestGrammar extends TestGrammar {
         ruleConvertorMap.put("Java", new HashMap<>());
 
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (generator, elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (generator, elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (generator, elements) -> { return elements[0].getGeneration(); }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
         ruleConvertorMap.get("Java").put("1+0*1", ruleConvertor);
 
-        ruleConvertor.put(getRule(0), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (generator, elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (generator, elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (generator, elements) -> { return elements[0].getGeneration(); }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
         ruleConvertorMap.get("Java").put("1", ruleConvertor);
 
-        ruleConvertor.put(getRule(0), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (generator, elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (generator, elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (generator, elements) -> { return elements[0].getGeneration(); }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
         ruleConvertorMap.get("Java").put("emptyReduce", ruleConvertor);
 
         ruleConvertorMap.put("C", new HashMap<>());
 
         ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (generator, elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (generator, elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (generator, elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (generator, elements) -> { return elements[0].getGeneration(); }); //B->1
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
+        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
         ruleConvertorMap.get("C").put("1+0*1", ruleConvertor);
     }
 

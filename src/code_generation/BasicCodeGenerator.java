@@ -10,14 +10,10 @@ public class BasicCodeGenerator implements CodeGenerator {
     protected String preGeneration;
     protected String postGeneration;
 
-    protected Set<IdentifierGeneration> declaredIdentifiers;
-
     public BasicCodeGenerator(Map<ProductionRule, Generator> ruleConvertor, String preGeneration, String postGeneration) {
         this.ruleConvertor = ruleConvertor;
         this.preGeneration = preGeneration;
         this.postGeneration = postGeneration;
-
-        this.declaredIdentifiers = new HashSet<>();
     }
 
     @Override
@@ -95,15 +91,7 @@ public class BasicCodeGenerator implements CodeGenerator {
         }
 
         Generator generator = ruleConvertor.get(reduction.reductionRule());
-        return new NonTerminalGeneration(generator.generateCode(this, reductionGeneration.getCodeElements()));
-    }
-
-    public boolean isDeclared(IdentifierGeneration identifier) {
-        return declaredIdentifiers.contains(identifier);
-    }
-
-    public void setDeclared(IdentifierGeneration identfier) {
-        declaredIdentifiers.add(identfier);
+        return new NonTerminalGeneration(generator.generateCode(reductionGeneration.getCodeElements()));
     }
 
     public class IncompleteReductionException extends RuntimeException {

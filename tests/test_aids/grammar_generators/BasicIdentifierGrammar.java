@@ -4,6 +4,8 @@ import java.util.*;
 
 import code_generation.*;
 import grammar_objects.*;
+import semantic_analysis.SemanticAnalyser;
+import semantic_analysis.TypeChecker;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
@@ -14,6 +16,18 @@ import syntax_analysis.parsing.*;
  * <element> := identifier | number
  */
 public class BasicIdentifierGrammar extends TestGrammar {
+
+    Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
+
+    public BasicIdentifierGrammar() {
+        super();
+    }
+
+    public BasicIdentifierGrammar(SemanticAnalyser semanticAnalyser) {
+        super();
+
+        setUpSemanticRuleConvertors(semanticRuleConvertorMap, semanticAnalyser);
+    }
 
     @Override
     protected void setUpTokens(List<Token> tokens) {
@@ -273,6 +287,8 @@ public class BasicIdentifierGrammar extends TestGrammar {
         switch(sentence) {
             case "XToYToX":
                 return parseTree0();
+            case "XToYToXSemantic":
+                return parseTree0();
             
             default:
                 throw new UnsupportedSentenceException("parse tree", sentence);
@@ -478,6 +494,15 @@ public class BasicIdentifierGrammar extends TestGrammar {
             "\t}\n" +
             "}"
         });
+
+        generationBookendMap.get("Java").put("XToYToXSemantic", new String[] {
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n",
+
+            "\t\tSystem.out.println(x);\n" +
+            "\t}\n" +
+            "}"
+        });
     }
 
     @Override
@@ -485,14 +510,31 @@ public class BasicIdentifierGrammar extends TestGrammar {
         ruleConvertorMap.put("Java", new HashMap<>());
 
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (generator, elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
-        ruleConvertor.put(getRule(1), (generator, elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
-        ruleConvertor.put(getRule(2), (generator, elements) -> {
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
+        ruleConvertor.put(getRule(2), (elements) -> {
+            return "\t\t" + elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration() + " " + 
+            elements[3].getGeneration() + " " + elements[4].getGeneration() + elements[5].getGeneration() + "\n"; 
+        });  //<statement> := identifier = <element> + <element>;
+        ruleConvertor.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
+        ruleConvertor.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
+        ruleConvertorMap.get("Java").put("XToYToX", ruleConvertor);
+    }
+
+
+    protected void setUpSemanticRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap, SemanticAnalyser semanticAnalyser) {
+        ruleConvertorMap.put("Java", new HashMap<>());
+
+        TypeChecker typeChecker = (TypeChecker)semanticAnalyser;
+        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
+        ruleConvertor.put(getRule(2), (elements) -> {
             String identifierType = "";
-            IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
-            if(!generator.isDeclared(identifier)) {
+            IdentifierGeneration identifier = (IdentifierGeneration)elements[0]; //TODO
+            if(!typeChecker.isDeclared(identifier)) {
                 identifierType = identifier.getType() + " ";
-                generator.setDeclared(identifier);
+                typeChecker.setDeclared(identifier);
             }
 
             return "\t\t" + identifierType + elements[0].getGeneration() + " " + 
@@ -500,15 +542,44 @@ public class BasicIdentifierGrammar extends TestGrammar {
             elements[3].getGeneration() + " " + elements[4].getGeneration() + 
             elements[5].getGeneration() + "\n"; 
         });  //<statement> := identifier = <element> + <element>;
-        ruleConvertor.put(getRule(3), (generator, elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
-        ruleConvertor.put(getRule(4), (generator, elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
-        ruleConvertorMap.get("Java").put("XToYToX", ruleConvertor);
+        ruleConvertor.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
+        ruleConvertor.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
+        ruleConvertorMap.get("Java").put("XToYToXSemantic", ruleConvertor);
     }
+    
+    public Map<ProductionRule, Generator> getSemanticRuleConvertor(String sentence, String language) {
+        Map<ProductionRule, Generator> ruleConvertor = null;
+
+        try {
+            ruleConvertor = semanticRuleConvertorMap.get(language).get(sentence);
+        }
+        catch (NullPointerException e) {
+            throw new UnsupportedSentenceException("langage and rule convertor", sentence);
+        }
+
+        if(ruleConvertor == null) {
+            throw new UnsupportedSentenceException("rule convertor", sentence);
+        }
+
+        return ruleConvertor;
+    }
+
 
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
         codeGenerations.put("Java", new HashMap<>());
         codeGenerations.get("Java").put("XToYToX",
+            "public class TestGrammar {\n" +
+            "\tpublic static void main(String[] args) {\n" +
+            "\t\tx = 1 + 2;\n" +
+            "\t\ty = x + 3;\n" +
+            "\t\tx = y + 0;\n" +
+            "\t\tSystem.out.println(x);\n" +
+            "\t}\n" +
+            "}"
+        );
+
+        codeGenerations.get("Java").put("XToYToXSemantic",
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
             "\t\tint x = 1 + 2;\n" +

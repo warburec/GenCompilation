@@ -76,7 +76,7 @@ public class BasicCodeGeneratorTests {
     }
 
     @Test
-    public void basicIdentifierXToYToXGeneration() {
+    public void XToYToXGeneration() {
         TestGrammar grammar = new BasicIdentifierGrammar();
         String sentence = "XToYToX";
         String language = "Java";
