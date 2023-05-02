@@ -33,4 +33,28 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
         return true;
     }
 
+    @Override
+    public String toString() {
+        String string = "";
+        
+        if(nonTerminal == null) {
+            string += "null";
+        }
+        else {
+            string += "<" + nonTerminal.toString() + "> := ";
+        }
+
+        for (LexicalElement lexicalElement : productionSequence) {
+            if(lexicalElement == null) { string += "null";  }
+
+            if(lexicalElement instanceof NonTerminal) {
+                string += "<" +lexicalElement.toString() + "> ";
+            }
+            else {
+                string += lexicalElement.toString() + " ";
+            }
+        }
+
+        return string;
+    }
 }

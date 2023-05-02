@@ -29,4 +29,9 @@ public abstract class LexicalElement {
         if(name == null) { return 0; }
         return name.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
