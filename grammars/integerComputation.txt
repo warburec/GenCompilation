@@ -5,7 +5,7 @@
                <if statement>
 
 <if statement> := if(<condition>) {<statement list>} |
-                  if(<condition>) {<statement list>} else {<statement list>}
+                  <if statement> else {<statement list>}
 
 <condition> := identifier <conditional operator> identifier |
                identifier <conditional operator> numConstant
@@ -22,7 +22,7 @@
                 <expression> + <value> |
                 <expression> - <value> |
                 <expression> * <value> |
-                <expression> / <value> |
+                <expression> / <value>
 
 <value> := identifier |
            numConstant

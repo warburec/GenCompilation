@@ -304,7 +304,6 @@ public class LR0Parser extends SyntaxAnalyser {
         }
     }
 
-    //TODO: Exceptions could be more helpful for users (line number, character number, reason)
     public class UnsupportedActionException extends Exception {
         private Action attemptedAction;
         private State currentState;

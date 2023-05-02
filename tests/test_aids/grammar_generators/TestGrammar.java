@@ -7,7 +7,6 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-//TODO: Add helper methods and classes to make creation easier (Some may be best put in the Grammar class), use composite pattern to allow .add().add().add().etc
 public abstract class TestGrammar extends Grammar {
     private List<State> getState = new ArrayList<>();
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
