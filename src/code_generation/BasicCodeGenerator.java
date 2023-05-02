@@ -56,7 +56,8 @@ public class BasicCodeGenerator implements CodeGenerator {
             }
             else {
                 if(currentState.getParseState() == null) {
-                    throw new IncompleteReductionException();
+                    states.pop(); //Goto the incomplete parent state
+                    throw new IncompleteReductionException(states.peek());
                 }
 
                 throw new UnrecognisedParseStateException(currentState.getParseState());
@@ -95,9 +96,9 @@ public class BasicCodeGenerator implements CodeGenerator {
     }
 
     public class IncompleteReductionException extends RuntimeException {
-        public IncompleteReductionException() {
-            super("Code generation for a reduction with incomplete elements was attempted, check the parse tree is correctly generated");
-            //TODO: More descriptive message, highlight the state with issues
+        public IncompleteReductionException(GenerationState incompleteState) {
+            super("Code generation for a reduction with incomplete elements was attempted, check the parse tree is correctly generated\n" +
+                incompleteState.toString());
         }
     }
 
@@ -129,6 +130,23 @@ public class BasicCodeGenerator implements CodeGenerator {
             return elementsGenerated;
         }
 
+        @Override
+        public String toString() {
+            String string = "";
+
+            string += "parseState: ";
+            if(parseState == null) {
+                string += null;
+            }
+            else {
+                string += parseState.toString();
+            }
+            string += "\n";
+
+            string += "elementsGenerated: " + elementsGenerated;
+
+            return string;
+        }
     }
 
 }

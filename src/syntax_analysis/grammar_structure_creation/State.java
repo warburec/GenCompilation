@@ -83,6 +83,7 @@ public class State {
             string += "\t" + position.toString() + "\n";
         }
 
+        string.stripTrailing();
         return string;
     }
 }

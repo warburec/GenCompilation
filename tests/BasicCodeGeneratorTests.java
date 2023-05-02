@@ -47,6 +47,19 @@ public class BasicCodeGeneratorTests {
     }
 
     @Test
+    public void testGrammarJavaMissingStateGeneration() {
+        TestGrammar grammar = new SmallTestGrammar();
+        String sentence = "1+0*1MissingReduction";
+        String language = "Java";
+        Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
+        String[] bookends = grammar.getGenerationBookends(sentence, language);
+        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor, bookends[0], bookends[1]);
+        ParseState rootParseState = grammar.getParseRoot(sentence);
+
+        assertThrows(IncompleteReductionException.class, () -> codeGenerator.generate(rootParseState));
+    }
+
+    @Test
     public void testGrammarSigleDigitJavaGeneration() {
         TestGrammar grammar = new SmallTestGrammar();
         String sentence = "1";
