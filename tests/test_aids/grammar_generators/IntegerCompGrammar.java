@@ -13,6 +13,12 @@ public class IntegerCompGrammar extends TestGrammar {
 
     Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
 
+    public IntegerCompGrammar(SemanticAnalyser semanticAnalyser) {
+        super();
+
+        setUpSemanticRuleConvertors(semanticRuleConvertorMap, semanticAnalyser);
+    }
+
     @Override
     protected void setUpTokens(List<Token> tokens) {
         tokens.add(new Token(";"));
@@ -72,7 +78,7 @@ public class IntegerCompGrammar extends TestGrammar {
         productionRules.add(new ProductionRule(
             new NonTerminal("statement"), 
             new LexicalElement[] {
-                new NonTerminal("assignement")
+                new NonTerminal("assignment")
         }));
         
         productionRules.add(new ProductionRule(
@@ -150,7 +156,7 @@ public class IntegerCompGrammar extends TestGrammar {
         }));
 
         productionRules.add(new ProductionRule(
-            new NonTerminal("assignement"), 
+            new NonTerminal("assignment"), 
             new LexicalElement[] {
                 new Identifier("identifier"),
                 new Token("="),

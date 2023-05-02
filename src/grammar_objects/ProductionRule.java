@@ -55,6 +55,7 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
             }
         }
 
+        string.stripTrailing();
         return string;
     }
 }

@@ -3,7 +3,7 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.*;
-import syntax_analysis.parsing.ParseFailedException;
+import syntax_analysis.parsing.*;
 
 public abstract class SyntaxAnalyser {
     
@@ -28,5 +28,5 @@ public abstract class SyntaxAnalyser {
         this.sentinel = sentinel;
     }
     
-    public abstract GrammarStructure analyse(Token[] inputTokens) throws ParseFailedException;
+    public abstract ParseState analyse(Token[] inputTokens) throws ParseFailedException;
 }
