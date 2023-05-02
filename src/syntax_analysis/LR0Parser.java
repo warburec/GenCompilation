@@ -17,6 +17,8 @@ public class LR0Parser extends SyntaxAnalyser {
 
     public static final Token EOF = new Token(null);
 
+    private int currentParseToken = -1;
+
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
@@ -253,6 +255,7 @@ public class LR0Parser extends SyntaxAnalyser {
                     if(currentToken.equals(EOF)) {
                         if(parseStates.peek().state().getPositions()
                             .contains(new GrammarPosition(acceptRule, 1))) { //Accept
+                            currentParseToken = -1;
                             return parseStates.pop();
                         }
                         else {
@@ -284,13 +287,15 @@ public class LR0Parser extends SyntaxAnalyser {
             }
         }
         catch(Exception e) {
-            throw new ParseFailedException(e); //TODO: Add which input token the fail occurred on
+            throw new ParseFailedException(e, currentParseToken);
         }
 
         return parseStates.pop();
     }
 
     private Token getNextToken(Iterator<Token> input) {
+        currentParseToken++;
+
         try {
             return input.next();
         }

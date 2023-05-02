@@ -119,6 +119,28 @@ public class LR0ParserTests {
     }
 
     @Test
+    public void parsingTestGrammarIncorrectSentence() {
+        TestGrammar grammar = new SmallTestGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        //1+2*1
+        Token[] inputTokens = new Token[] {
+            new Token("1"),
+            new Token("+"),
+            new Token("2"),
+            new Token("*"),
+            new Token("1")
+        };
+        
+        ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
+        System.out.println(exception);
+        assertTrue(exception.getCause() instanceof UnsupportedShiftException);
+    }
+
+    @Test
     public void selfReferentialGrammarStates() {
         TestGrammar grammar = new SelfReferentialGrammar();
         GrammarParts grammarParts = grammar.getParts();
