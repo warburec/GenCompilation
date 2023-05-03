@@ -80,6 +80,8 @@ public class LR0Parser extends SyntaxAnalyser {
         List<GrammarPosition> currentPositions = startPositions;
 
         if(elemantTraversed != null) {
+            //TODO: Ensure this is applied in the correct place, probably best after expansion (ensuring branches are only made once for the same value)
+            //Make into order expand, graph branches, tree breanches
             currentPositions = createParentGraphBranches(parentState, elemantTraversed, currentPositions);
         }
 
@@ -105,6 +107,7 @@ public class LR0Parser extends SyntaxAnalyser {
             State createdState = createState(currentState, nextPositions, nextElement);
 
             if(createdState != null) {
+                //TODO:Throw Non-DeterminismException, if a route for element already exists?
                 currentState.addBranch(new Route(createdState, nextElement));
             }
         }
@@ -126,12 +129,14 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elemantTraversed, List<GrammarPosition> currentPositions) {
+        //TODO:Create branch, only if all routes for the same lexEl goto the same place (no non-derterministic routes)
         for(int i = currentPositions.size() - 1; i >= 0; i--) {
             GrammarPosition position = currentPositions.get(i);
 
             State stateFound = getStateContainingPosition(position);
 
             if(stateFound != null) {
+                //TODO:Throw Non-DeterminismException, if a route for element already exists?
                 parentState.addBranch(new Route(stateFound, elemantTraversed));
                 currentPositions.remove(i);
             }
