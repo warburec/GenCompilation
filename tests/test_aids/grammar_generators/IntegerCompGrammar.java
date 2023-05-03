@@ -34,6 +34,7 @@ public class IntegerCompGrammar extends TestGrammar {
         tokens.add(new Token("!="));
         tokens.add(new Token("<="));
         tokens.add(new Token("="));
+        tokens.add(new Token("val"));
         tokens.add(new Token("+"));
         tokens.add(new Token("-"));
         tokens.add(new Token("*"));
@@ -56,7 +57,6 @@ public class IntegerCompGrammar extends TestGrammar {
         nonTerminals.add(new NonTerminal("conditional operator"));
         nonTerminals.add(new NonTerminal("assignment"));
         nonTerminals.add(new NonTerminal("expression"));
-        nonTerminals.add(new NonTerminal("value"));
     }
 
     @Override
@@ -65,14 +65,15 @@ public class IntegerCompGrammar extends TestGrammar {
             new NonTerminal("statement list"), 
             new LexicalElement[] {
                 new NonTerminal("statement list"),
-                new Token(";"),
-                new NonTerminal("statement")
+                new NonTerminal("statement"),
+                new Token(";")
         }));
         
         productionRules.add(new ProductionRule(
             new NonTerminal("statement list"), 
             new LexicalElement[] {
-                new NonTerminal("statement")
+                new NonTerminal("statement"),
+                new Token(";")
         }));
         
         productionRules.add(new ProductionRule(
@@ -166,7 +167,8 @@ public class IntegerCompGrammar extends TestGrammar {
         productionRules.add(new ProductionRule(
             new NonTerminal("expression"), 
             new LexicalElement[] {
-                new NonTerminal("value")
+                new Token("val"),
+                new Identifier("identifier")
         }));
 
         productionRules.add(new ProductionRule(
@@ -174,7 +176,7 @@ public class IntegerCompGrammar extends TestGrammar {
             new LexicalElement[] {
                 new NonTerminal("expression"),
                 new Token("+"),
-                new NonTerminal("value")
+                new Identifier("identifier")
         }));
 
         productionRules.add(new ProductionRule(
@@ -182,7 +184,7 @@ public class IntegerCompGrammar extends TestGrammar {
             new LexicalElement[] {
                 new NonTerminal("expression"),
                 new Token("-"),
-                new NonTerminal("value")
+                new Identifier("identifier")
         }));
 
         productionRules.add(new ProductionRule(
@@ -190,7 +192,7 @@ public class IntegerCompGrammar extends TestGrammar {
             new LexicalElement[] {
                 new NonTerminal("expression"),
                 new Token("*"),
-                new NonTerminal("value")
+                new Identifier("identifier")
         }));
 
         productionRules.add(new ProductionRule(
@@ -198,18 +200,45 @@ public class IntegerCompGrammar extends TestGrammar {
             new LexicalElement[] {
                 new NonTerminal("expression"),
                 new Token("/"),
-                new NonTerminal("value")
-        }));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("value"), 
-            new LexicalElement[] {
                 new Identifier("identifier")
         }));
 
+
         productionRules.add(new ProductionRule(
-            new NonTerminal("value"), 
+            new NonTerminal("expression"), 
             new LexicalElement[] {
+                new Literal("numConstant")
+        }));
+
+        productionRules.add(new ProductionRule(
+            new NonTerminal("expression"), 
+            new LexicalElement[] {
+                new NonTerminal("expression"),
+                new Token("+"),
+                new Literal("numConstant")
+        }));
+
+        productionRules.add(new ProductionRule(
+            new NonTerminal("expression"), 
+            new LexicalElement[] {
+                new NonTerminal("expression"),
+                new Token("-"),
+                new Literal("numConstant")
+        }));
+
+        productionRules.add(new ProductionRule(
+            new NonTerminal("expression"), 
+            new LexicalElement[] {
+                new NonTerminal("expression"),
+                new Token("*"),
+                new Literal("numConstant")
+        }));
+
+        productionRules.add(new ProductionRule(
+            new NonTerminal("expression"), 
+            new LexicalElement[] {
+                new NonTerminal("expression"),
+                new Token("/"),
                 new Literal("numConstant")
         }));
     }
@@ -255,8 +284,8 @@ public class IntegerCompGrammar extends TestGrammar {
 
         TypeChecker typeChecker = (TypeChecker)semanticAnalyser;
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + ";\n" + elements[2]; }); //<statement list> := <statement list>; <statement>
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration()+ ";\n"; }); //<statement list> := <statement list> <statement>;
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + ";\n"; }); //<statement list> := <statement>;
         ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //<statement> := <assignment>
         ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //<statement> := <if statement>
         ruleConvertor.put(getRule(4), (elements) -> { 
@@ -287,13 +316,16 @@ public class IntegerCompGrammar extends TestGrammar {
             generation += elements[0].getGeneration();
             return generation + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); 
         }); //<assignment> := identifier = <expression>
-        ruleConvertor.put(getRule(14), (elements) -> { return elements[0].getGeneration(); }); //<expression> := <value>
-        ruleConvertor.put(getRule(15), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + elements[2].getGeneration(); }); //<expression> + <value>
-        ruleConvertor.put(getRule(16), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + elements[2].getGeneration(); }); //<expression> - <value>
-        ruleConvertor.put(getRule(17), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + elements[2].getGeneration(); }); //<expression> * <value>
-        ruleConvertor.put(getRule(18), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + elements[2].getGeneration(); }); //<expression> / <value>
-        ruleConvertor.put(getRule(19), (elements) -> { return elements[0].getGeneration(); }); //<value> := identifier
-        ruleConvertor.put(getRule(20), (elements) -> { return elements[0].getGeneration(); }); //<value> := numConstant
+        ruleConvertor.put(getRule(14), (elements) -> { return elements[1].getGeneration(); }); // <expression> := val identifier
+        ruleConvertor.put(getRule(15), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> + identifier
+        ruleConvertor.put(getRule(16), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> - identifier
+        ruleConvertor.put(getRule(17), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> * identifier
+        ruleConvertor.put(getRule(18), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> / identifier
+        ruleConvertor.put(getRule(19), (elements) -> { return elements[0].getGeneration(); }); // <expression> := numConstant
+        ruleConvertor.put(getRule(20), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> + numConstant
+        ruleConvertor.put(getRule(21), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> - numConstant
+        ruleConvertor.put(getRule(22), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> * numConstant
+        ruleConvertor.put(getRule(23), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> / numConstant
         ruleConvertorMap.get("Java").put("JavaConversion", ruleConvertor);
     }
     

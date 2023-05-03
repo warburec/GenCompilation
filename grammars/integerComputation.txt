@@ -1,5 +1,5 @@
-<statement list> := <statement list>; <statement> |
-                    <statement>
+<statement list> := <statement list> <statement>; |
+                    <statement>;
 
 <statement> := <assignment> |
                <if statement>
@@ -18,13 +18,15 @@
 
 <assignment> := identifier = <expression>
 
-<expression> := <value> |
-                <expression> + <value> |
-                <expression> - <value> |
-                <expression> * <value> |
-                <expression> / <value>
-
-<value> := identifier |
-           numConstant
+<expression> := val identifier
+                <expression> + identifier |
+                <expression> - identifier |
+                <expression> * identifier |
+                <expression> / identifier |
+                numConstant |
+                <expression> + numConstant |
+                <expression> - numConstant |
+                <expression> * numConstant |
+                <expression> / numConstant
 
 [Note: All spaces and newlines are ignored]

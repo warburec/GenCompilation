@@ -41,8 +41,10 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
             string += "null";
         }
         else {
-            string += "<" + nonTerminal.toString() + "> := ";
+            string += "<" + nonTerminal.toString() + ">";
         }
+
+        string += " := ";
 
         for (LexicalElement lexicalElement : productionSequence) {
             if(lexicalElement == null) { string += "null";  }

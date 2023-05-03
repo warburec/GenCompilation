@@ -35,13 +35,13 @@ public class GrammarSandbox {
              * x = 1;
              * y = 2;
              * if(x <= y) {
-             *  x = y * y;
+             *  x = val y *  val y;
              * }
              * else {
              *  x = -10;
              * }
-             * y = 5 + x;
-             * x = x * y;
+             * y = 5 + val x;
+             * x = val x * val y;
              */
             parseRoot = syntaxAnalyser.analyse(new Token[] {
                 new Identifier("identifier", "int", "x"),
@@ -61,8 +61,10 @@ public class GrammarSandbox {
                 new Token("{"),
                 new Identifier("identifier", "int", "x"),
                 new Token("="),
+                new Token("val"),
                 new Identifier("identifier", "int", "y"),
                 new Token("*"),
+                new Token("val"),
                 new Identifier("identifier", "int", "y"),
                 new Token(";"),
                 new Token("}"),
@@ -77,12 +79,15 @@ public class GrammarSandbox {
                 new Token("="),
                 new Literal("numConstant", "5"),
                 new Token("+"),
+                new Token("val"),
                 new Identifier("identifier", "int", "x"),
                 new Token(";"),
                 new Identifier("identifier", "int", "x"),
                 new Token("="),
+                new Token("val"),
                 new Identifier("identifier", "int", "x"),
                 new Token("*"),
+                new Token("val"),
                 new Identifier("identifier", "int", "y"),
                 new Token(";")
             });
