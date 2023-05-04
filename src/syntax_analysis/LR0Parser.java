@@ -80,13 +80,11 @@ public class LR0Parser extends SyntaxAnalyser {
         List<GrammarPosition> currentPositions = startPositions;
 
         if(elemantTraversed != null) {
-            //TODO: Ensure this is applied in the correct place, probably best after expansion (ensuring branches are only made once for the same value)
-            //Make into order expand, graph branches, tree breanches
             currentPositions = createParentGraphBranches(parentState, elemantTraversed, currentPositions);
         }
 
         if(currentPositions.size() == 0) { return null; }
-
+        
         currentPositions = expandPositions(startPositions);
 
         State currentState = new State(new HashSet<>(currentPositions), parentState);
@@ -107,7 +105,6 @@ public class LR0Parser extends SyntaxAnalyser {
             State createdState = createState(currentState, nextPositions, nextElement);
 
             if(createdState != null) {
-                //TODO:Throw Non-DeterminismException, if a route for element already exists?
                 currentState.addBranch(new Route(createdState, nextElement));
             }
         }
@@ -115,6 +112,12 @@ public class LR0Parser extends SyntaxAnalyser {
         return currentState;
     }
 
+    /**
+     * Gets all of the relevent positions after traversing the nextElement
+     * @param currentPositions A List of all currentPositions
+     * @param nextElement An element to be traversed
+     * @return A List of new positions that traversed the given element
+     */
     private List<GrammarPosition> getNextPositionsTraversingElement(List<GrammarPosition> currentPositions, LexicalElement nextElement) {
         List<GrammarPosition> nextPositions = new ArrayList<>();
 
@@ -128,23 +131,39 @@ public class LR0Parser extends SyntaxAnalyser {
         return nextPositions;
     }
 
-    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elemantTraversed, List<GrammarPosition> currentPositions) {
-        //TODO:Create branch, only if all routes for the same lexEl goto the same place (no non-derterministic routes)
-        for(int i = currentPositions.size() - 1; i >= 0; i--) {
-            GrammarPosition position = currentPositions.get(i);
+    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
+        State foundLink = null;
 
-            State stateFound = getStateContainingPosition(position);
+        GrammarPosition position = currentPositions.get(0);
+        State stateFound = getStateContainingPosition(position);
 
-            if(stateFound != null) {
-                //TODO:Throw Non-DeterminismException, if a route for element already exists?
-                parentState.addBranch(new Route(stateFound, elemantTraversed));
-                currentPositions.remove(i);
+        if(stateFound != null) {
+            parentState.addBranch(new Route(stateFound, elementTraversed));
+            currentPositions.remove(currentPositions.size() - 1);
+        }
+
+        if(currentPositions.size() == 0) { return currentPositions; }
+
+        foundLink = stateFound;
+
+        for(int i = 0; i < currentPositions.size(); i++) {
+            position = currentPositions.get(i);
+
+            stateFound = getStateContainingPosition(position);
+
+            if(stateFound != foundLink) {
+                throw new NonDeterminismException(elementTraversed, currentPositions);
             }
         }
 
         return currentPositions;
     }
 
+    /**
+     * Finds the state containing the given position
+     * @param position The position to be found
+     * @return The state containing the position, or null if no state is found
+     */
     private State getStateContainingPosition(GrammarPosition position) {
         for (State state : states) {
             if(state.getPositions().contains(position)) {
@@ -292,7 +311,7 @@ public class LR0Parser extends SyntaxAnalyser {
             }
         }
         catch(Exception e) {
-            throw new ParseFailedException(e, currentParseToken);
+            throw new ParseFailedException(e, currentParseToken); //SyntaxError
         }
 
         return parseStates.pop();
