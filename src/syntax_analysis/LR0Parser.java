@@ -152,7 +152,7 @@ public class LR0Parser extends SyntaxAnalyser {
             stateFound = getStateContainingPosition(position);
 
             if(stateFound != foundLink) {
-                throw new NonDeterminismException(elementTraversed, currentPositions);
+                throw new NonDeterminismException(elementTraversed, currentPositions, parentState);
             }
         }
 

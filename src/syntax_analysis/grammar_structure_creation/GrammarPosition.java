@@ -54,13 +54,14 @@ public record GrammarPosition(ProductionRule rule, int position) {
                 string += "•";
             }
 
-            string += production[i].toString();
+            string += production[i].toString() + " ";
         }
 
         if(position == production.length) {
             string += "•";
         }
 
+        string.stripTrailing();
         return string;
     }
 }

@@ -7,5 +7,5 @@ public class Token extends LexicalElement {
     }
 
     //TODO: Add where it was read, line and/or symbol/column
-    
+
 }
