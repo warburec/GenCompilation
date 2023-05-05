@@ -6,14 +6,12 @@ import grammar_objects.LexicalElement;
 import syntax_analysis.grammar_structure_creation.*;
 
 public class NonDeterminismException extends RuntimeException {
-    private LexicalElement elementTraversed;
     private List<GrammarPosition> conflictingPositions;
     private State failingState;
 
     public NonDeterminismException(LexicalElement elementTraversed, List<GrammarPosition> conflictingPositions, State failingState) {
         super("Non-Determinism found whilst traversing \"" + elementTraversed + "\" ");
 
-        this.elementTraversed = elementTraversed;
         this.conflictingPositions = conflictingPositions;
         this.failingState = failingState;
     }

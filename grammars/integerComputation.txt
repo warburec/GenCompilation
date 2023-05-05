@@ -30,3 +30,5 @@
                 <expression> / numConstant
 
 [Note: All spaces and newlines are ignored]
+
+!!! Not LR(0)
