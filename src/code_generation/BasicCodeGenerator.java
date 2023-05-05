@@ -2,7 +2,7 @@ package code_generation;
 
 import java.util.*;
 
-import grammar_objects.ProductionRule;
+import grammar_objects.*;
 import syntax_analysis.parsing.*;
 
 public class BasicCodeGenerator implements CodeGenerator {
@@ -21,7 +21,7 @@ public class BasicCodeGenerator implements CodeGenerator {
         Stack<GenerationState> states = new Stack<>();
         states.push(new GenerationState(parseRoot));
 
-        String currentlyBuiltCode = "";
+        CodeElement currentlyBuiltCode = null;
         while(!states.isEmpty()) {
             GenerationState currentState = states.peek();
 
@@ -56,21 +56,32 @@ public class BasicCodeGenerator implements CodeGenerator {
             }
             else {
                 if(currentState.getParseState() == null) {
-                    throw new IncompleteReductionException();
+                    states.pop(); //Goto the incomplete parent state
+                    throw new IncompleteReductionException(states.peek());
                 }
 
                 throw new UnrecognisedParseStateException(currentState.getParseState());
             }
         }
 
-        return preGeneration + currentlyBuiltCode + postGeneration;
+        return preGeneration + currentlyBuiltCode.getGeneration() + postGeneration;
     }
 
-    private String produceShiftedString(ShiftedState shift) {
-        return shift.tokenUsed().getName(); //TODO: look this up in tables, to allow for identifiers
+    private CodeElement produceShiftedString(ShiftedState shift) {
+        Token token = shift.tokenUsed();
+
+        if(token instanceof Identifier) {
+            return new IdentifierGeneration((Identifier)token);
+        }
+        if(token instanceof Literal) {
+            return new LiteralGeneration((Literal)token);
+        }
+        else {
+            return new TokenGeneration(token);
+        }
     }
 
-    private String produceReductionString(GenerationState reductionGeneration) {
+    private CodeElement produceReductionString(GenerationState reductionGeneration) {
         ReducedState reduction = null;
 
         try {
@@ -81,20 +92,19 @@ public class BasicCodeGenerator implements CodeGenerator {
         }
 
         Generator generator = ruleConvertor.get(reduction.reductionRule());
-        return generator.generateCode(reductionGeneration.getCodeElements());
+        return new NonTerminalGeneration(generator.generateCode(reductionGeneration.getCodeElements()));
     }
 
-
     public class IncompleteReductionException extends RuntimeException {
-        public IncompleteReductionException() {
-            super("Code generation for a reduction with incomplete elements was attempted, check the parse tree is correctly generated");
-            //TODO: More descriptive message, highlight the state with issues
+        public IncompleteReductionException(GenerationState incompleteState) {
+            super("Code generation for a reduction with incomplete elements was attempted, check the parse tree is correctly generated\n" +
+                incompleteState.toString());
         }
     }
 
     private class GenerationState {
         private ParseState parseState;
-        private List<String> codeElements;
+        private List<CodeElement> codeElements;
         private int elementsGenerated;
 
         public GenerationState(ParseState parseState) {
@@ -103,13 +113,13 @@ public class BasicCodeGenerator implements CodeGenerator {
             elementsGenerated = 0;
         }
 
-        public void addCodeElement(String element) {
+        public void addCodeElement(CodeElement element) {
             codeElements.add(element);
             elementsGenerated++;
         }
 
-        public String[] getCodeElements() {
-            return codeElements.toArray(new String[codeElements.size()]);
+        public CodeElement[] getCodeElements() {
+            return codeElements.toArray(new CodeElement[codeElements.size()]);
         }
 
         public ParseState getParseState() {
@@ -120,6 +130,23 @@ public class BasicCodeGenerator implements CodeGenerator {
             return elementsGenerated;
         }
 
+        @Override
+        public String toString() {
+            String string = "";
+
+            string += "parseState: ";
+            if(parseState == null) {
+                string += null;
+            }
+            else {
+                string += parseState.toString();
+            }
+            string += "\n";
+
+            string += "elementsGenerated: " + elementsGenerated;
+
+            return string;
+        }
     }
 
 }

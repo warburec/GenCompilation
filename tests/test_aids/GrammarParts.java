@@ -1,4 +1,4 @@
-package tests.testAids;
+package tests.test_aids;
 
 import java.util.Set;
 

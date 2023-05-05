@@ -8,11 +8,10 @@ import org.junit.Test;
 
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
-import syntax_analysis.grammar_structure_creation.ShiftAction.UnsupportedShiftException;
 import syntax_analysis.parsing.*;
+import tests.test_aids.GrammarParts;
+import tests.test_aids.grammar_generators.*;
 import syntax_analysis.*;
-import tests.testAids.GrammarParts;
-import tests.testAids.GrammarGenerators.*;
 
 public class LR0ParserTests {
     
@@ -184,5 +183,84 @@ public class LR0ParserTests {
         Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
-    //TODO: Add identifiers
+
+    @Test
+    public void basicIdentifierGrammarStates() {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
+
+        Set<State> expectedStateSet = grammar.getGetState();
+        assertEquals(expectedStateSet, generatedStates);
+    }
+
+    @Test
+    public void basicIdentifierGrammarAction() {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
+
+        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        assertEquals(expectedActionTable, generatedActionTable);
+    }
+
+    @Test
+    public void basicIdentifierGrammarGoto() {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
+
+        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        assertEquals(expectedGotoTable, generatedGotoTable);
+    }
+
+    @Test
+    public void XToYToXGrammarCompleteSentence() throws ParseFailedException {
+        TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Token[] inputTokens = new Token[] {
+            new Identifier("identifier", null, "x"),
+            new Token("="),
+            new Literal("number", "1"),
+            new Token("+"),
+            new Literal("number", "2"),
+            new Token(";"),
+            new Identifier("identifier", null, "y"),
+            new Token("="),
+            new Identifier("identifier", null, "x"),
+            new Token("+"),
+            new Literal("number", "3"),
+            new Token(";"),
+            new Identifier("identifier", null, "x"),
+            new Token("="),
+            new Identifier("identifier", null, "y"),
+            new Token("+"),
+            new Literal("number", "0"),
+            new Token(";")
+        };
+        
+        ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
+
+        ParseState expectedParseState = grammar.getParseRoot("XToYToX");
+        assertEquals(expectedParseState, generatedParseRoot);
+    }
 }

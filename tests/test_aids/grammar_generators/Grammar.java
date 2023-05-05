@@ -1,9 +1,9 @@
-package tests.testAids.GrammarGenerators;
+package tests.test_aids.grammar_generators;
 
 import java.util.*;
 
 import grammar_objects.*;
-import tests.testAids.GrammarParts;
+import tests.test_aids.GrammarParts;
 
 public abstract class Grammar {
     

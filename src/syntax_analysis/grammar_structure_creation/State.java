@@ -104,4 +104,16 @@ public class State {
 
         return hashCode;
     }
+
+    @Override
+    public String toString() {
+        String string = "State:\n";
+
+        for (GrammarPosition position : positions) {
+            string += "\t" + position.toString() + "\n";
+        }
+
+        string.stripTrailing();
+        return string;
+    }
 }
