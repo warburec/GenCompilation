@@ -1,6 +1,9 @@
 package syntax_analysis.grammar_structure_creation;
 
 import java.util.*;
+import java.util.Map.*;
+
+import grammar_objects.*;
 
 public class State {
     private Set<GrammarPosition> positions;
@@ -46,23 +49,49 @@ public class State {
         }
 
         if(branches.size() != otherState.getBranches().size()) { return false; }
-        for(Route branch : branches) {
-            boolean matchFound = false;
-
-            for (Route otherBranch : otherState.getBranches()) {
-                if(branch.elementTraversed().equals(otherBranch.elementTraversed())) { 
-                    matchFound = true; 
-                    break;
-                }
-            }
-
-            if(!matchFound) { return false; }
             
-            //if(!otherState.getBranches().contains(branch)) { return false; } //TODO: Check how branches are handled for equality, this was an old and failing recursive check
-        }
-        //TODO handle self referential states
+        return branchesEqual(otherState);
+    }
 
-        return true;
+    /**
+     * Tests equality of branches between this and another state, based on number of Routes for each LexicalElement
+     * @param otherState The other state to be compared with
+     * @return The equality of both state's branches
+     */
+    private boolean branchesEqual(State otherState) {
+        HashMap<LexicalElement, Integer> currentRouteCount = new HashMap<>();
+        HashMap<LexicalElement, Integer> otherRouteCount = new HashMap<>();
+
+        for (Route branch : getBranches()) {
+            LexicalElement elementTraversed = branch.elementTraversed();
+
+            if(currentRouteCount.get(elementTraversed) != null) {
+                currentRouteCount.put(elementTraversed, currentRouteCount.get(elementTraversed) + 1);
+            }
+            else {
+                currentRouteCount.put(elementTraversed, 1);
+            }
+        }
+
+        for (Route otherBranch : otherState.getBranches()) {
+            LexicalElement elementTraversed = otherBranch.elementTraversed();
+
+            if(otherRouteCount.get(elementTraversed) != null) {
+                otherRouteCount.put(elementTraversed, otherRouteCount.get(elementTraversed) + 1);
+            }
+            else {
+                otherRouteCount.put(elementTraversed, 1);
+            }
+        }
+
+        boolean routesEqual = true;
+        for(Entry<LexicalElement, Integer> entry : currentRouteCount.entrySet()) {
+            if(otherRouteCount.get(entry.getKey()) != entry.getValue()) {
+                routesEqual = false;
+            }
+        }
+
+        return routesEqual;
     }
 
     @Override

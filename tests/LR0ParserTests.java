@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
+import syntax_analysis.grammar_structure_creation.ShiftAction.UnsupportedShiftException;
 import syntax_analysis.parsing.*;
 import syntax_analysis.*;
 import tests.testAids.GrammarParts;
@@ -116,6 +117,27 @@ public class LR0ParserTests {
         
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
         assertTrue(exception.getCause() instanceof IncompleteParseException);
+    }
+
+    @Test
+    public void parsingTestGrammarIncorrectSentence() {
+        TestGrammar grammar = new SmallTestGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        //1+2*1
+        Token[] inputTokens = new Token[] {
+            new Token("1"),
+            new Token("+"),
+            new Token("2"),
+            new Token("*"),
+            new Token("1")
+        };
+        
+        ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
+        assertTrue(exception.getCause() instanceof UnsupportedShiftException);
     }
 
     @Test
