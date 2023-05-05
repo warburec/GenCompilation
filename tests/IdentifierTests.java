@@ -25,11 +25,20 @@ public class IdentifierTests {
     }
 
     @Test
-    public void differentIdentifierNames() {
+    public void differentIdentifierNamesGrammatically() {
         Identifier i1 = new Identifier("Identifier", "String", "x");
         Identifier i2 = new Identifier("Identifier", "String", "y");
 
-        assertNotEquals(i1, i2);
+        assertTrue(i1.equals(i2));
+        assertTrue(i1.grammaticallyEquals(i2));
+    }
+
+    @Test
+    public void differentIdentifierNamesExact() {
+        Identifier i1 = new Identifier("Identifier", "String", "x");
+        Identifier i2 = new Identifier("Identifier", "String", "y");
+
+        assertFalse(i1.exactlyEquals(i2));
     }
 
     @Test
@@ -37,6 +46,6 @@ public class IdentifierTests {
         Identifier i1 = new Identifier("Identifier", "String", "x");
         Identifier i2 = new Identifier("Identifier", "Integer", "x");
 
-        assertThrows(ConflictingTypesException.class, () -> i1.equals(i2));
+        assertThrows(ConflictingTypesException.class, () -> i1.exactlyEquals(i2));
     }
 }

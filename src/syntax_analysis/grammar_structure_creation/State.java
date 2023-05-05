@@ -59,8 +59,7 @@ public class State {
             if(!matchFound) { return false; }
             
             //if(!otherState.getBranches().contains(branch)) { return false; } //TODO: Check how branches are handled for equality, this was an old and failing recursive check
-        }
-        //TODO handle self referential states
+        }                                                                           //Handle self referential states carefully
 
         return true;
     }
@@ -74,5 +73,17 @@ public class State {
         }
 
         return hashCode;
+    }
+
+    @Override
+    public String toString() {
+        String string = "State:\n";
+
+        for (GrammarPosition position : positions) {
+            string += "\t" + position.toString() + "\n";
+        }
+
+        string.stripTrailing();
+        return string;
     }
 }

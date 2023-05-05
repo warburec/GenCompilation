@@ -35,4 +35,33 @@ public record GrammarPosition(ProductionRule rule, int position) {
         return hashCode;
     }
 
+    @Override
+    public String toString() {
+        String string = "";
+
+        if(rule.nonTerminal() != null) {
+            string += rule.nonTerminal().toString();
+        }
+        else {
+            string += "null";
+        }
+
+        string += " := ";
+
+        LexicalElement[] production = rule.productionSequence();
+        for(int i = 0; i < production.length; i++) {
+            if(i == position) {
+                string += "•";
+            }
+
+            string += production[i].toString() + " ";
+        }
+
+        if(position == production.length) {
+            string += "•";
+        }
+
+        string.stripTrailing();
+        return string;
+    }
 }

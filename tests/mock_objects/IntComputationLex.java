@@ -1,4 +1,4 @@
-package tests.mockObjects;
+package tests.mock_objects;
 
 import lexical_analysis.LexicalAnalyser;
 

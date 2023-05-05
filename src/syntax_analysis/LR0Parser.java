@@ -17,6 +17,8 @@ public class LR0Parser extends SyntaxAnalyser {
 
     public static final Token EOF = new Token(null);
 
+    private int currentParseToken = -1;
+
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         checkForInvalidNonTerminals();
@@ -82,7 +84,7 @@ public class LR0Parser extends SyntaxAnalyser {
         }
 
         if(currentPositions.size() == 0) { return null; }
-
+        
         currentPositions = expandPositions(startPositions);
 
         State currentState = new State(new HashSet<>(currentPositions), parentState);
@@ -110,6 +112,12 @@ public class LR0Parser extends SyntaxAnalyser {
         return currentState;
     }
 
+    /**
+     * Gets all of the relevent positions after traversing the nextElement
+     * @param currentPositions A List of all currentPositions
+     * @param nextElement An element to be traversed
+     * @return A List of new positions that traversed the given element
+     */
     private List<GrammarPosition> getNextPositionsTraversingElement(List<GrammarPosition> currentPositions, LexicalElement nextElement) {
         List<GrammarPosition> nextPositions = new ArrayList<>();
 
@@ -123,26 +131,39 @@ public class LR0Parser extends SyntaxAnalyser {
         return nextPositions;
     }
 
-    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elemantTraversed, List<GrammarPosition> currentPositions) {
-        for(int i = currentPositions.size() - 1; i >= 0; i--) {
-            GrammarPosition position = currentPositions.get(i);
+    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
+        State foundLink = null;
 
-            LexicalElement lastElement = position.getLastElementRead();
-            if(lastElement == null) { continue; } //TODO: Remove these element checks, no longer needed as rules will all have traversed the element (if not yet expanded)
-            
-            if(lastElement.equals(elemantTraversed)) {
-                State stateFound = getStateContainingPosition(position);
+        GrammarPosition position = currentPositions.get(0);
+        State stateFound = getStateContainingPosition(position);
 
-                if(stateFound != null) {
-                    parentState.addBranch(new Route(stateFound, elemantTraversed));
-                    currentPositions.remove(i);
-                }
+        if(stateFound != null) {
+            parentState.addBranch(new Route(stateFound, elementTraversed));
+            currentPositions.remove(currentPositions.size() - 1);
+        }
+
+        if(currentPositions.size() == 0) { return currentPositions; }
+
+        foundLink = stateFound;
+
+        for(int i = 0; i < currentPositions.size(); i++) {
+            position = currentPositions.get(i);
+
+            stateFound = getStateContainingPosition(position);
+
+            if(stateFound != foundLink) {
+                throw new NonDeterminismException(elementTraversed, currentPositions, parentState);
             }
         }
 
         return currentPositions;
     }
 
+    /**
+     * Finds the state containing the given position
+     * @param position The position to be found
+     * @return The state containing the position, or null if no state is found
+     */
     private State getStateContainingPosition(GrammarPosition position) {
         for (State state : states) {
             if(state.getPositions().contains(position)) {
@@ -258,6 +279,7 @@ public class LR0Parser extends SyntaxAnalyser {
                     if(currentToken.equals(EOF)) {
                         if(parseStates.peek().state().getPositions()
                             .contains(new GrammarPosition(acceptRule, 1))) { //Accept
+                            currentParseToken = -1;
                             return parseStates.pop();
                         }
                         else {
@@ -289,13 +311,15 @@ public class LR0Parser extends SyntaxAnalyser {
             }
         }
         catch(Exception e) {
-            throw new ParseFailedException(e);
+            throw new ParseFailedException(e, currentParseToken); //SyntaxError
         }
 
         return parseStates.pop();
     }
 
     private Token getNextToken(Iterator<Token> input) {
+        currentParseToken++;
+
         try {
             return input.next();
         }
@@ -304,7 +328,6 @@ public class LR0Parser extends SyntaxAnalyser {
         }
     }
 
-    //TODO: Exceptions could be more helpful for users (line number, character number, reason)
     public class UnsupportedActionException extends Exception {
         private Action attemptedAction;
         private State currentState;
