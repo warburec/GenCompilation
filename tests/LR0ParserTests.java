@@ -136,7 +136,7 @@ public class LR0ParserTests {
         };
         
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
-        assertTrue(exception.getCause() instanceof UnsupportedShiftException);
+        assertTrue(exception.getCause() instanceof SyntaxError);
     }
 
     @Test
