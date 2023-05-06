@@ -9,9 +9,6 @@ import grammar_objects.Token;
 
 public class DelimitedLexicalAnalyser implements LexicalAnalyser {
 
-    //TODO: Tokenise by largest possible matching token
-    //Allow RegEx input to apply rules for delimiters etc.
-
     private Set<String> delimiters;
     
     /**
