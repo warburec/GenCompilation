@@ -1,5 +1,6 @@
 package grammar_objects;
 
+//TODO: Sentence position, restructure is probably needed, factory?
 public class Identifier extends Token {
     String type = null;
     String identifierName = null;
