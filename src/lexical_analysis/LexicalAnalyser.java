@@ -1,6 +1,7 @@
 package lexical_analysis;
 
+import grammar_objects.Token;
+
 public interface LexicalAnalyser {
-    //TODO: Tokenise by largest possible matching token
-    //Allow RegEx input to apply rules for delimiters etc.
+    public Token[] analyse(String sentence);
 }
