@@ -1,24 +1,37 @@
 package lexical_analysis;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import grammar_objects.Token;
+import helperObjects.*;
 
 public class DelimitedLexicalAnalyser implements LexicalAnalyser {
 
     private Set<String> delimiters;
     
+    private NotEmptyTuple<String, String> stringMarkers;
+    private NotEmptyTuple<String, String> characterMarkers;
+    private NotEmptyTuple<String, String> integerMarkers;
+    private NotEmptyTuple<String, String> floatMarkers;
+    private String identifierRegex;
+    private String[] reservedWords;
+    private List<Tuple<Integer, Integer>> identifierMarkers;
+    
     /**
      * Default delimiters, whitespace
      */
-    public DelimitedLexicalAnalyser() {
+    public DelimitedLexicalAnalyser(
+        NotEmptyTuple<String, String> stringMarkers,
+        NotEmptyTuple<String, String> characterMarkers,
+        NotEmptyTuple<String, String> integerMarkers,
+        NotEmptyTuple<String, String> floatMarkers,
+        String identifierRegex,
+        String[] reservedWords) {
         String[] delimiters = new String[] {
             " ", "\t", "\n", "\r"
         };
 
+        setUpInnerAnalyserVariables(stringMarkers, characterMarkers, integerMarkers, floatMarkers, identifierRegex, reservedWords, identifierMarkers);
         setUpDelimiters(delimiters);
     }
 
@@ -26,7 +39,15 @@ public class DelimitedLexicalAnalyser implements LexicalAnalyser {
      * Delimiters will be treated like whitespace
      * @param delimiters
      */
-    public DelimitedLexicalAnalyser(String[] delimiters) {
+    public DelimitedLexicalAnalyser(
+        String[] delimiters,
+        NotEmptyTuple<String, String> stringMarkers,
+        NotEmptyTuple<String, String> characterMarkers,
+        NotEmptyTuple<String, String> integerMarkers,
+        NotEmptyTuple<String, String> floatMarkers,
+        String identifierRegex,
+        String[] reservedWords) {
+        setUpInnerAnalyserVariables(stringMarkers, characterMarkers, integerMarkers, floatMarkers, identifierRegex, reservedWords, identifierMarkers);
         setUpDelimiters(delimiters);
     }
 
@@ -40,6 +61,23 @@ public class DelimitedLexicalAnalyser implements LexicalAnalyser {
 
             this.delimiters.add(delimiter);
         }
+    }
+
+    private void setUpInnerAnalyserVariables(
+        NotEmptyTuple<String, String> stringMarkers,
+        NotEmptyTuple<String, String> characterMarkers,
+        NotEmptyTuple<String, String> integerMarkers,
+        NotEmptyTuple<String, String> floatMarkers,
+        String identifierRegex,
+        String[] reservedWords,
+        List<Tuple<Integer, Integer>> identifierMarkers) {
+        this.stringMarkers = stringMarkers;
+        this.characterMarkers = characterMarkers;
+        this.integerMarkers = integerMarkers;
+        this.floatMarkers = floatMarkers;
+        this.identifierRegex = identifierRegex;
+        this.reservedWords = reservedWords;
+        this.identifierMarkers = identifierMarkers;
     }
 
     public String removeDelimiters(String sentence) {
@@ -77,9 +115,18 @@ public class DelimitedLexicalAnalyser implements LexicalAnalyser {
     
     @Override
     public Token[] analyse(String sentence) {
+        //TODO: mark identifier positions
         String reducedSentence = removeDelimiters(sentence);
 
-        return new NonDelimitedLexicalAnalyser().analyse(reducedSentence);
+        return new NonDelimitedLexicalAnalyser(
+            stringMarkers, 
+            characterMarkers, 
+            integerMarkers, 
+            floatMarkers, 
+            reducedSentence, 
+            reservedWords, 
+            identifierMarkers)
+        .analyse(reducedSentence);
     }
     
 }

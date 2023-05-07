@@ -1,8 +1,11 @@
 package lexical_analysis;
 
-import grammar_objects.Token;
+import java.util.List;
+
+import grammar_objects.*;
 import helperObjects.*;
 
+//TODO: Create builders for lexical analysers
 public class NonDelimitedLexicalAnalyser  implements LexicalAnalyser {
 
     private NotEmptyTuple<String, String> stringMarkers;
@@ -10,7 +13,8 @@ public class NonDelimitedLexicalAnalyser  implements LexicalAnalyser {
     private NotEmptyTuple<String, String> floatMarkers;
     private NotEmptyTuple<String, String> characterMarkers;
     private String identifierRegex;
-    private String[] reserverdWords;
+    private String[] reservedWords;
+    private List<Tuple<Integer, Integer>> identifierMarkers;
 
     /**
      * 
@@ -19,13 +23,15 @@ public class NonDelimitedLexicalAnalyser  implements LexicalAnalyser {
      * @param floatMarkers May be null
      * @param characterMarkers Cannot be null, cannot be the same as the string markers
      * @param identifierRegex Will be replaced with "^[a-zA-Z][a-zA-Z0-9]*$" if left as null (alphanumeric, starting with an alphabetic character)
+     * @param identifierMarkers Marks the positions of every identifier. If these are not marked identifiers cannot contain any reserved words
      */
     public NonDelimitedLexicalAnalyser(NotEmptyTuple<String, String> stringMarkers,
         NotEmptyTuple<String, String> characterMarkers,
         NotEmptyTuple<String, String> integerMarkers,
-        NotEmptyTuple<String, String> floatMarkers, 
+        NotEmptyTuple<String, String> floatMarkers,
         String identifierRegex,
-        String[] reserverdWords) {
+        String[] reservedWords,
+        List<Tuple<Integer, Integer>> identifierMarkers) {
         
         if(stringMarkers == null) { throw new IllegalArgumentException("String markers must be defined"); }
         this.stringMarkers = stringMarkers;
@@ -44,7 +50,9 @@ public class NonDelimitedLexicalAnalyser  implements LexicalAnalyser {
         if(identifierRegex == "") { throw new IllegalArgumentException("Identifier regex must be defined"); }
         this.identifierRegex = identifierRegex;
 
-        this.reserverdWords = reserverdWords;
+        this.reservedWords = reservedWords;
+
+        this.identifierMarkers = identifierMarkers;
     }
 
     @Override
@@ -54,6 +62,9 @@ public class NonDelimitedLexicalAnalyser  implements LexicalAnalyser {
 
         // Tokenise by largest possible matching token
         // Allow two formats for identifiers, Type identName, or identName {any amount of tokens} literal(with type)
+
+        //For each character
+            //Look at last characters (max lookback is the length of the largest reserved word)
     }
 
 }
