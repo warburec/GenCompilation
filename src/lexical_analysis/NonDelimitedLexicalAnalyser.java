@@ -1,6 +1,6 @@
 package lexical_analysis;
 
-import java.util.List;
+import java.util.*;
 
 import grammar_objects.*;
 import helperObjects.*;
@@ -61,10 +61,55 @@ public class NonDelimitedLexicalAnalyser  implements LexicalAnalyser {
         // boolean matches = a.matches(identifierRegex); //For evaluating identifiers
 
         // Tokenise by largest possible matching token
-        // Allow two formats for identifiers, Type identName, or identName {any amount of tokens} literal(with type)
-
+        // Allow two formats for identifiers: Type identName, or identName {any amount of tokens} literal(with type)
+        
         //For each character
             //Look at last characters (max lookback is the length of the largest reserved word)
+        
+
+        //Note: Identifiers cannot contain reserved words unless marked
+        
+        List<Token> tokens = new LinkedList<>();
+
+        Iterator<Character> input = sentence.chars().mapToObj(c -> (char) c).iterator();
+
+        int largestReservedWord = getLargestSize(reservedWords);
+        Queue<Character> lookBack = new ArrayDeque<Character>();
+
+        while(getNextChar(input, lookBack, largestReservedWord)) {
+            System.out.println(lookBack);
+        }
+
+        //Tokenize end of queue
+
+
+        
+        return (Token[])tokens.toArray();
     }
 
+    private int getLargestSize(String[] strings) {
+        int largest = 0;
+
+        for (String string : strings) {
+            if(string.length() > largest) {
+                largest = string.length();
+            }
+        }
+
+        return largest;
+    }
+
+    private boolean getNextChar(Iterator<Character> input, Queue<Character> buffer, int maxBufferLen) {
+        try {
+            if(buffer.size() == maxBufferLen) {
+                buffer.remove();
+            }
+
+            buffer.add(input.next());
+            return true;
+        }
+        catch(NoSuchElementException e) {
+            return false;
+        }
+    }
 }

@@ -14,7 +14,13 @@ public class DelimitedLexicalAnalyserTests {
         "for (int n : numbers) {\n" +
         "\t//Do stuff\n" +
         "}";
-        DelimitedLexicalAnalyser lexAnalyser = new DelimitedLexicalAnalyser();
+        DelimitedLexicalAnalyser lexAnalyser = new DelimitedLexicalAnalyser(
+            null,
+            null,
+            null,
+            null,
+            sentence,
+            null);
 
         String outputString = lexAnalyser.removeDelimiters(sentence);
 
