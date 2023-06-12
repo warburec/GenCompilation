@@ -4,12 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import grammar_objects.Identifier;
-import grammar_objects.Token;
-import helperObjects.NotEmptyTuple;
-import lexical_analysis.NonDelimitedLexicalAnalyser;
 
-public class NonDelimitedLexicalAnalyserTests {
+public class GeneralLexicalAnalyserTests {
     
     @Test
     public void whitespaceDelimiterRemoval() {
@@ -19,7 +15,7 @@ public class NonDelimitedLexicalAnalyserTests {
         "}";
         NotEmptyTuple<String, String> stringMarkers = new NotEmptyTuple<String, String>("\"", "\"");
         NotEmptyTuple<String, String> characterMarkers = new NotEmptyTuple<String, String>("\'", "\'");
-        NonDelimitedLexicalAnalyser lexAnalyser = new NonDelimitedLexicalAnalyser(
+        NonDelimitedLexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
             stringMarkers,
             characterMarkers,
             null,
