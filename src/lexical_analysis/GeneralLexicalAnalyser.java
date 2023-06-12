@@ -10,13 +10,13 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
         During analysis:
             [ Methods of seperation:
-            -   Delimiters, 
-            -   Flank user-definables by predefined tokens,
-            -   Start/end of neighbouring tokens have unique symbols (includes no overlap),
+            -   Flank user-definables by reserved symbols (punctuation, operaters, whitespace, start of file, or end of file),
+            -   Start/end of neighbouring tokens have unique symbols (includes no overlap) (toggle),
             -   Fixed number of start symbols with a unique centre
             -       (?? start section would be assumed to be part of this token, not the last one read. 
             -       Potentially being confusing. Maybe allow this feature to be toggled)
             ]
+            user-definables cannot be reserved words
 
     */
 
