@@ -1,0 +1,12 @@
+Methods of token seperation:
+-   Flank user-definables by reserved symbols (punctuation, operaters, whitespace, start of file, or end of file),
+-   Start/end of neighbouring tokens have unique symbols (includes no overlap) (toggle),
+-   Fixed number of start symbols with a distinguishing centre
+-       (?? start section would be assumed to be part of this token, not the last one read. 
+-       Potentially being confusing. Maybe allow this feature to be toggled)
+
+user-definables cannot be reserved words
+
+Approaches:
+    Pure lexical analysis
+    Grammar assisted analysis (will be a lot slower, but allows two tokens to have the same regex and be tokenised before syntax analysis)
