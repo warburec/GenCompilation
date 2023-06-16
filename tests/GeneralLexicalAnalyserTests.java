@@ -35,7 +35,7 @@ public class GeneralLexicalAnalyserTests {
             "for"
         };
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[a-z].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"[0-9]].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(

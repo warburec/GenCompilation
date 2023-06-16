@@ -1,7 +1,6 @@
 package lexical_analysis;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import grammar_objects.*;
@@ -62,7 +61,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         this.weaklyReservedWords = weaklyReservedWords;
 
         validateDynamicTokens();
-        generateRegexMatchers(dynamicTokenRegex);
+        generateDynamicRegexPatterns(dynamicTokenRegex);
     }
 
     private void validateDynamicTokens() {
@@ -70,7 +69,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         //TODO
     }
 
-    private void generateRegexMatchers(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegexStringBased) {
+    private void generateDynamicRegexPatterns(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegexStringBased) {
         dynamicTokenRegex = new HashMap<>();
 
         for (String regexString : dynamicTokenRegexStringBased.keySet()) {
@@ -103,11 +102,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             String tokWithoutDelim = holder.getString();
 
-            if(tokWithoutDelim.equals("")) { 
-                continue; 
-            }
-            else {
-                tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length()));
+            if(!tokWithoutDelim.equals("")) {
+                tokenList.addAll(produceTokens(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
 
                 if(c == '\n') {
                     lineNum++;
@@ -122,7 +118,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             tokenList.addAll(produceTokens(currentTokStr, lineNum, columnNum));
         }
 
-        return (Token[])tokenList.toArray();
+        return tokenList.toArray(new Token[tokenList.size()]);
     }
 
     /**
@@ -157,10 +153,11 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
         //Match to regex
         for(String part : splitByStrongWords) {
+            if(part.equals("")) { continue; }
             tokens.add(produceToken(part, lineNum, columnNum));
         }
 
-        return null;
+        return tokens;
     }
 
     private Token produceToken(String string, int lineNum, int columnNum) {
@@ -206,7 +203,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             temp.clear();
 
             for (String substring : substrings) {
-                for(String part : substring.split(reservedWord)) {
+                for(String part : substring.split(Pattern.quote(reservedWord))) { //TODO: Reserved words could be regex
                     temp.add(part);
                 }
             }
