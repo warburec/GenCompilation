@@ -1,6 +1,8 @@
 package lexical_analysis;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import grammar_objects.*;
 import helperObjects.NotEmptyTuple;
@@ -10,12 +12,15 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     private String[] whitespaceDelimiters;
     private String[] stronglyReservedWords;
     private String[] weaklyReservedWords;
-    private Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex;
+    private Map<Pattern, NotEmptyTuple<String, String>> dynamicTokenRegex;
 
     /**
      *  User-definables/dynamic tokens must have mutually exclusive regex
      *  This makes the assumption that differentiation of tokens with the same Regex (if present) can be done later (semantic analysis)
      *  The empty string between two delimiters is not considered as a token
+     * 
+     *  Line numbers will be made according to "\n" instances. Note: These do not have to be considered as whitespace in the grammar
+     * 
      *  @param whitespaceDelimiters All string to be considered as whitespace (Will not be tokenised)
      *  @param stronglyReservedWords Words that cannot be part of a user-definable token. Examples: operators, punctuation, etc. (Not including whitespace)
      *  @param weaklyReservedWords Words that will be tokenised if they do not appear as part of a user-definable token
@@ -55,9 +60,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         this.whitespaceDelimiters = whitespaceDelimiters;
         this.stronglyReservedWords = stronglyReservedWords;
         this.weaklyReservedWords = weaklyReservedWords;
-        this.dynamicTokenRegex = dynamicTokenRegex;
 
         validateDynamicTokens();
+        generateRegexMatchers(dynamicTokenRegex);
     }
 
     private void validateDynamicTokens() {
@@ -65,26 +70,49 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         //TODO
     }
 
+    private void generateRegexMatchers(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegexStringBased) {
+        dynamicTokenRegex = new HashMap<>();
+
+        for (String regexString : dynamicTokenRegexStringBased.keySet()) {
+            Pattern regexPattern = Pattern.compile(regexString);
+            dynamicTokenRegex.put(regexPattern, dynamicTokenRegexStringBased.get(regexString));
+        }
+    }
+
     @Override
     public Token[] analyse(String sentence) {
         List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
+
+        int lineNum = 1;
+        int columnNum = 0;
 
         ArrayList<Character> currentCharList = new ArrayList<>();
         String currentTokStr = "";
         for (char c : sentenceChars) {
             currentCharList.add(c);
 
+            columnNum++;
+
             currentTokStr = getStringRepresentation(currentCharList);
 
             if(!removeEndingDelimiter(currentTokStr)) { continue; }
-            if(currentTokStr.equals("")) { continue; }
 
-            tokenList.add(produceToken(currentTokStr));
+            if(currentTokStr.equals("")) { 
+                continue; 
+            }
+            else {
+                tokenList.add(produceToken(currentTokStr, lineNum, columnNum));
+
+                if(c == 'n') {
+                    lineNum++;
+                    columnNum = 0;
+                }
+            }
         }
 
         if(!currentTokStr.equals("")) {
-            tokenList.add(produceToken(currentTokStr));
+            tokenList.add(produceToken(currentTokStr, lineNum, columnNum));
         }
 
         return (Token[])tokenList.toArray();
@@ -114,12 +142,33 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return false;
     }
 
-    private Token produceToken(String string) {
-        //Disallow containing any strongly reserved words
+    private Token produceToken(String string, int lineNum, int columnNum) {
+        String strongWordFound = containsStronglyReservedWord(string);
+        if(strongWordFound != null) {
+            throw new RuntimeException("Dynamic token found containing the strongly reserved word \"" + strongWordFound + "\"");
+        }
         
         //Match to regex
-        for(String regex : dynamicTokenRegex.keySet()) {
-            //TODO:
+        for(Pattern regex : dynamicTokenRegex.keySet()) {
+            if(regex.matcher(string).matches()) {
+                NotEmptyTuple<String, String> details = dynamicTokenRegex.get(regex);
+
+                return DynamicTokenFactory.create(
+                    details.value1(),
+                    details.value2(),
+                    string,
+                    lineNum,
+                    columnNum
+                );
+            }
+        }
+
+        return null;
+    }
+
+    private String containsStronglyReservedWord(String string) {
+        for (String reservedWord : stronglyReservedWords) {
+            if(string.contains(reservedWord)) { return reservedWord; }
         }
 
         return null;

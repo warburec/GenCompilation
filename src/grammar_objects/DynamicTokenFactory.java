@@ -2,7 +2,7 @@ package grammar_objects;
 
 public class DynamicTokenFactory {
     
-    public Token create(
+    public static Token create(
         String type,
         String grammaticalName,
         String instanceName,
