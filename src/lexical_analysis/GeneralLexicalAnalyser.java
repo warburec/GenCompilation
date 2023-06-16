@@ -84,6 +84,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
 
+        StringHolder holder = new StringHolder();
+
         int lineNum = 1;
         int columnNum = 0;
 
@@ -96,23 +98,28 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             currentTokStr = getStringRepresentation(currentCharList);
 
-            if(!removeEndingDelimiter(currentTokStr)) { continue; }
+            holder.setString(currentTokStr);
+            if(!removeEndingDelimiter(holder)) { continue; }
 
-            if(currentTokStr.equals("")) { 
+            String tokWithoutDelim = holder.getString();
+
+            if(tokWithoutDelim.equals("")) { 
                 continue; 
             }
             else {
-                tokenList.add(produceToken(currentTokStr, lineNum, columnNum));
+                tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length()));
 
-                if(c == 'n') {
+                if(c == '\n') {
                     lineNum++;
                     columnNum = 0;
                 }
             }
+
+            currentCharList.clear();
         }
 
         if(!currentTokStr.equals("")) {
-            tokenList.add(produceToken(currentTokStr, lineNum, columnNum));
+            tokenList.addAll(produceTokens(currentTokStr, lineNum, columnNum));
         }
 
         return (Token[])tokenList.toArray();
@@ -123,7 +130,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @param string The string to be altered
      * @return Whether a removal occured or not
      */
-    private boolean removeEndingDelimiter(String string) {
+    private boolean removeEndingDelimiter(StringHolder holder) {
+        String string = holder.getString();
         int stringLen = string.length();
 
         for (String delimiter : whitespaceDelimiters) {
@@ -134,7 +142,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             String endSubstring = string.substring(stringLen - delimLength, stringLen);
 
             if(endSubstring.equals(delimiter)) {
-                string = string.substring(0, stringLen - delimLength);
+                holder.setString(string.substring(0, stringLen - delimLength));
                 return true;
             }
         }
@@ -142,36 +150,72 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return false;
     }
 
-    private Token produceToken(String string, int lineNum, int columnNum) {
-        String strongWordFound = containsStronglyReservedWord(string);
-        if(strongWordFound != null) {
-            throw new RuntimeException("Dynamic token found containing the strongly reserved word \"" + strongWordFound + "\"");
-        }
+    private List<Token> produceTokens(String string, int lineNum, int columnNum) {
+        List<String> splitByStrongWords = splitAtStronglyReservedWords(string); //TODO: Retain line and column information
         
-        //Match to regex
-        for(Pattern regex : dynamicTokenRegex.keySet()) {
-            if(regex.matcher(string).matches()) {
-                NotEmptyTuple<String, String> details = dynamicTokenRegex.get(regex);
+        List<Token> tokens = new ArrayList<>(4);
 
-                return DynamicTokenFactory.create(
-                    details.value1(),
-                    details.value2(),
-                    string,
-                    lineNum,
-                    columnNum
-                );
+        //Match to regex
+        for(String part : splitByStrongWords) {
+            tokens.add(produceToken(part, lineNum, columnNum));
+        }
+
+        return null;
+    }
+
+    private Token produceToken(String string, int lineNum, int columnNum) {
+        //Check for weakly reserved words
+        Token foundWeakReserved = matchWeaklyReservedWord(string, lineNum, columnNum);
+
+        if(foundWeakReserved != null) {return foundWeakReserved; }
+
+        for(Pattern regex : dynamicTokenRegex.keySet()) {
+            if(!regex.matcher(string).matches()) { continue; }
+
+            NotEmptyTuple<String, String> details = dynamicTokenRegex.get(regex);
+
+            return DynamicTokenFactory.create(
+                details.value1(),
+                details.value2(),
+                string,
+                lineNum,
+                columnNum
+            );
+        }
+
+        throw new RuntimeException("No dynamic token lexemes matched the string \"" + string + "\" at line " + lineNum + " column " + columnNum);
+    }
+
+    private Token matchWeaklyReservedWord(String string, int lineNum, int columnNum) {
+        for (String weakWord : weaklyReservedWords) {
+            if(string.equals(weakWord)) {
+                return new Token(string, lineNum, columnNum); //TODO: Consider allowing users to define subtypes of Token to use (factory)
             }
         }
 
         return null;
     }
 
-    private String containsStronglyReservedWord(String string) {
+    private List<String> splitAtStronglyReservedWords(String string) {
+        List<String> substrings = new ArrayList<>(4);
+        substrings.add(string);
+
+        List<String> temp = new ArrayList<>(4);
+
         for (String reservedWord : stronglyReservedWords) {
-            if(string.contains(reservedWord)) { return reservedWord; }
+            temp.clear();
+
+            for (String substring : substrings) {
+                for(String part : substring.split(reservedWord)) {
+                    temp.add(part);
+                }
+            }
+
+            substrings.clear();
+            substrings.addAll(temp);
         }
 
-        return null;
+        return substrings;
     }
 
     /* https://stackoverflow.com/questions/6324826/converting-arraylist-of-characters-to-a-string */
@@ -185,4 +229,15 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return builder.toString();
     }
     
+    private class StringHolder {
+        private String string;
+
+        public String getString() {
+            return string;
+        }
+
+        public void setString(String string) {
+            this.string = string;
+        }
+    }
 }
