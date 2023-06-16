@@ -7,6 +7,11 @@ import helperObjects.NotEmptyTuple;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
+    private String[] whitespaceDelimiters;
+    private String[] stronglyReservedWords;
+    private String[] weaklyReservedWords;
+    private Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex;
+
     /**
      *  User-definables/dynamic tokens must have mutually exclusive regex
      *  This makes the assumption that differentiation of tokens with the same Regex (if present) can be done later (semantic analysis)
@@ -31,12 +36,12 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] weaklyReservedWords
         ) {
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<>();
-        dynamicTokenRegex.put("Identifier", new NotEmptyTuple<String, String>("identifier", "[a-zA-Z].*"));
-        dynamicTokenRegex.put("Literal", new NotEmptyTuple<String, String>("string", "\".*\""));
-        dynamicTokenRegex.put("Literal", new NotEmptyTuple<String, String>("integer", "[0-9]+"));
-        dynamicTokenRegex.put("Literal", new NotEmptyTuple<String, String>("real", "[0-9]\\.[0-9]+"));
-        dynamicTokenRegex.put("Literal", new NotEmptyTuple<String, String>("boolean", "[true|false]"));
-        dynamicTokenRegex.put("Literal", new NotEmptyTuple<String, String>("character", "\'.\'"));
+        dynamicTokenRegex.put("[a-zA-Z].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
+        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
+        dynamicTokenRegex.put("[0-9]+", new NotEmptyTuple<String, String>("Literal", "integer"));
+        dynamicTokenRegex.put("[0-9]\\.[0-9]+", new NotEmptyTuple<String, String>("Literal", "real"));
+        dynamicTokenRegex.put("[true|false]", new NotEmptyTuple<String, String>("Literal", "boolean"));
+        dynamicTokenRegex.put("\'.\'", new NotEmptyTuple<String, String>("Literal", "character"));
 
         initialise(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords, dynamicTokenRegex);
     }
@@ -47,6 +52,11 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] weaklyReservedWords,
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex
         ) {
+        this.whitespaceDelimiters = whitespaceDelimiters;
+        this.stronglyReservedWords = stronglyReservedWords;
+        this.weaklyReservedWords = weaklyReservedWords;
+        this.dynamicTokenRegex = dynamicTokenRegex;
+
         validateDynamicTokens();
     }
 
@@ -86,12 +96,32 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @return Whether a removal occured or not
      */
     private boolean removeEndingDelimiter(String string) {
-        //TODO
-        return true;
+        int stringLen = string.length();
+
+        for (String delimiter : whitespaceDelimiters) {
+            int delimLength = delimiter.length();
+
+            if(delimLength > stringLen) { continue; }
+
+            String endSubstring = string.substring(stringLen - delimLength, stringLen);
+
+            if(endSubstring.equals(delimiter)) {
+                string = string.substring(0, stringLen - delimLength);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Token produceToken(String string) {
-        //TODO
+        //Disallow containing any strongly reserved words
+        
+        //Match to regex
+        for(String regex : dynamicTokenRegex.keySet()) {
+            //TODO:
+        }
+
         return null;
     }
 
