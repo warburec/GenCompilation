@@ -1,7 +1,6 @@
 package lexical_analysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import grammar_objects.*;
 import helperObjects.NotEmptyTuple;
@@ -48,20 +47,63 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] weaklyReservedWords,
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex
         ) {
-        // Initial checking:
-        // User-definables/dynamic tokens must have mutually exclusive regex
         validateDynamicTokens();
-        //TODO
     }
 
     private void validateDynamicTokens() {
+        // User-definables/dynamic tokens must have mutually exclusive regex
         //TODO
     }
 
     @Override
     public Token[] analyse(String sentence) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'analyse'");
+        List<Token> tokenList = new LinkedList<>();
+        char[] sentenceChars = sentence.toCharArray();
+
+        ArrayList<Character> currentCharList = new ArrayList<>();
+        String currentTokStr = "";
+        for (char c : sentenceChars) {
+            currentCharList.add(c);
+
+            currentTokStr = getStringRepresentation(currentCharList);
+
+            if(!removeEndingDelimiter(currentTokStr)) { continue; }
+            if(currentTokStr.equals("")) { continue; }
+
+            tokenList.add(produceToken(currentTokStr));
+        }
+
+        if(!currentTokStr.equals("")) {
+            tokenList.add(produceToken(currentTokStr));
+        }
+
+        return (Token[])tokenList.toArray();
+    }
+
+    /**
+     * Removes the ending delimiter of a string if it contains one
+     * @param string The string to be altered
+     * @return Whether a removal occured or not
+     */
+    private boolean removeEndingDelimiter(String string) {
+        //TODO
+        return true;
+    }
+
+    private Token produceToken(String string) {
+        //TODO
+        return null;
+    }
+
+    /* https://stackoverflow.com/questions/6324826/converting-arraylist-of-characters-to-a-string */
+    private String getStringRepresentation(ArrayList<Character> list)
+    {    
+        StringBuilder builder = new StringBuilder(list.size());
+        for(Character ch: list)
+        {
+            builder.append(ch);
+        }
+        return builder.toString();
     }
     
 }

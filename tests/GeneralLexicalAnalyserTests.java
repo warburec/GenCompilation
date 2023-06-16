@@ -11,7 +11,7 @@ import lexical_analysis.*;
 
 
 public class GeneralLexicalAnalyserTests {
-    
+
     @Test
     public void whitespaceDelimiterRemoval() {
         String sentence =
