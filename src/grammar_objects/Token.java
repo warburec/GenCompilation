@@ -33,6 +33,14 @@ public class Token extends LexicalElement {
             positionType = PositionType.LineAndColumn;
         }
     }
+
+    public Integer getLineNumber() {
+        return lineNumber;
+    }
+
+    public Integer getColumnNumber() {
+        return columnNumber;
+    }
     
     public String getPositionString() {
         switch(positionType) {

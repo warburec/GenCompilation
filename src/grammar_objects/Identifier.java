@@ -1,10 +1,12 @@
 package grammar_objects;
 
-//TODO: Sentence position, restructure is probably needed, factory?
 public class Identifier extends Token {
     String type = null;
     String identifierName = null;
 
+
+    //TODO: Consider if all constructors are necessary
+    
     //Untyped, no specific name
     public Identifier(String grammaticalName) {
         super(grammaticalName);
@@ -20,6 +22,26 @@ public class Identifier extends Token {
     //Named and typed
     public Identifier(String grammaticalName, String type, String identifierName) {
         super(grammaticalName);
+
+        this.type = type;
+        this.identifierName = identifierName;
+    }
+
+    //Untyped, no specific name
+    public Identifier(String grammaticalName, int lineNum, int columnNum) {
+        super(grammaticalName, lineNum, columnNum);
+    }
+
+    //Typed, no specific name
+    public Identifier(String grammaticalName, String type, int lineNum, int columnNum) {
+        super(grammaticalName, lineNum, columnNum);
+
+        this.type = type;
+    }
+
+    //Named and typed
+    public Identifier(String grammaticalName, String type, String identifierName, int lineNum, int columnNum) {
+        super(grammaticalName, lineNum, columnNum);
 
         this.type = type;
         this.identifierName = identifierName;
