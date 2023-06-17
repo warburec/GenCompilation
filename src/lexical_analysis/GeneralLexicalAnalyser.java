@@ -98,6 +98,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             currentTokStr = getStringRepresentation(currentCharList);
 
+            holder.setEndingLineNum(lineNum);
+            holder.setEndingColumnNum(columnNum);
 
             holder.setString(currentTokStr);
             removeEndingStronglyReserved(holder, lineNum, columnNum);
@@ -108,16 +110,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             if(!tokWithoutDelim.equals("")) {
                 tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
-
-                if(c == '\n') {
-                    lineNum++;
-                    columnNum = 0;
-                }
             }
 
             if(holder.getToken() != null) {
                 tokenList.add(holder.getToken());
             }
+
+            lineNum = holder.getEndingLineNum();
+            columnNum = holder.getEndingColumnNum();
 
             currentCharList.clear();
         }
@@ -148,6 +148,12 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             if(endSubstring.equals(delimiter)) {
                 holder.setString(string.substring(0, stringLen - delimLength));
 
+                int newlinePos = getNewlinePosition(delimiter);
+                if(newlinePos != -1) {
+                    holder.setEndingLineNum(lineNum + 1);
+                    holder.setEndingColumnNum(newlinePos);
+                }
+
                 holder.setRemovalOccurred();
                 return true;
             }
@@ -169,6 +175,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 if(newlinePos != -1) {
                     lineNum++;
                     columnNum = substring.length() - newlinePos;
+
+                    holder.setEndingLineNum(lineNum);
+                    holder.setEndingColumnNum(columnNum + strongWord.length());
                 }
 
                 holder.setToken(new Token(strongWord, lineNum, columnNum)); //TODO: Allow use of factory for type?
@@ -270,6 +279,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         private Token token;
         private boolean removalOccured;
 
+        private int endingLineNum;
+        private int endingColumnNum;
+
         public String getString() {
             return string;
         }
@@ -299,5 +311,22 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             token = null;
             removalOccured = false;
         }
+
+        public void setEndingLineNum(int endingLineNum) {
+            this.endingLineNum = endingLineNum;
+        }
+
+        public int getEndingLineNum() {
+            return endingLineNum;
+        }
+
+        public void setEndingColumnNum(int endingColumnNum) {
+            this.endingColumnNum = endingColumnNum;
+        }
+
+        public int getEndingColumnNum() {
+            return endingColumnNum;
+        }
+        
     }
 }
