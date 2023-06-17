@@ -18,12 +18,14 @@ public class GeneralLexicalAnalyserTests {
         "for (int n : numbers) {\n" +
         "    //Do stuff\n" +
         "}";
+
         String[] delims = new String[] {
             " ",
             "\t",
             "\r\n",
             "\n"
         };
+
         String[] stronglyReserved = new String[] {
             "(",
             ")",
@@ -31,9 +33,11 @@ public class GeneralLexicalAnalyserTests {
             "{",
             "}"
         };
+
         String[] weaklyReserved = new String[] {
             "for"
         };
+
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
         dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
@@ -45,7 +49,9 @@ public class GeneralLexicalAnalyserTests {
             dynamicTokenRegex
         );
         
+
         Token[] actual = lexAnalyser.analyse(sentence);
+
 
         Token[] expected = new Token[] {
             new Token("for", 1, 1),
@@ -62,6 +68,11 @@ public class GeneralLexicalAnalyserTests {
         };
 
         assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
     }
 
 }

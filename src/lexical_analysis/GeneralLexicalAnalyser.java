@@ -79,7 +79,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     @Override
-    public Token[] analyse(String sentence) {
+    public Token[] analyse(String sentence) { //TODO: Try optimising/restructuring for clarity /////////////////////////////
         List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
 
@@ -195,20 +195,6 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return string.indexOf('\n');
     }
 
-    private List<Token> produceTokens(String string, int lineNum, int columnNum) {
-        List<String> splitByStrongWords = splitAtStronglyReservedWords(string); //TODO: Retain line and column information /////////////////////////// tokenise these
-        
-        List<Token> tokens = new ArrayList<>(4);
-
-        //Match to regex
-        for(String part : splitByStrongWords) {
-            if(part.equals("")) { continue; }
-            tokens.add(produceToken(part, lineNum, columnNum));
-        }
-
-        return tokens;
-    }
-
     private Token produceToken(String string, int lineNum, int columnNum) {
         //Check for weakly reserved words
         Token foundWeakReserved = matchWeaklyReservedWord(string, lineNum, columnNum);
@@ -240,28 +226,6 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
 
         return null;
-    }
-
-    private List<String> splitAtStronglyReservedWords(String string) {
-        List<String> substrings = new ArrayList<>(4);
-        substrings.add(string);
-
-        List<String> temp = new ArrayList<>(4);
-
-        for (String reservedWord : stronglyReservedWords) {
-            temp.clear();
-
-            for (String substring : substrings) {
-                for(String part : substring.split(Pattern.quote(reservedWord))) { //TODO: Reserved words could be regex
-                    temp.add(part);
-                }
-            }
-
-            substrings.clear();
-            substrings.addAll(temp);
-        }
-
-        return substrings;
     }
 
     private String getStringRepresentation(ArrayList<Character> list)
