@@ -35,7 +35,7 @@ public class GeneralLexicalAnalyserTests {
             "for"
         };
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[^\"[0-9]].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -48,17 +48,17 @@ public class GeneralLexicalAnalyserTests {
         Token[] actual = lexAnalyser.analyse(sentence);
 
         Token[] expected = new Token[] {
-            new Token("for", 1, 0),
-            new Token("(", 1, 4),
-            new Identifier("identifier", "int"),
-            new Identifier("identifier", "n"),
-            new Token(":", 1, 11),
-            new Identifier("identifier", "numbers"),
+            new Token("for", 1, 1),
+            new Token("(", 1, 5),
+            new Identifier("identifier", "int", 1, 6),
+            new Identifier("identifier", "n", 1, 10),
+            new Token(":", 1, 12),
+            new Identifier("identifier", "numbers", 1, 14),
             new Token(")", 1, 21),
             new Token("{", 1, 23),
-            new Identifier("identifier", "//Do"), //No preprocessing
-            new Identifier("identifier", "stuffs"), // ^
-            new Token("}", 3, 0)
+            new Identifier("identifier", "//Do", 2, 5), //No preprocessing
+            new Identifier("identifier", "stuffs", 2, 10), // ^
+            new Token("}", 3, 1)
         };
 
         assertArrayEquals(expected, actual);
