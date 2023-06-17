@@ -102,7 +102,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             holder.setEndingColumnNum(columnNum);
 
             holder.setString(currentTokStr);
-            removeEndingStronglyReserved(holder, lineNum, columnNum);
+            removeStronglyReservedEnding(holder, lineNum, columnNum);
 
             if(!holder.removalOccured()) { continue; }
 
@@ -123,7 +123,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
 
         if(!currentTokStr.equals("")) {
-            tokenList.addAll(produceTokens(currentTokStr, lineNum, columnNum));
+            tokenList.add(produceToken(currentTokStr, lineNum, columnNum));
         }
 
         return tokenList.toArray(new Token[tokenList.size()]);
@@ -134,7 +134,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @param string The string to be altered
      * @return Whether a removal occured or not
      */
-    private boolean removeEndingStronglyReserved(StrongResRemovalHolder holder, int lineNum, int columnNum) {
+    private boolean removeStronglyReservedEnding(StrongResRemovalHolder holder, int lineNum, int columnNum) {
         String string = holder.getString();
         int stringLen = string.length();
 
@@ -151,7 +151,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 int newlinePos = getNewlinePosition(delimiter);
                 if(newlinePos != -1) {
                     holder.setEndingLineNum(lineNum + 1);
-                    holder.setEndingColumnNum(newlinePos);
+                    holder.setEndingColumnNum(delimLength - newlinePos - 1);
                 }
 
                 holder.setRemovalOccurred();
@@ -167,20 +167,25 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             String endSubstring = string.substring(stringLen - wordLength, stringLen);
 
             if(endSubstring.equals(strongWord)) {
-                String substring = string.substring(0, stringLen - wordLength);
-                holder.setString(substring);
+                String startSubstring = string.substring(0, stringLen - wordLength);
+                holder.setString(startSubstring);
 
-                int newlinePos = getNewlinePosition(substring);
-
+                int newlinePos = getNewlinePosition(startSubstring);
                 if(newlinePos != -1) {
                     lineNum++;
-                    columnNum = substring.length() - newlinePos;
-
-                    holder.setEndingLineNum(lineNum);
-                    holder.setEndingColumnNum(columnNum + strongWord.length());
+                    columnNum = startSubstring.length() - newlinePos - 1;
                 }
 
                 holder.setToken(new Token(strongWord, lineNum, columnNum)); //TODO: Allow use of factory for type?
+
+                newlinePos = getNewlinePosition(strongWord);
+                if(newlinePos != -1) {
+                    lineNum++;
+                    columnNum = strongWord.length() - newlinePos - 1;
+                }
+
+                holder.setEndingLineNum(lineNum);
+                holder.setEndingColumnNum(columnNum);
 
                 holder.setRemovalOccurred();
                 return true;
