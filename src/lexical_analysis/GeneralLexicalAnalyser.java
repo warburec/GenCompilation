@@ -147,7 +147,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     private List<Token> produceTokens(String string, int lineNum, int columnNum) {
-        List<String> splitByStrongWords = splitAtStronglyReservedWords(string); //TODO: Retain line and column information
+        List<String> splitByStrongWords = splitAtStronglyReservedWords(string); //TODO: Retain line and column information /////////////////////////// tokenise these
         
         List<Token> tokens = new ArrayList<>(4);
 
@@ -215,14 +215,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return substrings;
     }
 
-    /* https://stackoverflow.com/questions/6324826/converting-arraylist-of-characters-to-a-string */
     private String getStringRepresentation(ArrayList<Character> list)
     {    
         StringBuilder builder = new StringBuilder(list.size());
-        for(Character ch: list)
-        {
-            builder.append(ch);
+
+        for(Character c : list) {
+            builder.append(c);
         }
+
         return builder.toString();
     }
     

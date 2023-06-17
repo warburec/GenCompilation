@@ -56,8 +56,8 @@ public class GeneralLexicalAnalyserTests {
             new Identifier("identifier", "numbers"),
             new Token(")", 1, 21),
             new Token("{", 1, 23),
-            new Token("//Do", 2,  6), //No preprocessing
-            new Token("stuffs", 2, 10),
+            new Identifier("identifier", "//Do"), //No preprocessing
+            new Identifier("identifier", "stuffs"), // ^
             new Token("}", 3, 0)
         };
 
