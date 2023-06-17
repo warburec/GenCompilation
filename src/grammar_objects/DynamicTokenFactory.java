@@ -7,13 +7,13 @@ public class DynamicTokenFactory {
         String grammaticalName,
         String instanceName,
         int lineNum,
-        int columNum
+        int columnNum
     ) {
         switch(type) {
             case "Token":
-                return new Token(grammaticalName, lineNum, columNum);
+                return new Token(grammaticalName, lineNum, columnNum);
             case "Identifier":
-                return new Identifier(grammaticalName, instanceName, instanceName);
+                return new Identifier(grammaticalName, instanceName, instanceName, lineNum, columnNum);
             case "Literal":
                 return new Literal(grammaticalName, instanceName);
             default:

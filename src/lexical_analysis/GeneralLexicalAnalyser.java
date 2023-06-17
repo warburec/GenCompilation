@@ -83,7 +83,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
 
-        StringHolder holder = new StringHolder();
+        StrongResRemovalHolder holder = new StrongResRemovalHolder();
 
         int lineNum = 1;
         int columnNum = 0;
@@ -92,23 +92,31 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String currentTokStr = "";
         for (char c : sentenceChars) {
             currentCharList.add(c);
-
+            holder.clear();
+            
             columnNum++;
 
             currentTokStr = getStringRepresentation(currentCharList);
 
+
             holder.setString(currentTokStr);
-            if(!removeEndingDelimiter(holder)) { continue; }
+            removeEndingStronglyReserved(holder, lineNum, columnNum);
+
+            if(!holder.removalOccured()) { continue; }
 
             String tokWithoutDelim = holder.getString();
 
             if(!tokWithoutDelim.equals("")) {
-                tokenList.addAll(produceTokens(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
+                tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
 
                 if(c == '\n') {
                     lineNum++;
                     columnNum = 0;
                 }
+            }
+
+            if(holder.getToken() != null) {
+                tokenList.add(holder.getToken());
             }
 
             currentCharList.clear();
@@ -126,7 +134,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @param string The string to be altered
      * @return Whether a removal occured or not
      */
-    private boolean removeEndingDelimiter(StringHolder holder) {
+    private boolean removeEndingStronglyReserved(StrongResRemovalHolder holder, int lineNum, int columnNum) {
         String string = holder.getString();
         int stringLen = string.length();
 
@@ -139,11 +147,42 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             if(endSubstring.equals(delimiter)) {
                 holder.setString(string.substring(0, stringLen - delimLength));
+
+                holder.setRemovalOccurred();
+                return true;
+            }
+        }
+
+        for (String strongWord : stronglyReservedWords) {
+            int wordLength = strongWord.length();
+
+            if(wordLength > stringLen) { continue; }
+
+            String endSubstring = string.substring(stringLen - wordLength, stringLen);
+
+            if(endSubstring.equals(strongWord)) {
+                String substring = string.substring(0, stringLen - wordLength);
+                holder.setString(substring);
+
+                int newlinePos = getNewlinePosition(substring);
+
+                if(newlinePos != -1) {
+                    lineNum++;
+                    columnNum = substring.length() - newlinePos;
+                }
+
+                holder.setToken(new Token(strongWord, lineNum, columnNum)); //TODO: Allow use of factory for type?
+
+                holder.setRemovalOccurred();
                 return true;
             }
         }
 
         return false;
+    }
+
+    private int getNewlinePosition(String string) {
+        return string.indexOf('\n');
     }
 
     private List<Token> produceTokens(String string, int lineNum, int columnNum) {
@@ -226,8 +265,10 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return builder.toString();
     }
     
-    private class StringHolder {
+    private class StrongResRemovalHolder {
         private String string;
+        private Token token;
+        private boolean removalOccured;
 
         public String getString() {
             return string;
@@ -235,6 +276,28 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
         public void setString(String string) {
             this.string = string;
+        }
+
+        public Token getToken() {
+            return token;
+        }
+
+        public void setToken(Token token) {
+            this.token = token;
+        }
+
+        public void setRemovalOccurred() {
+            removalOccured = true;
+        }
+
+        public boolean removalOccured() {
+            return removalOccured;
+        }
+        
+        public void clear() {
+            string = null;
+            token = null;
+            removalOccured = false;
         }
     }
 }
