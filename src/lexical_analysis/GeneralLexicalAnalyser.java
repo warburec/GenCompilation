@@ -122,10 +122,6 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             currentCharList.clear();
         }
 
-        if(!currentTokStr.equals("")) {
-            tokenList.add(produceToken(currentTokStr, lineNum, columnNum));
-        }
-
         return tokenList.toArray(new Token[tokenList.size()]);
     }
 
