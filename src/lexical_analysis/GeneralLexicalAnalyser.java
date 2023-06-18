@@ -73,7 +73,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         dynamicTokenRegex = new HashMap<>();
 
         for (String regexString : dynamicTokenRegexStringBased.keySet()) {
-            Pattern regexPattern = Pattern.compile(regexString);
+            Pattern regexPattern = Pattern.compile(regexString, Pattern.DOTALL);
             dynamicTokenRegex.put(regexPattern, dynamicTokenRegexStringBased.get(regexString));
         }
     }
@@ -120,6 +120,23 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             columnNum = holder.getEndingColumnNum();
 
             currentCharList.clear();
+        }
+
+        if(!currentCharList.isEmpty()) {
+            currentTokStr = getStringRepresentation(currentCharList);
+
+            holder.setString(currentTokStr);
+            removeStronglyReservedEnding(holder, lineNum, columnNum);
+
+            String tokWithoutDelim = holder.getString();
+
+            if(!tokWithoutDelim.equals("")) {
+                tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
+            }
+
+            if(holder.getToken() != null) {
+                tokenList.add(holder.getToken());
+            }
         }
 
         return tokenList.toArray(new Token[tokenList.size()]);
@@ -199,7 +216,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         //Check for weakly reserved words
         Token foundWeakReserved = matchWeaklyReservedWord(string, lineNum, columnNum);
 
-        if(foundWeakReserved != null) {return foundWeakReserved; }
+        if(foundWeakReserved != null) { return foundWeakReserved; }
 
         for(Pattern regex : dynamicTokenRegex.keySet()) {
             if(!regex.matcher(string).matches()) { continue; }

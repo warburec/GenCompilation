@@ -99,7 +99,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -144,7 +144,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); 
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -188,7 +188,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -254,7 +254,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -315,7 +315,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
-        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
         dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
         dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -351,4 +351,46 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
+    @Test
+    public void newlineWithinTokens() {
+        String sentence =
+        "a\n" +
+        "wwb\n" +
+        "c";
+
+        String[] delims = new String[] {
+            "w"
+        };
+
+        String[] stronglyReserved = new String[] {
+        };
+
+        String[] weaklyReserved = new String[] {
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        dynamicTokenRegex.put(".+", new NotEmptyTuple<String, String>("Identifier", "identifier"));
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new Identifier("identifier", "a\n", 1, 1),
+            new Identifier("identifier", "b\nc", 2, 3)
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
 }
