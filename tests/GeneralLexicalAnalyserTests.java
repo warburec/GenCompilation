@@ -118,4 +118,48 @@ public class GeneralLexicalAnalyserTests {
         assertArrayEquals(expected, actual);
     }
 
+    @Test
+    public void whitespaceOnly() {
+        String sentence =
+        "   \n" +
+        "\t\t ";
+
+        String[] delims = new String[] {
+            " ",
+            "\t",
+            "\r\n",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "(",
+            ")",
+            ":",
+            "{",
+            "}"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for"
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier")); //TODO: Reformat to Regex:<Class, grammarName> 
+        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
+        dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {};
+
+        assertArrayEquals(expected, actual);
+    }
 }
