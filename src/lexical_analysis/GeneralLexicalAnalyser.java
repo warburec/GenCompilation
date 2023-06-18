@@ -8,7 +8,7 @@ import helperObjects.NotEmptyTuple;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
-    private String[] whitespaceDelimiters;
+    private String[] whitespaceDelimiters; //TODO: Cache newline positions
     private String[] stronglyReservedWords;
     private String[] weaklyReservedWords;
     private Map<Pattern, NotEmptyTuple<String, String>> dynamicTokenRegex;
@@ -147,7 +147,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @param string The string to be altered
      * @return Whether a removal occured or not
      */
-    private boolean removeStronglyReservedEnding(StrongResRemovalHolder holder, int lineNum, int columnNum) {
+    private boolean removeStronglyReservedEnding(StrongResRemovalHolder holder, int LineNum, int endColumnNum) {
         String string = holder.getString();
         int stringLen = string.length();
 
@@ -163,7 +163,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
                 int newlinePos = getNewlinePosition(delimiter);
                 if(newlinePos != -1) {
-                    holder.setEndingLineNum(lineNum + 1);
+                    holder.setEndingLineNum(LineNum + 1);
                     holder.setEndingColumnNum(delimLength - newlinePos - 1);
                 }
 
@@ -185,20 +185,20 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
                 int newlinePos = getNewlinePosition(startSubstring);
                 if(newlinePos != -1) {
-                    lineNum++;
-                    columnNum = startSubstring.length() - newlinePos - 1;
+                    LineNum++;
+                    endColumnNum = startSubstring.length() - newlinePos - 1;
                 }
 
-                holder.setToken(new Token(strongWord, lineNum, columnNum - wordLength + 1)); //TODO: Allow use of factory for type?
+                holder.setToken(new Token(strongWord, LineNum, endColumnNum - wordLength + 1)); //TODO: Allow use of factory for type?
 
                 newlinePos = getNewlinePosition(strongWord);
                 if(newlinePos != -1) {
-                    lineNum++;
-                    columnNum = strongWord.length() - newlinePos - 1;
+                    LineNum++;
+                    endColumnNum = strongWord.length() - newlinePos - 1;
                 }
 
-                holder.setEndingLineNum(lineNum);
-                holder.setEndingColumnNum(columnNum);
+                holder.setEndingLineNum(LineNum);
+                holder.setEndingColumnNum(endColumnNum);
 
                 holder.setRemovalOccurred();
                 return true;
@@ -213,7 +213,6 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     private Token produceToken(String string, int lineNum, int columnNum) {
-        //Check for weakly reserved words
         Token foundWeakReserved = matchWeaklyReservedWord(string, lineNum, columnNum);
 
         if(foundWeakReserved != null) { return foundWeakReserved; }
