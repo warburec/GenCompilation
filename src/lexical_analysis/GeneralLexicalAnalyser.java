@@ -172,7 +172,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                     columnNum = startSubstring.length() - newlinePos - 1;
                 }
 
-                holder.setToken(new Token(strongWord, lineNum, columnNum)); //TODO: Allow use of factory for type?
+                holder.setToken(new Token(strongWord, lineNum, columnNum - wordLength + 1)); //TODO: Allow use of factory for type?
 
                 newlinePos = getNewlinePosition(strongWord);
                 if(newlinePos != -1) {
