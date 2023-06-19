@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import grammar_objects.*;
 import helperObjects.NotEmptyTuple;
+import helperObjects.Tuple;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
@@ -104,13 +105,11 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             if(holder.removalType == RemovalType.None) { continue; }
 
             if(!holder.prefix.equals("")) {
-                tokenList.add(produceToken(holder.prefix, lineNum, columnNum  + 1 - currentTokStr.length())); //+1 for 1-indexing
+                tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
 
-                int newlinePos = getNewlinePosition(holder.prefix); //TODO: Fix the assumption that prefix/suffix strings will only contain one newline
-                if(newlinePos != -1) {
-                    lineNum++;
-                    columnNum = holder.prefix.length() - newlinePos;
-                }
+                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, lineNum, columnNum - holder.suffix.length());
+                lineNum = endPos.value1();
+                columnNum = endPos.value2() + holder.suffix.length();
             }
 
             if(holder.removalType == RemovalType.StronglyReserved) {
@@ -118,11 +117,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             }
 
             if(!holder.suffix.equals("")) {
-                int newlinePos = getNewlinePosition(holder.suffix);
-                if(newlinePos != -1) {
-                    lineNum++;
-                    columnNum = holder.suffix.length() - newlinePos - 1;
-                }
+                Tuple<Integer, Integer> endPos = getEndingPosition(holder.suffix, lineNum, columnNum);
+                lineNum = endPos.value1();
+                columnNum = endPos.value2();
             }
 
             currentCharList.clear();
@@ -136,11 +133,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             if(!holder.prefix.equals("")) {
                 tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
 
-                int newlinePos = getNewlinePosition(holder.prefix);
-                if(newlinePos != -1) {
-                    lineNum++;
-                    columnNum = holder.prefix.length() - newlinePos;
-                }
+                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, lineNum, columnNum - holder.suffix.length());
+                lineNum = endPos.value1();
+                columnNum = endPos.value2() + holder.suffix.length();
             }
 
             if(holder.removalType == RemovalType.StronglyReserved) {
@@ -149,6 +144,26 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
 
         return tokenList.toArray(new Token[tokenList.size()]);
+    }
+
+    /**
+     * Gets the ending position of the analyser if the position was displayed on-screen
+     * @param string The string to be analysed
+     * @param lineNum The initial line number of analysis
+     * @param columnNum The initial column number of analysis
+     * @return The final perceived position of the analyser in the tuple {line number, column number}
+     */
+    private Tuple<Integer, Integer> getEndingPosition(String string, int lineNum, int columnNum) {
+        List<Integer> newlinePositions = getNewlinePositions(string);
+
+        if(newlinePositions.size() > 0) {
+            lineNum += newlinePositions.size();
+            
+            int lastPos = newlinePositions.get(newlinePositions.size() - 1);
+            columnNum = string.length() - lastPos - 1; 
+        }
+
+        return new NotEmptyTuple<Integer, Integer>(lineNum, columnNum);
     }
 
     private Token tokeniseStronglyReserved(String word, int lineNum, int columnNum) {
@@ -205,8 +220,16 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         holder.removalType = RemovalType.None;
     }
 
-    private int getNewlinePosition(String string) {
-        return string.indexOf('\n');
+    private List<Integer> getNewlinePositions(String string) {
+        List<Integer> newlinePositions = new ArrayList<>(string.length());
+
+        int currentIndex = string.indexOf("\n");
+        while (currentIndex >= 0) {
+            newlinePositions.add(currentIndex);
+            currentIndex = string.indexOf("\n", currentIndex + 1);
+        }
+
+        return newlinePositions;
     }
 
     private Token produceToken(String string, int lineNum, int columnNum) {

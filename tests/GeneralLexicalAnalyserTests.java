@@ -393,4 +393,50 @@ public class GeneralLexicalAnalyserTests {
             assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
         }
     }
+
+    @Test
+    public void multipleNewlineWithinTokens() {
+        String sentence =
+        "a\n" +
+        "\n" +
+        "wwb\n" +
+        "\n" +
+        "d\n" +
+        "c";
+
+        String[] delims = new String[] {
+            "w"
+        };
+
+        String[] stronglyReserved = new String[] {
+        };
+
+        String[] weaklyReserved = new String[] {
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        dynamicTokenRegex.put(".+", new NotEmptyTuple<String, String>("Identifier", "identifier"));
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new Identifier("identifier", "a\n\n", 1, 1),
+            new Identifier("identifier", "b\n\nd\nc", 3, 3)
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
 }
