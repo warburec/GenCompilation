@@ -79,12 +79,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     @Override
-    public Token[] analyse(String sentence) { //TODO: Try optimising/restructuring for clarity /////////////////////////////
+    public Token[] analyse(String sentence) {
         List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
 
         StrongResRemovalHolder holder = new StrongResRemovalHolder();
 
+        //Note: These mark the current position of analysis, not the position for tokens (these will be offset backwards from this position)
+        //These are also 1-indexed
         int lineNum = 1;
         int columnNum = 0;
 
@@ -92,32 +94,36 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String currentTokStr = "";
         for (char c : sentenceChars) {
             currentCharList.add(c);
-            holder.clear();
             
             columnNum++;
 
             currentTokStr = getStringRepresentation(currentCharList);
 
-            holder.setEndingLineNum(lineNum);
-            holder.setEndingColumnNum(columnNum);
+            removeStronglyReservedEnding(currentTokStr, holder);
 
-            holder.setString(currentTokStr);
-            removeStronglyReservedEnding(holder, lineNum, columnNum);
+            if(holder.removalType == RemovalType.None) { continue; }
 
-            if(!holder.removalOccured()) { continue; }
+            if(!holder.prefix.equals("")) {
+                tokenList.add(produceToken(holder.prefix, lineNum, columnNum  + 1 - currentTokStr.length())); //+1 for 1-indexing
 
-            String tokWithoutDelim = holder.getString();
-
-            if(!tokWithoutDelim.equals("")) {
-                tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
+                int newlinePos = getNewlinePosition(holder.prefix); //TODO: Fix the assumption that prefix/suffix strings will only contain one newline
+                if(newlinePos != -1) {
+                    lineNum++;
+                    columnNum = holder.prefix.length() - newlinePos;
+                }
             }
 
-            if(holder.getToken() != null) {
-                tokenList.add(holder.getToken());
+            if(holder.removalType == RemovalType.StronglyReserved) {
+                tokenList.add(tokeniseStronglyReserved(holder.suffix, lineNum, columnNum  + 1 - holder.suffix.length())); //+1 for 1-indexing
             }
 
-            lineNum = holder.getEndingLineNum();
-            columnNum = holder.getEndingColumnNum();
+            if(!holder.suffix.equals("")) {
+                int newlinePos = getNewlinePosition(holder.suffix);
+                if(newlinePos != -1) {
+                    lineNum++;
+                    columnNum = holder.suffix.length() - newlinePos - 1;
+                }
+            }
 
             currentCharList.clear();
         }
@@ -125,30 +131,36 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         if(!currentCharList.isEmpty()) {
             currentTokStr = getStringRepresentation(currentCharList);
 
-            holder.setString(currentTokStr);
-            removeStronglyReservedEnding(holder, lineNum, columnNum);
+            removeStronglyReservedEnding(currentTokStr, holder);
 
-            String tokWithoutDelim = holder.getString();
+            if(!holder.prefix.equals("")) {
+                tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
 
-            if(!tokWithoutDelim.equals("")) {
-                tokenList.add(produceToken(tokWithoutDelim, lineNum, columnNum - currentTokStr.length() + 1)); //+1 for 1-indexed
+                int newlinePos = getNewlinePosition(holder.prefix);
+                if(newlinePos != -1) {
+                    lineNum++;
+                    columnNum = holder.prefix.length() - newlinePos;
+                }
             }
 
-            if(holder.getToken() != null) {
-                tokenList.add(holder.getToken());
+            if(holder.removalType == RemovalType.StronglyReserved) {
+                tokenList.add(tokeniseStronglyReserved(holder.suffix, lineNum, columnNum + 1 - holder.suffix.length())); //+1 for 1-indexing
             }
         }
 
         return tokenList.toArray(new Token[tokenList.size()]);
     }
 
+    private Token tokeniseStronglyReserved(String word, int lineNum, int columnNum) {
+        return new Token(word, lineNum, columnNum);
+    }
+
     /**
-     * Removes the ending delimiter of a string if it contains one
+     * Removes the ending delimiter of a string if it contains one, placing the result in the given holder object
      * @param string The string to be altered
-     * @return Whether a removal occured or not
+     * @param holder A holder object to hold the string split at reserved words and the type of removal that occurred
      */
-    private boolean removeStronglyReservedEnding(StrongResRemovalHolder holder, int LineNum, int endColumnNum) {
-        String string = holder.getString();
+    private void removeStronglyReservedEnding(String string, StrongResRemovalHolder holder) {
         int stringLen = string.length();
 
         for (String delimiter : whitespaceDelimiters) {
@@ -159,16 +171,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             String endSubstring = string.substring(stringLen - delimLength, stringLen);
 
             if(endSubstring.equals(delimiter)) {
-                holder.setString(string.substring(0, stringLen - delimLength));
+                String startSubstring = string.substring(0, stringLen - delimLength);
 
-                int newlinePos = getNewlinePosition(delimiter);
-                if(newlinePos != -1) {
-                    holder.setEndingLineNum(LineNum + 1);
-                    holder.setEndingColumnNum(delimLength - newlinePos - 1);
-                }
+                holder.prefix = startSubstring;
+                holder.suffix = delimiter;
 
-                holder.setRemovalOccurred();
-                return true;
+                holder.removalType = RemovalType.Delimiter;
+
+                return;
             }
         }
 
@@ -181,31 +191,18 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             if(endSubstring.equals(strongWord)) {
                 String startSubstring = string.substring(0, stringLen - wordLength);
-                holder.setString(startSubstring);
 
-                int newlinePos = getNewlinePosition(startSubstring);
-                if(newlinePos != -1) {
-                    LineNum++;
-                    endColumnNum = startSubstring.length() - newlinePos - 1;
-                }
+                holder.prefix = startSubstring;
+                holder.suffix = endSubstring;
 
-                holder.setToken(new Token(strongWord, LineNum, endColumnNum - wordLength + 1)); //TODO: Allow use of factory for type?
+                holder.removalType = RemovalType.StronglyReserved;
 
-                newlinePos = getNewlinePosition(strongWord);
-                if(newlinePos != -1) {
-                    LineNum++;
-                    endColumnNum = strongWord.length() - newlinePos - 1;
-                }
-
-                holder.setEndingLineNum(LineNum);
-                holder.setEndingColumnNum(endColumnNum);
-
-                holder.setRemovalOccurred();
-                return true;
+                return;
             }
         }
 
-        return false;
+        holder.prefix = string;
+        holder.removalType = RemovalType.None;
     }
 
     private int getNewlinePosition(String string) {
@@ -256,58 +253,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
     
     private class StrongResRemovalHolder {
-        private String string;
-        private Token token;
-        private boolean removalOccured;
+        public String prefix;
+        public String suffix;
+        public RemovalType removalType;
+    }
 
-        private int endingLineNum;
-        private int endingColumnNum;
-
-        public String getString() {
-            return string;
-        }
-
-        public void setString(String string) {
-            this.string = string;
-        }
-
-        public Token getToken() {
-            return token;
-        }
-
-        public void setToken(Token token) {
-            this.token = token;
-        }
-
-        public void setRemovalOccurred() {
-            removalOccured = true;
-        }
-
-        public boolean removalOccured() {
-            return removalOccured;
-        }
-        
-        public void clear() {
-            string = null;
-            token = null;
-            removalOccured = false;
-        }
-
-        public void setEndingLineNum(int endingLineNum) {
-            this.endingLineNum = endingLineNum;
-        }
-
-        public int getEndingLineNum() {
-            return endingLineNum;
-        }
-
-        public void setEndingColumnNum(int endingColumnNum) {
-            this.endingColumnNum = endingColumnNum;
-        }
-
-        public int getEndingColumnNum() {
-            return endingColumnNum;
-        }
-        
+    private enum RemovalType {
+        None,
+        Delimiter,
+        StronglyReserved
     }
 }
