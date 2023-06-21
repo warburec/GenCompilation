@@ -9,10 +9,14 @@ import helperObjects.Tuple;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
-    private String[] whitespaceDelimiters; //TODO: Cache newline positions
+    private String[] whitespaceDelimiters;
     private String[] stronglyReservedWords;
     private String[] weaklyReservedWords;
     private Map<Pattern, NotEmptyTuple<String, String>> dynamicTokenRegex;
+
+    private Map<String, List<Integer>> whitespaceNewlinePositions;
+    private Map<String, List<Integer>> stronglyReservedWordNewlinePositions;
+    private Map<String, List<Integer>> weaklyReservedWordNewlinePositions;
 
     /**
      *  User-definables/dynamic tokens must have mutually exclusive regex
@@ -30,7 +34,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] whitespaceDelimiters,
         String[] stronglyReservedWords,
         String[] weaklyReservedWords,
-        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex //TODO: Try passing in classes directly
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex //TODO: Try passing in classes directly or use enum
         ) {
         initialise(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords, dynamicTokenRegex);
     }
@@ -62,7 +66,29 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         this.weaklyReservedWords = weaklyReservedWords;
 
         validateDynamicTokens();
+        cacheNewlinePositions(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords);
         generateDynamicRegexPatterns(dynamicTokenRegex);
+    }
+
+    private void cacheNewlinePositions(
+        String[] whitespaceDelimiters, 
+        String[] stronglyReservedWords, 
+        String[] weaklyReservedWords
+        ) {
+        whitespaceNewlinePositions = new HashMap<>();
+        for(String delim : whitespaceDelimiters) {
+            whitespaceNewlinePositions.put(delim, getNewlinePositions(delim));
+        }
+
+        stronglyReservedWordNewlinePositions = new HashMap<>();
+        for(String strongWord : stronglyReservedWords) {
+            stronglyReservedWordNewlinePositions.put(strongWord, getNewlinePositions(strongWord));
+        }
+
+        weaklyReservedWordNewlinePositions = new HashMap<>();
+        for(String weakWord : weaklyReservedWords) {
+            weaklyReservedWordNewlinePositions.put(weakWord, getNewlinePositions(weakWord));
+        }
     }
 
     private void validateDynamicTokens() {
@@ -107,17 +133,19 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             if(!holder.prefix.equals("")) {
                 tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
 
-                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, lineNum, columnNum - holder.suffix.length());
+                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, StringType.Dynamic, lineNum, columnNum - holder.suffix.length());
                 lineNum = endPos.value1();
                 columnNum = endPos.value2() + holder.suffix.length();
             }
 
+            StringType suffixType = StringType.Delimiter;
             if(holder.removalType == RemovalType.StronglyReserved) {
                 tokenList.add(tokeniseStronglyReserved(holder.suffix, lineNum, columnNum  + 1 - holder.suffix.length())); //+1 for 1-indexing
+                suffixType = StringType.StrongWord;
             }
 
             if(!holder.suffix.equals("")) {
-                Tuple<Integer, Integer> endPos = getEndingPosition(holder.suffix, lineNum, columnNum);
+                Tuple<Integer, Integer> endPos = getEndingPosition(holder.suffix, suffixType, lineNum, columnNum);
                 lineNum = endPos.value1();
                 columnNum = endPos.value2();
             }
@@ -133,7 +161,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             if(!holder.prefix.equals("")) {
                 tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
 
-                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, lineNum, columnNum - holder.suffix.length());
+                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, StringType.Dynamic, lineNum, columnNum - holder.suffix.length());
                 lineNum = endPos.value1();
                 columnNum = endPos.value2() + holder.suffix.length();
             }
@@ -153,8 +181,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @param columnNum The initial column number of analysis
      * @return The final perceived position of the analyser in the tuple {line number, column number}
      */
-    private Tuple<Integer, Integer> getEndingPosition(String string, int lineNum, int columnNum) {
-        List<Integer> newlinePositions = getNewlinePositions(string);
+    private Tuple<Integer, Integer> getEndingPosition(String string, StringType stringType, int lineNum, int columnNum) {
+        List<Integer> newlinePositions = getNewlinePositions(string, stringType);
 
         if(newlinePositions.size() > 0) {
             lineNum += newlinePositions.size();
@@ -218,6 +246,21 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
         holder.prefix = string;
         holder.removalType = RemovalType.None;
+    }
+
+    private List<Integer> getNewlinePositions(String string, StringType stringType) {
+        switch(stringType) {
+            case Dynamic:
+                return getNewlinePositions(string);
+            case Delimiter:
+                return whitespaceNewlinePositions.get(string);
+            case StrongWord:
+                return stronglyReservedWordNewlinePositions.get(string);
+            case WeakWord:
+                return weaklyReservedWordNewlinePositions.get(string);
+            default:
+                throw new RuntimeException("Unsupported string type");
+        }
     }
 
     private List<Integer> getNewlinePositions(String string) {
@@ -285,5 +328,12 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         None,
         Delimiter,
         StronglyReserved
+    }
+
+    private enum StringType {
+        Delimiter,
+        StrongWord,
+        WeakWord,
+        Dynamic
     }
 }
