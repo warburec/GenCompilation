@@ -39,6 +39,18 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         initialise(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords, dynamicTokenRegex);
     }
 
+    /**
+     * Default dynamic tokens:
+     * Regex:"[a-zA-Z].*",     Object type:"Identifier", Grammatical name:"identifier"
+     * Regex:"\".*\"",         Object type:"Literal",    Grammatical name:"string"
+     * Regex:"[0-9]+",         Object type:"Literal",    Grammatical name:"integer"
+     * Regex:"[0-9]\\.[0-9]+", Object type:"Literal",    Grammatical name:"real"
+     * Regex:"[true|false]",   Object type:"Literal",    Grammatical name:"boolean"
+     * Regex:"\'.\'",          Object type:"Literal",    Grammatical name:"character"
+     * @param whitespaceDelimiters
+     * @param stronglyReservedWords
+     * @param weaklyReservedWords
+     */
     public GeneralLexicalAnalyser(
         String[] whitespaceDelimiters,
         String[] stronglyReservedWords,

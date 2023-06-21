@@ -10,6 +10,12 @@ public class BasicCodeGenerator implements CodeGenerator {
     protected String preGeneration;
     protected String postGeneration;
 
+    /**
+     * 
+     * @param ruleConvertor A map of production rules and generation functions to produce strings for them
+     * @param preGeneration A string that will precede the generated code
+     * @param postGeneration A string that will follow the generated code
+     */
     public BasicCodeGenerator(Map<ProductionRule, Generator> ruleConvertor, String preGeneration, String postGeneration) {
         this.ruleConvertor = ruleConvertor;
         this.preGeneration = preGeneration;
