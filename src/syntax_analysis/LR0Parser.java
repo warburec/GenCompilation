@@ -6,6 +6,7 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
+//TODO: Highlight non-deterministic rules, show users where rules couldbe changed to become left-recursive
 public class LR0Parser extends SyntaxAnalyser {
 
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
