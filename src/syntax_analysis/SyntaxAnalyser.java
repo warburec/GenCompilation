@@ -3,6 +3,7 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.*;
+import helperObjects.LexElementFinder;
 import syntax_analysis.parsing.*;
 
 public abstract class SyntaxAnalyser {
@@ -28,5 +29,19 @@ public abstract class SyntaxAnalyser {
         this.sentinel = sentinel;
     }
     
+    public SyntaxAnalyser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
+        this.tokens = LexElementFinder.tokens(productionRules);
+        this.nonTerminals = LexElementFinder.nonTerminals(productionRules);
+        this.productionRules = productionRules;
+        this.sentinel = sentinel;
+    }
+
+    public SyntaxAnalyser(ProductionRule[] productionRules, NonTerminal sentinel) {
+        this.tokens = LexElementFinder.tokens(productionRules);
+        this.nonTerminals = LexElementFinder.nonTerminals(productionRules);
+        this.productionRules = Set.of(productionRules);
+        this.sentinel = sentinel;
+    }
+
     public abstract ParseState analyse(Token[] inputTokens) throws ParseFailedException;
 }
