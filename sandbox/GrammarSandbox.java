@@ -343,5 +343,5 @@ public class GrammarSandbox {
     //     String output = codeGenerator.generate(analysedSyntaxStates);
 
     //     System.out.println(output);
-    }
+    // }
 }

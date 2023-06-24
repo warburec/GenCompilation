@@ -263,4 +263,98 @@ public class LR0ParserTests {
         ParseState expectedParseState = grammar.getParseRoot("XToYToX");
         assertEquals(expectedParseState, generatedParseRoot);
     }
+
+    @Test
+    public void nonDeterminism() {
+        ProductionRule[] productionRules = new ProductionRule[] {
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new NonTerminal("A")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new NonTerminal("B")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("A"),
+                new LexicalElement[] {
+                    new Token("a")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("B"),
+                new LexicalElement[] {
+                    new Token("a")
+                }
+            )
+        };
+        NonTerminal sentinel = new NonTerminal("S");
+
+        assertThrows(NonDeterminismException.class, () -> {
+            new LR0Parser(productionRules, sentinel);
+        });
+    }
+
+    @Test
+    public void rightRecursion() {
+        ProductionRule[] productionRules = new ProductionRule[] {
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new Token("a"),
+                    new NonTerminal("S")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new Token("a"),
+                }
+            )
+        };
+        NonTerminal sentinel = new NonTerminal("S");
+        assertThrows(LR0Parser.RightRecursionException.class, () -> {
+            new LR0Parser(productionRules, sentinel);
+        });
+    }
+
+    @Test
+    public void multipleRightRecursions() {
+        ProductionRule[] productionRules = new ProductionRule[] {
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new Token("a"),
+                    new NonTerminal("S")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new NonTerminal("A"),
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("A"),
+                new LexicalElement[] {
+                    new Token("b"),
+                    new NonTerminal("A")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("A"),
+                new LexicalElement[] {
+                    new NonTerminal("c"),
+                }
+            ),
+        };
+        NonTerminal sentinel = new NonTerminal("S");
+        assertThrows(LR0Parser.RightRecursionException.class, () -> {
+            new LR0Parser(productionRules, sentinel);
+        });
+    }
 }
