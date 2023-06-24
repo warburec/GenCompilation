@@ -42,32 +42,9 @@ public class LR0Parser extends SyntaxAnalyser {
 
     private void initialise() {
         checkForInvalidNonTerminals();
-        checkForRightRecursion();
-
         generateProductionMap();
         generateStates();
         generateActionAndGotoTables();
-    }
-
-    private void checkForRightRecursion() {
-        Set<ProductionRule> rightRecursiveRules = new HashSet<>();
-
-        for(ProductionRule rule : productionRules) {
-            LexicalElement[] elements = rule.productionSequence();
-            LexicalElement lastElement = elements[elements.length - 1];
-
-            if(rule.nonTerminal().equals(lastElement)) {
-                rightRecursiveRules.add(rule);
-            }
-        }
-
-        if(!rightRecursiveRules.isEmpty()) {
-            if(rightRecursiveRules.size() == 1) {
-                throw new RightRecursionException((ProductionRule)rightRecursiveRules.toArray()[0]);
-            }
-
-            throw new RightRecursionException(rightRecursiveRules);
-        }
     }
 
     private void checkForInvalidNonTerminals() {
@@ -386,37 +363,6 @@ public class LR0Parser extends SyntaxAnalyser {
 
         public State getCurrentState() {
             return currentState;
-        }
-    }
-
-    public class RightRecursionException extends RuntimeException{
-        Set<ProductionRule> rules;
-        boolean messageSet = true;
-
-        public RightRecursionException(ProductionRule rule) {
-            super("The rule " + rule.toString() + " is right-recursive. Try restructuring this rule/grammar to make it left-recursive");
-        }
-
-        public RightRecursionException(Set<ProductionRule> rules) {
-            super();
-
-            this.rules = rules;
-            this.messageSet = false;
-        }
-
-        @Override
-        public String getMessage(){
-            if(messageSet) {
-                return super.getMessage();
-            }
-
-            String ruleList = "";
-            
-            for(ProductionRule rule : rules) {
-                ruleList += rule.toString() + "\n";
-            }
-
-            return "The rules :\n" + ruleList + " are right-recursive. Try restructuring the rules to make them left-recursive";
         }
     }
 }
