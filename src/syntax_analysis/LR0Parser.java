@@ -6,7 +6,7 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-//TODO: Highlight non-deterministic rules, show users where rules couldbe changed to become left-recursive
+//TODO: Highlight non-deterministic rules, show users where rules could be changed to become left or right-recursive to work as intended
 public class LR0Parser extends SyntaxAnalyser {
 
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
@@ -152,11 +152,7 @@ public class LR0Parser extends SyntaxAnalyser {
         if(stateFound != null) {
             Route newRoute = new Route(stateFound, elementTraversed);
 
-            if(parentState.getBranches().contains(newRoute)) {
-                throw new NonDeterminismException(elementTraversed, currentPositions, parentState);
-            }
-
-            parentState.addBranch(newRoute); //TODO: Throw NonDeterminismException with helpful hints when a branch that already exists is added
+            parentState.addBranch(newRoute);
             currentPositions.remove(currentPositions.size() - 1);
         }
 
@@ -243,7 +239,17 @@ public class LR0Parser extends SyntaxAnalyser {
                         continue;
                     }
 
-                    actionTable.put(state, new ReduceAction(position.rule()));
+                    ReduceAction reductionAction = new ReduceAction(position.rule());
+
+                    if(actionTable.get(state) != null) {
+                        List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
+                        conflicts.add(((ReduceAction)actionTable.get(state)).reductionRule());
+                        conflicts.add(reductionAction.reductionRule());
+
+                        throw new NonDeterminismException(conflicts, state);
+                    }
+
+                    actionTable.put(state, reductionAction);
                 }
             }
 
