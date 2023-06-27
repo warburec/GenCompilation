@@ -244,16 +244,16 @@ public class IntegerCompGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
+    protected void setUpStates(List<NoLookaheadState> states, ProductionRule extraRootRule) {
 
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
+    protected void setUpActionTable(Map<NoLookaheadState, Action> actionTable) {
     }
 
     @Override
-    protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
+    protected void setUpGotoTable(Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> gotoTable) {
     }
 
     @Override

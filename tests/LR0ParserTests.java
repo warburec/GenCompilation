@@ -41,7 +41,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getGetState();
+        Set<NoLookaheadState> expectedStateSet = grammar.getGetState();
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -56,7 +56,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        Map<NoLookaheadState, Action> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -71,7 +71,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
-        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
 
@@ -150,7 +150,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getGetState();
+        Set<NoLookaheadState> expectedStateSet = grammar.getGetState();
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -165,7 +165,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        Map<NoLookaheadState, Action> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -180,7 +180,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
-        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
 
@@ -195,7 +195,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getGetState();
+        Set<NoLookaheadState> expectedStateSet = grammar.getGetState();
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -210,7 +210,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        Map<NoLookaheadState, Action> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -225,7 +225,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
-        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
     }
 

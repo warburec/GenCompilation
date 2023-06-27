@@ -70,8 +70,8 @@ public class SelfReferentialGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
-        states.add(new State( //0
+    protected void setUpStates(List<NoLookaheadState> states, ProductionRule extraRootRule) {
+        states.add(new NoLookaheadState( //0
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
                 new GrammarPosition(getRule(0), 0)
@@ -79,14 +79,14 @@ public class SelfReferentialGrammar extends TestGrammar {
             null
         ));
 
-        states.add(new State( //1
+        states.add(new NoLookaheadState( //1
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 1),
             }),
             getState(0)
         ));
 
-        states.add(new State( //2
+        states.add(new NoLookaheadState( //2
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 1),
                 new GrammarPosition(getRule(1), 0)
@@ -94,14 +94,14 @@ public class SelfReferentialGrammar extends TestGrammar {
             getState(0)
         ));
 
-        states.add(new State( //3
+        states.add(new NoLookaheadState( //3
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 2),
             }),
             getState(2)
         ));
 
-        states.add(new State( //4
+        states.add(new NoLookaheadState( //4
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(1), 1),
                 new GrammarPosition(getRule(2), 0),
@@ -110,14 +110,14 @@ public class SelfReferentialGrammar extends TestGrammar {
             getState(2)
         ));
 
-        states.add(new State( //5
+        states.add(new NoLookaheadState( //5
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(1), 2)
             }),
             getState(4)
         ));
 
-        states.add(new State( //6
+        states.add(new NoLookaheadState( //6
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(2), 1),
                 new GrammarPosition(getRule(2), 0),
@@ -126,14 +126,14 @@ public class SelfReferentialGrammar extends TestGrammar {
             getState(4)
         ));
 
-        states.add(new State( //7
+        states.add(new NoLookaheadState( //7
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(2), 2)
             }),
             getState(6)
         ));
 
-        states.add(new State( //8
+        states.add(new NoLookaheadState( //8
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(3), 1)
             }),
@@ -167,8 +167,8 @@ public class SelfReferentialGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
-        Map<Token, State> currentStateActions = new HashMap<>();
+    protected void setUpActionTable(Map<NoLookaheadState, Action> actionTable) {
+        Map<Token, NoLookaheadState> currentStateActions = new HashMap<>();
 
         currentStateActions.put(new Token("h"), getState(2));
         actionTable.put(getState(0), new ShiftAction(new HashMap<>(currentStateActions)));
@@ -200,8 +200,8 @@ public class SelfReferentialGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
-        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+    protected void setUpGotoTable(Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> gotoTable) {
+        Map<NonTerminal, NoLookaheadState> currentGotoActions = new HashMap<>();
 
         currentGotoActions.put(new NonTerminal("H"), getState(1));
         gotoTable.put(getState(0), new HashMap<>(currentGotoActions));

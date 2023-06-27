@@ -8,13 +8,13 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
 public abstract class TestGrammar extends Grammar {
-    private List<State> getState = new ArrayList<>();
+    private List<NoLookaheadState> getState = new ArrayList<>();
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
     private Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap = new HashMap<>(); //Language, <Sentence, ruleConverterMap>
     private Map<String, Map<String, String[]>> generationBookendMap = new HashMap<>();                   //Language, <Sentence, {preGeneration, postGeneration}>
 
-    private Map<State, Action> actionTable = new HashMap<>();
-    private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
+    private Map<NoLookaheadState, Action> actionTable = new HashMap<>();
+    private Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> gotoTable = new HashMap<>();
 
     public TestGrammar() {
         setUpTokens(tokens);
@@ -44,26 +44,26 @@ public abstract class TestGrammar extends Grammar {
     }
 
 
-    protected abstract void setUpStates(List<State> states, ProductionRule extraRootRule);
+    protected abstract void setUpStates(List<NoLookaheadState> states, ProductionRule extraRootRule);
 
-    public Set<State> getGetState() {
+    public Set<NoLookaheadState> getGetState() {
         return new HashSet<>(getState);
     }
 
-    protected State getState(int index) {
+    protected NoLookaheadState getState(int index) {
         return getState.get(index);
     }
 
 
-    protected abstract void setUpActionTable(Map<State, Action> actionTable);
+    protected abstract void setUpActionTable(Map<NoLookaheadState, Action> actionTable);
 
-    public Map<State, Action> getActionTable() {
+    public Map<NoLookaheadState, Action> getActionTable() {
         return actionTable;
     }
 
-    protected abstract void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable);
+    protected abstract void setUpGotoTable(Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> gotoTable);
 
-    public Map<State, Map<NonTerminal, State>> getGotoTable() {
+    public Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> getGotoTable() {
         return gotoTable;
     }
 

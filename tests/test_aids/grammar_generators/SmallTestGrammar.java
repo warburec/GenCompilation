@@ -73,8 +73,8 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
-        states.add(new State(
+    protected void setUpStates(List<NoLookaheadState> states, ProductionRule extraRootRule) {
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
                 new GrammarPosition(getRule(1), 0),
@@ -86,7 +86,7 @@ public class SmallTestGrammar extends TestGrammar {
             null
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 1),
                 new GrammarPosition(getRule(1), 1),
@@ -95,7 +95,7 @@ public class SmallTestGrammar extends TestGrammar {
             getState(0)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(1), 2),
                 new GrammarPosition(getRule(3), 0),
@@ -104,14 +104,14 @@ public class SmallTestGrammar extends TestGrammar {
             getState(1)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(1), 3),
             }),
             getState(2)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 2),
                 new GrammarPosition(getRule(3), 0),
@@ -120,28 +120,28 @@ public class SmallTestGrammar extends TestGrammar {
             getState(1)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 3),
             }),
             getState(3)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(2), 1),
             }),
             getState(0)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(3), 1),
             }),
             getState(0)
         ));
 
-        states.add(new State(
+        states.add(new NoLookaheadState(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(4), 1),
             }),
@@ -176,8 +176,8 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
-        Map<Token, State> currentStateActions = new HashMap<>();
+    protected void setUpActionTable(Map<NoLookaheadState, Action> actionTable) {
+        Map<Token, NoLookaheadState> currentStateActions = new HashMap<>();
 
         currentStateActions.put(new Token("0"), getState(7));
         currentStateActions.put(new Token("1"), getState(8));
@@ -212,8 +212,8 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
-        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+    protected void setUpGotoTable(Map<NoLookaheadState, Map<NonTerminal, NoLookaheadState>> gotoTable) {
+        Map<NonTerminal, NoLookaheadState> currentGotoActions = new HashMap<>();
 
         currentGotoActions.put(new NonTerminal("E"), getState(1));
         currentGotoActions.put(new NonTerminal("B"), getState(6));

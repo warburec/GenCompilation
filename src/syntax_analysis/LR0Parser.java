@@ -99,7 +99,7 @@ public class LR0Parser extends SyntaxAnalyser {
         
         currentPositions = expandPositions(startPositions);
 
-        State currentState = new State(new HashSet<>(currentPositions), parentState);
+        State currentState = new NoLookaheadState(new HashSet<>(currentPositions), parentState);
         states.add(currentState);
 
         List<LexicalElement> elementsUsed = new ArrayList<>();
