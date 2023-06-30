@@ -17,7 +17,16 @@ public class FirstSetGenerator {
             firstNTSets.put(nonTerminal, new HashSet<>());
         }
 
-        // Add all first rule elements (including empty token if necessary)
+        findAllFirstElements(productionRules, firstTokenSets, firstNTSets, emptyToken);
+
+        resolveCompleteSets(firstTokenSets, firstNTSets);
+        resolveConnectedSets(firstTokenSets, firstNTSets);
+
+        return firstTokenSets;
+    }
+
+    private static void findAllFirstElements(Set<ProductionRule> productionRules, HashMap<NonTerminal, Set<Token>> firstTokenSets,
+            HashMap<NonTerminal, Set<NonTerminal>> firstNTSets, Token emptyToken) {
         for(ProductionRule rule : productionRules) {
             if(rule.productionSequence().length == 0 || 
                 (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
@@ -58,8 +67,10 @@ public class FirstSetGenerator {
                 }
             }
         }
+    }
 
-
+    private static void resolveCompleteSets(HashMap<NonTerminal, Set<Token>> firstTokenSets,
+            HashMap<NonTerminal, Set<NonTerminal>> firstNTSets) {
         List<NonTerminal> completeSets = new ArrayList<>();
 
         do {
@@ -71,7 +82,7 @@ public class FirstSetGenerator {
                 }
             }
 
-            // Replace competed sets with their tokens
+            // Replace completed sets with their tokens
             for(NonTerminal nonTerminal : completeSets) {
                 firstNTSets.remove(nonTerminal);
 
@@ -92,15 +103,16 @@ public class FirstSetGenerator {
                 }
             }
         } while (!completeSets.isEmpty());
+    }
 
+    private static void resolveConnectedSets(HashMap<NonTerminal, Set<Token>> firstTokenSets,
+            HashMap<NonTerminal, Set<NonTerminal>> firstNTSets) {
         boolean changesMade = false;
 
         do {
             changesMade = false;
 
             for (NonTerminal nonTerminal : firstNTSets.keySet()) {
-                Set<NonTerminal> nTSet = firstNTSets.get(nonTerminal);
-
                 for (NonTerminal nonTerminal2 : firstNTSets.get(nonTerminal)) {
                     if(firstTokenSets.get(nonTerminal).containsAll(firstTokenSets.get(nonTerminal2))) {
                         continue;
@@ -114,8 +126,6 @@ public class FirstSetGenerator {
                 }
             }
         } while (changesMade);
-
-        return firstTokenSets;
     }
 
     private static Set<LexicalElement> getFollowingElements(NonTerminal nonTerminal, Set<ProductionRule> productionRules) {
