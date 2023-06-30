@@ -10,13 +10,18 @@ public class FirstSetGenerator {
         HashMap<NonTerminal, Set<Token>> firstTokenSets = new HashMap<>();
         HashMap<NonTerminal, Set<NonTerminal>> firstNTSets = new HashMap<>();
 
+        Token emptyToken = new Token("");
+
         for(NonTerminal nonTerminal : nonTerminals) {
             firstTokenSets.put(nonTerminal, new HashSet<>());
+            firstNTSets.put(nonTerminal, new HashSet<>());
         }
 
         // Add all first rule elements (including empty token if necessary)
         for(ProductionRule rule : productionRules) {
-            if(rule.productionSequence().length == 0) {
+            if(rule.productionSequence().length == 0 || 
+                (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
+            ) {
                 Set<LexicalElement> followingElements = getFollowingElements(rule.nonTerminal(), productionRules);
 
                 for (LexicalElement element : followingElements) {
@@ -27,16 +32,31 @@ public class FirstSetGenerator {
                         firstNTSets.get(rule.nonTerminal()).add((NonTerminal)element);
                     }
                 }
+
+                continue;
             }
 
-            if(rule.getFirstElement() instanceof Token) {
-                firstTokenSets.get(rule.nonTerminal()).add((Token)rule.getFirstElement());
-            }
-            else {
-                if(rule.nonTerminal().equals(rule.getFirstElement())) { continue; }
+            boolean keepChecking = true;
+            int index = 0;
+            LexicalElement element = rule.getFirstElement();
 
-                firstNTSets.get(rule.nonTerminal()).add((NonTerminal)rule.getFirstElement());
-            }            
+            while(keepChecking) {
+                if(element instanceof Token) {
+                    if(emptyToken.equals(rule.getFirstElement())) {
+                        element = rule.productionSequence()[index];
+                    }
+
+                    keepChecking = false;
+                    firstTokenSets.get(rule.nonTerminal()).add((Token)rule.getFirstElement());
+                }
+                else {
+                    keepChecking = false;
+
+                    if(rule.nonTerminal().equals(rule.getFirstElement())) { break; }
+
+                    firstNTSets.get(rule.nonTerminal()).add((NonTerminal)rule.getFirstElement());
+                }
+            }
         }
 
 
@@ -45,7 +65,7 @@ public class FirstSetGenerator {
         do {
             completeSets.clear();
 
-            for(NonTerminal nonTerminal : nonTerminals) {
+            for(NonTerminal nonTerminal : firstNTSets.keySet()) {
                 if(firstNTSets.get(nonTerminal).isEmpty()) {
                     completeSets.add(nonTerminal);
                 }
@@ -105,9 +125,13 @@ public class FirstSetGenerator {
             LexicalElement[] elements = rule.productionSequence();
 
             for (int i = 0; i < elements.length - 1; i++) {
-                if(nonTerminal.equals(elements[i++])) { continue; }
+                if(!nonTerminal.equals(elements[i])) { continue; }
 
-                followingElements.add(elements[i++]);
+                LexicalElement nextElement = elements[i + 1];
+
+                if(!nonTerminal.equals(nextElement)) {
+                    followingElements.add(nextElement);
+                }
             }
         }
 
