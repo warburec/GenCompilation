@@ -4,6 +4,7 @@ import java.util.*;
 
 import grammar_objects.*;
 import helperObjects.FirstSetGenerator;
+import helperObjects.FollowSetGenerator;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
@@ -60,7 +61,7 @@ public class SLR1Parser extends SyntaxAnalyser {
     }
 
     private void generateFollowSets() {
-        //TODO: Implement
+        followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
     }
 
     private void checkForInvalidNonTerminals() {
