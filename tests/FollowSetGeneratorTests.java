@@ -67,18 +67,16 @@ public class FollowSetGeneratorTests {
 
 
         HashMap<NonTerminal, Set<Token>> expectedSets = new HashMap<>();
-        //TODO:
         expectedSets.put(
             new NonTerminal("S"),
             Set.of(
-                new Token("b"),
-                new Token("d")
+                new EOF(),
+                new Token("a")
         ));
         expectedSets.put(
             new NonTerminal("T"),
             Set.of(
-                new Token("b"),
-                new Token("d")
+                new Token("c")
         ));
         expectedSets.put(
             new NonTerminal("E"),
@@ -175,39 +173,43 @@ public class FollowSetGeneratorTests {
 
 
         HashMap<NonTerminal, Set<Token>> expectedSets = new HashMap<>();
-        //TODO:
         expectedSets.put(
             new NonTerminal("e"),
             Set.of(
-                new Token("y"),
-                new Token("x"),
-                new Token("(")
+                new EOF(),
+                new Token(")")
         ));
         expectedSets.put(
             new NonTerminal("e'"),
             Set.of(
-                new Token("+")
+                new EOF(),
+                new Token(")")
         ));
         expectedSets.put(
             new NonTerminal("t"),
             Set.of(
-                new Token("y"),
-                new Token("x"),
-                new Token("(")
+                new Token("+"),
+                new Token(")"),
+                new EOF()
         ));
         expectedSets.put(
             new NonTerminal("t'"),
             Set.of(
-                new Token("*")
+                new Token("+"),
+                new Token(")"),
+                new EOF()
         ));
          expectedSets.put(
             new NonTerminal("f"),
             Set.of(
-                new Token("y"),
-                new Token("x"),
-                new Token("(")
+                new Token("*"),
+                new Token("+"),
+                new Token(")"),
+                new EOF()
         ));
 
         assertEquals(expectedSets, actualSets);
     }
+
+    //TODO: Add follow tests for added first set tests
 }

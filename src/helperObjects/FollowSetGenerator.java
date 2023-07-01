@@ -4,6 +4,7 @@ import java.util.*;
 
 import grammar_objects.*;
 
+//TODO: Clean up
 public class FollowSetGenerator {
     
     public static HashMap<NonTerminal, Set<Token>> generate(
@@ -13,28 +14,33 @@ public class FollowSetGenerator {
         HashMap<NonTerminal, Set<Token>> firstSets
     ) {
         HashMap<NonTerminal, Set<Token>> followTokenSets = new HashMap<>();
-        HashMap<NonTerminal, Set<NonTerminal>> followNTSets = new HashMap<>();
+        HashMap<NonTerminal, Set<NonTerminal>> followingNTSets = new HashMap<>();
 
         for(NonTerminal nonTerminal : nonTerminals) {
             followTokenSets.put(nonTerminal, new HashSet<>());
-            followNTSets.put(nonTerminal, new HashSet<>());
+            followingNTSets.put(nonTerminal, new HashSet<>());
         }
 
         followTokenSets.get(sentinel).add(new EOF());
 
-        findAllFollowingElements(productionRules, followTokenSets, followNTSets);
+        Token emptyToken = new Token("");
+        
+        findAndCombineFollowingElements(productionRules, nonTerminals, followTokenSets, followingNTSets, firstSets, emptyToken);
 
-        resolveConnectedSets(followTokenSets, followNTSets);
+        resolveConnectedSets(followTokenSets, followingNTSets, firstSets, emptyToken);
 
         return followTokenSets;
     }
 
-    private static void findAllFollowingElements(
+    private static void findAndCombineFollowingElements(
         Set<ProductionRule> productionRules, 
+        Set<NonTerminal> nonTerminals,
         HashMap<NonTerminal, Set<Token>> followTokenSets,
-        HashMap<NonTerminal, Set<NonTerminal>> followNTSets
+        HashMap<NonTerminal, Set<NonTerminal>> followingNTSets,
+        HashMap<NonTerminal, Set<Token>> firstSets,
+        Token emptyToken
     ) {
-        Token emptyToken = new Token("");
+        Set<NonTerminal> emptyNonTerminals = findEmptyNonTerminals(productionRules, nonTerminals, emptyToken);
 
         for(ProductionRule rule : productionRules) {
             LexicalElement[] elements = rule.productionSequence();
@@ -55,39 +61,81 @@ public class FollowSetGenerator {
                         followTokenSets.get(elements[i]).add((Token)nextElement);
                     }
                     else {
-                        followNTSets.get(elements[i]).add((NonTerminal)nextElement);
+                        followTokenSets.get(elements[i]).addAll(
+                            removeEmpty(firstSets.get((NonTerminal)nextElement), emptyToken)
+                        );
+
+                        if(emptyNonTerminals.contains((NonTerminal)nextElement)) {
+                            followingNTSets.get(elements[i]).add((NonTerminal)nextElement);
+                        }
                     }
                 }
             }
 
             LexicalElement lastElement = elements[elements.length - 1];
-            if(lastElement instanceof NonTerminal) {
-                followNTSets.get((NonTerminal)lastElement).add(rule.nonTerminal());
+            if(lastElement instanceof NonTerminal &&
+                !rule.nonTerminal().equals((NonTerminal)lastElement)) 
+            {
+                followingNTSets.get((NonTerminal)lastElement).add(rule.nonTerminal()); //TODO: do until root if applicable
             }
         }
     }
 
-    private static void resolveConnectedSets(HashMap<NonTerminal, Set<Token>> followTokenSets,
-            HashMap<NonTerminal, Set<NonTerminal>> followNTSets) {
-        boolean changesMade = false;
+    private static void resolveConnectedSets(
+        HashMap<NonTerminal, Set<Token>> followTokenSets,
+        HashMap<NonTerminal, Set<NonTerminal>> followingNTSets,
+        HashMap<NonTerminal, Set<Token>> firstSets,
+        Token emptyToken
+    ) {
+        boolean keepChecking = false;
 
         do {
-            changesMade = false;
+            keepChecking = false;
 
-            for (NonTerminal nonTerminal : followNTSets.keySet()) {
-                for (NonTerminal nonTerminal2 : followNTSets.get(nonTerminal)) {
+            for(NonTerminal nonTerminal : followingNTSets.keySet()) {
+                for(NonTerminal nonTerminal2 : followingNTSets.get(nonTerminal)) {
                     if(followTokenSets.get(nonTerminal).containsAll(followTokenSets.get(nonTerminal2))) {
                         continue;
                     }
 
-                    followTokenSets.get(nonTerminal).addAll(
-                        followTokenSets.get(nonTerminal2)
-                    );
-                    
-                    changesMade = true;
+                    keepChecking = true;
+
+                    followTokenSets.get(nonTerminal).addAll(followTokenSets.get(nonTerminal2));
                 }
             }
-        } while (changesMade);
+        } while (keepChecking);
+
+        for (NonTerminal nonTerminal : followingNTSets.keySet()) {
+            followTokenSets.get(nonTerminal).remove(emptyToken);
+        }
     }
 
+    private static Set<NonTerminal> findEmptyNonTerminals(
+        Set<ProductionRule> productionRules, 
+        Set<NonTerminal> nonTerminals,
+        Token emptyToken
+    ) {
+        Set<NonTerminal> emptyNonTerminals = new HashSet<>();
+
+        for(ProductionRule rule : productionRules) {
+            if(rule.productionSequence().length == 0 ||
+                (rule.productionSequence().length == 1 && emptyToken.equals(rule.productionSequence()[0]))
+            ) {
+                emptyNonTerminals.add(rule.nonTerminal());
+            }
+        }
+
+        return emptyNonTerminals;
+    }
+    
+    private static Set<Token> removeEmpty(Set<Token> set, Token emptyToken) {
+        Set<Token> tokens = new HashSet<>();
+
+        for (Token token : set) {
+            if(!emptyToken.equals(token)) {
+                tokens.add(token);
+            }
+        }
+        return tokens;
+    }
 }
