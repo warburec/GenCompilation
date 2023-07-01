@@ -10,6 +10,8 @@ public class FirstSetGenerator {
         HashMap<NonTerminal, Set<Token>> firstTokenSets = new HashMap<>();
         HashMap<NonTerminal, Set<NonTerminal>> firstNTSets = new HashMap<>();
 
+        Set<NonTerminal> emptyNonTerminals = new HashSet<>();
+
         Token emptyToken = new Token("");
 
         for(NonTerminal nonTerminal : nonTerminals) {
@@ -17,20 +19,31 @@ public class FirstSetGenerator {
             firstNTSets.put(nonTerminal, new HashSet<>());
         }
 
-        findAllFirstElements(productionRules, firstTokenSets, firstNTSets, emptyToken);
+        findAllFirstElements(productionRules, firstTokenSets, firstNTSets, emptyToken, emptyNonTerminals);
 
         resolveCompleteSets(firstTokenSets, firstNTSets);
         resolveConnectedSets(firstTokenSets, firstNTSets);
 
+        for (NonTerminal nonTerminal : emptyNonTerminals) {
+            firstTokenSets.get(nonTerminal).add(emptyToken);
+        }
+
         return firstTokenSets;
     }
 
-    private static void findAllFirstElements(Set<ProductionRule> productionRules, HashMap<NonTerminal, Set<Token>> firstTokenSets,
-            HashMap<NonTerminal, Set<NonTerminal>> firstNTSets, Token emptyToken) {
+    private static void findAllFirstElements(
+        Set<ProductionRule> productionRules, 
+        HashMap<NonTerminal, Set<Token>> firstTokenSets,
+        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets, 
+        Token emptyToken,
+        Set<NonTerminal> emptyNonTerminals
+    ) {
         for(ProductionRule rule : productionRules) {
             if(rule.productionSequence().length == 0 || 
                 (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
             ) {
+                emptyNonTerminals.add(rule.nonTerminal());
+
                 Set<LexicalElement> followingElements = getFollowingElements(rule.nonTerminal(), productionRules);
 
                 for (LexicalElement element : followingElements) {

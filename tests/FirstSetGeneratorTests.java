@@ -74,6 +74,7 @@ public class FirstSetGeneratorTests {
         expectedSets.put(
             new NonTerminal("E"),
             Set.of(
+                new Token(""),
                 new Token("b"),
                 new Token("d")
         ));
@@ -169,7 +170,8 @@ public class FirstSetGeneratorTests {
         expectedSets.put(
             new NonTerminal("e'"),
             Set.of(
-                new Token("+")
+                new Token("+"),
+                new Token("")
         ));
         expectedSets.put(
             new NonTerminal("t"),
@@ -181,7 +183,8 @@ public class FirstSetGeneratorTests {
         expectedSets.put(
             new NonTerminal("t'"),
             Set.of(
-                new Token("*")
+                new Token("*"),
+                new Token("")
         ));
          expectedSets.put(
             new NonTerminal("f"),
@@ -193,4 +196,6 @@ public class FirstSetGeneratorTests {
 
         assertEquals(expectedSets, actualSets);
     }
+
+    //TODO: add tests for various empty token positions
 }
