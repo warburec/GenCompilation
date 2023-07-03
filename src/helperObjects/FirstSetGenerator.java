@@ -10,8 +10,6 @@ public class FirstSetGenerator {
         HashMap<NonTerminal, Set<Token>> firstTokenSets = new HashMap<>();
         HashMap<NonTerminal, Set<NonTerminal>> firstNTSets = new HashMap<>();
 
-        Set<NonTerminal> emptyNonTerminals = new HashSet<>();
-
         Token emptyToken = new Token("");
 
         for(NonTerminal nonTerminal : nonTerminals) {
@@ -19,16 +17,32 @@ public class FirstSetGenerator {
             firstNTSets.put(nonTerminal, new HashSet<>());
         }
 
+        Set<NonTerminal> emptyNonTerminals = findEmptyNonTerminals(productionRules, nonTerminals, emptyToken);
+
         findAllFirstElements(productionRules, firstTokenSets, firstNTSets, emptyToken, emptyNonTerminals);
 
         resolveCompleteSets(firstTokenSets, firstNTSets);
-        resolveConnectedSets(firstTokenSets, firstNTSets);
+        resolveConnectedSets(firstTokenSets, firstNTSets, emptyToken);
 
         for (NonTerminal nonTerminal : emptyNonTerminals) {
             firstTokenSets.get(nonTerminal).add(emptyToken);
         }
 
         return firstTokenSets;
+    }
+
+    private static Set<NonTerminal> findEmptyNonTerminals(Set<ProductionRule> productionRules, Set<NonTerminal> nonTerminals, Token emptyToken) {
+        Set<NonTerminal> emptyNonTerminals = new HashSet<>();
+
+        for (ProductionRule rule : productionRules) {
+            if(rule.productionSequence().length == 0 || 
+                (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
+            ) {
+                emptyNonTerminals.add(rule.nonTerminal());
+            }
+        }
+
+        return emptyNonTerminals;
     }
 
     private static void findAllFirstElements(
@@ -42,41 +56,46 @@ public class FirstSetGenerator {
             if(rule.productionSequence().length == 0 || 
                 (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
             ) {
-                emptyNonTerminals.add(rule.nonTerminal());
-
-                Set<LexicalElement> followingElements = getFollowingElements(rule.nonTerminal(), productionRules);
-
-                for (LexicalElement element : followingElements) {
-                    if(element instanceof Token) {
-                        firstTokenSets.get(rule.nonTerminal()).add((Token)element);
-                    }
-                    else {
-                        firstNTSets.get(rule.nonTerminal()).add((NonTerminal)element);
-                    }
-                }
-
+                firstTokenSets.get(rule.nonTerminal()).add((Token)emptyToken);
                 continue;
             }
 
-            boolean keepChecking = true;
-            int index = 0;
+            boolean foundNonEmpty = false;
+            int index = -1;
             LexicalElement element = rule.getFirstElement();
 
-            while(keepChecking) {
+            while(index < rule.productionSequence().length) {
+                index += 1;
+                element = rule.productionSequence()[index];
+
                 if(element instanceof Token) {
-                    if(emptyToken.equals(rule.getFirstElement())) {
-                        element = rule.productionSequence()[index];
+                    if(emptyToken.equals(element)) {
+                        continue;
                     }
 
-                    keepChecking = false;
-                    firstTokenSets.get(rule.nonTerminal()).add((Token)rule.getFirstElement());
+                    firstTokenSets.get(rule.nonTerminal()).add((Token)element);
+
+                    foundNonEmpty = true;
+                    break;
                 }
                 else {
-                    keepChecking = false;
+                    if(rule.nonTerminal().equals(element)) { 
+                        foundNonEmpty = true;
+                        break;
+                    }
 
-                    if(rule.nonTerminal().equals(rule.getFirstElement())) { break; }
+                    firstNTSets.get(rule.nonTerminal()).add((NonTerminal)element);
 
-                    firstNTSets.get(rule.nonTerminal()).add((NonTerminal)rule.getFirstElement());
+                    if(!emptyNonTerminals.contains((NonTerminal)element)) { 
+                        foundNonEmpty = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!foundNonEmpty) {
+                if(emptyNonTerminals.contains((NonTerminal)element)) {
+                    firstTokenSets.get(rule.nonTerminal()).add(emptyToken);
                 }
             }
         }
@@ -118,8 +137,11 @@ public class FirstSetGenerator {
         } while (!completeSets.isEmpty());
     }
 
-    private static void resolveConnectedSets(HashMap<NonTerminal, Set<Token>> firstTokenSets,
-            HashMap<NonTerminal, Set<NonTerminal>> firstNTSets) {
+    private static void resolveConnectedSets(
+        HashMap<NonTerminal, Set<Token>> firstTokenSets,
+        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets,
+        Token emptyToken
+    ) {
         boolean changesMade = false;
 
         do {
@@ -127,18 +149,29 @@ public class FirstSetGenerator {
 
             for (NonTerminal nonTerminal : firstNTSets.keySet()) {
                 for (NonTerminal nonTerminal2 : firstNTSets.get(nonTerminal)) {
-                    if(firstTokenSets.get(nonTerminal).containsAll(firstTokenSets.get(nonTerminal2))) {
+                    Set<Token> tokensWithoutEmpty = removeEmpty(firstTokenSets.get(nonTerminal2), emptyToken);
+
+                    if(firstTokenSets.get(nonTerminal).containsAll(tokensWithoutEmpty)) {
                         continue;
                     }
 
-                    firstTokenSets.get(nonTerminal).addAll(
-                        firstTokenSets.get(nonTerminal2)
-                    );
+                    firstTokenSets.get(nonTerminal).addAll(tokensWithoutEmpty);
                     
                     changesMade = true;
                 }
             }
         } while (changesMade);
+    }
+
+    private static Set<Token> removeEmpty(Set<Token> set, Token emptyToken) {
+        Set<Token> tokens = new HashSet<>();
+
+        for (Token token : set) {
+            if(!emptyToken.equals(token)) {
+                tokens.add(token);
+            }
+        }
+        return tokens;
     }
 
     private static Set<LexicalElement> getFollowingElements(NonTerminal nonTerminal, Set<ProductionRule> productionRules) {
