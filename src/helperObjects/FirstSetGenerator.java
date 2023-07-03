@@ -24,10 +24,6 @@ public class FirstSetGenerator {
         resolveCompleteSets(firstTokenSets, firstNTSets);
         resolveConnectedSets(firstTokenSets, firstNTSets, emptyToken);
 
-        for (NonTerminal nonTerminal : emptyNonTerminals) {
-            firstTokenSets.get(nonTerminal).add(emptyToken);
-        }
-
         return firstTokenSets;
     }
 
@@ -101,8 +97,10 @@ public class FirstSetGenerator {
         }
     }
 
-    private static void resolveCompleteSets(HashMap<NonTerminal, Set<Token>> firstTokenSets,
-            HashMap<NonTerminal, Set<NonTerminal>> firstNTSets) {
+    private static void resolveCompleteSets(
+        HashMap<NonTerminal, Set<Token>> firstTokenSets,
+        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets
+    ) {
         List<NonTerminal> completeSets = new ArrayList<>();
 
         do {
@@ -122,15 +120,15 @@ public class FirstSetGenerator {
                     Set<NonTerminal> elements = firstNTSets.get(nonTerminal2);
 
                     for(NonTerminal element : elements) {
-                        if(nonTerminal.equals(element)) {
-                            elements.remove(nonTerminal);
+                        if(!nonTerminal.equals(element)) { continue; }
+                        
+                        elements.remove(nonTerminal);
 
-                            firstTokenSets.get(nonTerminal2).addAll(
-                                firstTokenSets.get(nonTerminal)
-                            );
+                        firstTokenSets.get(nonTerminal2).addAll(
+                            firstTokenSets.get(nonTerminal)
+                        );
 
-                            break;
-                        }
+                        break;
                     }
                 }
             }

@@ -4,7 +4,6 @@ import java.util.*;
 
 import grammar_objects.*;
 
-//TODO: Clean up
 public class FollowSetGenerator {
     
     public static HashMap<NonTerminal, Set<Token>> generate(
@@ -25,22 +24,21 @@ public class FollowSetGenerator {
 
         Token emptyToken = new Token("");
         
-        findAndCombineFollowingElements(productionRules, nonTerminals, followTokenSets, followingNTSets, firstSets, emptyToken);
+        findAndCombineFollowingElements(productionRules, followTokenSets, followingNTSets, firstSets, emptyToken);
 
-        resolveConnectedSets(followTokenSets, followingNTSets, firstSets, emptyToken);
+        resolveConnectedSets(followTokenSets, followingNTSets, emptyToken);
 
         return followTokenSets;
     }
 
     private static void findAndCombineFollowingElements(
-        Set<ProductionRule> productionRules, 
-        Set<NonTerminal> nonTerminals,
+        Set<ProductionRule> productionRules,
         HashMap<NonTerminal, Set<Token>> followTokenSets,
         HashMap<NonTerminal, Set<NonTerminal>> followingNTSets,
         HashMap<NonTerminal, Set<Token>> firstSets,
         Token emptyToken
     ) {
-        Set<NonTerminal> emptyNonTerminals = findEmptyNonTerminals(productionRules, nonTerminals, emptyToken);
+        Set<NonTerminal> emptyNonTerminals = findEmptyNonTerminals(productionRules, emptyToken);
 
         for(ProductionRule rule : productionRules) {
             LexicalElement[] elements = rule.productionSequence();
@@ -48,26 +46,26 @@ public class FollowSetGenerator {
             if(elements.length == 0) { continue; }
 
             for(int i = 0; i < elements.length - 1; i++) {
-                if(elements[i] instanceof NonTerminal) {
-                    int offset = 1;
-                    LexicalElement nextElement = elements[i + offset];
+                if(!(elements[i] instanceof NonTerminal)) { continue; }
 
-                    while(nextElement.equals(emptyToken)) {
-                        offset++;
-                        nextElement = elements[i + offset];
-                    }
+                int offset = 1;
+                LexicalElement nextElement = elements[i + offset];
 
-                    if(nextElement instanceof Token) {
-                        followTokenSets.get(elements[i]).add((Token)nextElement);
-                    }
-                    else {
-                        followTokenSets.get(elements[i]).addAll(
-                            removeEmpty(firstSets.get((NonTerminal)nextElement), emptyToken)
-                        );
+                while(nextElement.equals(emptyToken)) {
+                    offset++;
+                    nextElement = elements[i + offset];
+                }
 
-                        if(emptyNonTerminals.contains((NonTerminal)nextElement)) {
-                            followingNTSets.get(elements[i]).add((NonTerminal)nextElement);
-                        }
+                if(nextElement instanceof Token) {
+                    followTokenSets.get(elements[i]).add((Token)nextElement);
+                }
+                else {
+                    followTokenSets.get(elements[i]).addAll(
+                        removeEmpty(firstSets.get((NonTerminal)nextElement), emptyToken)
+                    );
+
+                    if(emptyNonTerminals.contains((NonTerminal)nextElement)) {
+                        followingNTSets.get(elements[i]).add((NonTerminal)nextElement);
                     }
                 }
             }
@@ -84,7 +82,6 @@ public class FollowSetGenerator {
     private static void resolveConnectedSets(
         HashMap<NonTerminal, Set<Token>> followTokenSets,
         HashMap<NonTerminal, Set<NonTerminal>> followingNTSets,
-        HashMap<NonTerminal, Set<Token>> firstSets,
         Token emptyToken
     ) {
         boolean keepChecking = false;
@@ -111,8 +108,7 @@ public class FollowSetGenerator {
     }
 
     private static Set<NonTerminal> findEmptyNonTerminals(
-        Set<ProductionRule> productionRules, 
-        Set<NonTerminal> nonTerminals,
+        Set<ProductionRule> productionRules,
         Token emptyToken
     ) {
         Set<NonTerminal> emptyNonTerminals = new HashSet<>();
