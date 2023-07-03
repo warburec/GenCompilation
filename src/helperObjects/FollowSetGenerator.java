@@ -76,7 +76,7 @@ public class FollowSetGenerator {
             if(lastElement instanceof NonTerminal &&
                 !rule.nonTerminal().equals((NonTerminal)lastElement)) 
             {
-                followingNTSets.get((NonTerminal)lastElement).add(rule.nonTerminal()); //TODO: do until root if applicable
+                followingNTSets.get((NonTerminal)lastElement).add(rule.nonTerminal());
             }
         }
     }

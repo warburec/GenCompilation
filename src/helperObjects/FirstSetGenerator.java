@@ -174,24 +174,4 @@ public class FirstSetGenerator {
         return tokens;
     }
 
-    private static Set<LexicalElement> getFollowingElements(NonTerminal nonTerminal, Set<ProductionRule> productionRules) {
-        Set<LexicalElement> followingElements = new HashSet<>();
-
-        for(ProductionRule rule : productionRules) {
-            LexicalElement[] elements = rule.productionSequence();
-
-            for (int i = 0; i < elements.length - 1; i++) {
-                if(!nonTerminal.equals(elements[i])) { continue; }
-
-                LexicalElement nextElement = elements[i + 1];
-
-                if(!nonTerminal.equals(nextElement)) {
-                    followingElements.add(nextElement);
-                }
-            }
-        }
-
-        return followingElements;
-    }
-
 }
