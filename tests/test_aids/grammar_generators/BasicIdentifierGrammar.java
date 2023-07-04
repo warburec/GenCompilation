@@ -4,8 +4,7 @@ import java.util.*;
 
 import code_generation.*;
 import grammar_objects.*;
-import semantic_analysis.SemanticAnalyser;
-import semantic_analysis.TypeChecker;
+import semantic_analysis.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
@@ -215,48 +214,60 @@ public class BasicIdentifierGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
-        Map<Token, State> currentStateActions = new HashMap<>();
+    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        List<Token> allTokens = new ArrayList<>();
+        allTokens.addAll(tokens);
+        allTokens.add(endOfFile);
 
-        currentStateActions.put(new Identifier("identifier"), getState(3));
-        actionTable.put(getState(0), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
 
-        currentStateActions.put(new Identifier("identifier"), getState(3));
-        actionTable.put(getState(1), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
+        stateActions.put(endOfFile, new Accept());
 
-        actionTable.put(getState(2), new ReduceAction(getRule(1)));
+        stateActions = actionTable.get(getState(2));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(1)));
+        }
 
-        currentStateActions.put(new Token("="), getState(4));
-        actionTable.put(getState(3), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new Token("="), new Shift(getState(4)));
 
-        currentStateActions.put(new Identifier("identifier"), getState(8));
-        currentStateActions.put(new Literal("number"), getState(9));
-        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
+        stateActions.put(new Literal("number"), new Shift(getState(9)));
 
-        currentStateActions.put(new Token("+"), getState(6));
-        actionTable.put(getState(5), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new Token("+"), new Shift(getState(6)));
 
-        currentStateActions.put(new Identifier("identifier"), getState(8));
-        currentStateActions.put(new Literal("number"), getState(9));
-        actionTable.put(getState(6), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
+        stateActions.put(new Literal("number"), new Shift(getState(9)));
 
-        currentStateActions.put(new Token(";"), getState(11));
-        actionTable.put(getState(7), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(7));
+        stateActions.put(new Token(";"),new Shift( getState(11)));
 
-        actionTable.put(getState(8), new ReduceAction(getRule(3)));
+        stateActions = actionTable.get(getState(8));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(3)));
+        }
 
-        actionTable.put(getState(9), new ReduceAction(getRule(4)));
+        stateActions = actionTable.get(getState(9));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(4)));
+        }
 
-        actionTable.put(getState(10), new ReduceAction(getRule(0)));
+        stateActions = actionTable.get(getState(10));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(0)));
+        }
 
-        actionTable.put(getState(11), new ReduceAction(getRule(2)));
+        stateActions = actionTable.get(getState(11));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(2)));
+        }
+
     }
 
     @Override

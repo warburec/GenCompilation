@@ -8,12 +8,12 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
 public abstract class TestGrammar extends Grammar {
-    private List<State> getState = new ArrayList<>();
+    private List<State> states = new ArrayList<>();
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
     private Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap = new HashMap<>(); //Language, <Sentence, ruleConverterMap>
     private Map<String, Map<String, String[]>> generationBookendMap = new HashMap<>();                   //Language, <Sentence, {preGeneration, postGeneration}>
 
-    private Map<State, Action> actionTable = new HashMap<>();
+    private Map<State, Map<Token, Action>> actionTable = new HashMap<>();
     private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
 
     public TestGrammar() {
@@ -22,8 +22,13 @@ public abstract class TestGrammar extends Grammar {
         setUpNonTerminals(nonTerminals);
         setUpProductionRules(productionRules);
 
-        setUpStates(getState, new ProductionRule(null, new LexicalElement[] {sentinal}));
-        setUpActionTable(actionTable);
+        setUpStates(states, new ProductionRule(null, new LexicalElement[] {sentinal}));
+
+        for (State state : states) {
+            actionTable.put(state, new HashMap<>());
+            gotoTable.put(state, new HashMap<>());
+        }
+        setUpActionTable(actionTable, new EOF());
         setUpGotoTable(gotoTable);
 
         setUpRuleConvertors(ruleConvertorMap);
@@ -46,18 +51,18 @@ public abstract class TestGrammar extends Grammar {
 
     protected abstract void setUpStates(List<State> states, ProductionRule extraRootRule);
 
-    public Set<State> getGetState() {
-        return new HashSet<>(getState);
+    public Set<State> getStates() {
+        return new HashSet<>(states);
     }
 
     protected State getState(int index) {
-        return getState.get(index);
+        return states.get(index);
     }
 
 
-    protected abstract void setUpActionTable(Map<State, Action> actionTable);
+    protected abstract void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile);
 
-    public Map<State, Action> getActionTable() {
+    public Map<State, Map<Token, Action>> getActionTable() {
         return actionTable;
     }
 

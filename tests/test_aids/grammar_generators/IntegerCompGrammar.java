@@ -249,7 +249,7 @@ public class IntegerCompGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
+    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
     }
 
     @Override

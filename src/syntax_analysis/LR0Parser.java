@@ -12,11 +12,11 @@ public class LR0Parser extends SyntaxAnalyser {
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
     protected State rootState;
-    protected Map<State, Action> actionTable;
+    protected Map<State, Map<Token, Action>> actionTable;
     protected Map<State, Map<NonTerminal, State>> gotoTable;
     protected ProductionRule acceptRule;
 
-    public static final Token EOF = new Token(null);
+    public static final Token EOF = new EOF();
 
     private int currentParseToken = -1;
 
@@ -231,25 +231,40 @@ public class LR0Parser extends SyntaxAnalyser {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 
+        Set<Token> allTokens = new HashSet<>();
+        allTokens.addAll(tokens);
+        allTokens.add(EOF);
+
+        for (State state : states) {
+            actionTable.put(state, new HashMap<>());
+            gotoTable.put(state, new HashMap<>());
+        }
+
         for(State state : states) {
             //Reductions
             for(GrammarPosition position : state.getPositions()) {
                 if(position.isClosed()) {
                     if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
+                        actionTable.get(state).put(EOF, new Accept());
                         continue;
                     }
 
-                    ReduceAction reductionAction = new ReduceAction(position.rule());
+                    Reduction reductionAction = new Reduction(position.rule());
 
-                    if(actionTable.get(state) != null) {
+                    if(!actionTable.get(state).isEmpty()) {
                         List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
-                        conflicts.add(((ReduceAction)actionTable.get(state)).reductionRule());
+
+                        Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
+                        conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
                         conflicts.add(reductionAction.reductionRule());
 
                         throw new NonDeterminismException(conflicts, state);
                     }
 
-                    actionTable.put(state, reductionAction);
+                    //Add reduction for all tokens (inc. EOF)
+                    for (Token token : allTokens) {
+                        actionTable.get(state).put(token, reductionAction);
+                    }
                 }
             }
 
@@ -268,16 +283,17 @@ public class LR0Parser extends SyntaxAnalyser {
                 }
             }
 
-            if(shiftActions.size() > 0) {
-                actionTable.put(state, new ShiftAction(shiftActions));
+            for(Token token : shiftActions.keySet()) {
+                actionTable.get(state).put(token, new Shift(shiftActions.get(token)));
             }
-            if(gotoActions.size() > 0) {
-                gotoTable.put(state, gotoActions);
+            
+            for(NonTerminal nonTerminal : gotoActions.keySet()) {
+                gotoTable.get(state).put(nonTerminal, gotoActions.get(nonTerminal));
             } 
         }
     }
 
-    public Map<State, Action> getActionTable() {
+    public Map<State, Map<Token, Action>> getActionTable() {
         return actionTable;
     }
 
@@ -295,28 +311,17 @@ public class LR0Parser extends SyntaxAnalyser {
 
         try {
             while(!accepted) {
-                Action action = actionTable.get(parseStates.peek().state());
+                Action action = actionTable.get(parseStates.peek().state()).get(currentToken);
 
-                if(action instanceof ShiftAction) {
-                    ShiftAction shiftAction = (ShiftAction)action;
+                if(action instanceof Shift) {
+                    Shift shiftAction = (Shift)action;
 
-                    if(currentToken.equals(EOF)) {
-                        if(parseStates.peek().state().getPositions()
-                            .contains(new GrammarPosition(acceptRule, 1))) { //Accept
-                            currentParseToken = -1;
-                            return parseStates.pop();
-                        }
-                        else {
-                            throw new IncompleteParseException();
-                        }
-                    }
-
-                    parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
+                    parseStates.add(new ShiftedState(shiftAction.gotoState(), currentToken));
 
                     currentToken = getNextToken(input);
                 }
-                else if (action instanceof ReduceAction) {
-                    ReduceAction reduceAction = (ReduceAction)action;
+                else if(action instanceof Reduction) {
+                    Reduction reduceAction = (Reduction)action;
 
                     int stackSize = parseStates.size();
                     int numOfElements = reduceAction.reductionRule().productionSequence().length;
@@ -329,13 +334,24 @@ public class LR0Parser extends SyntaxAnalyser {
                     State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
                     parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
                 }
+                else if(action instanceof Accept) {
+                    if(parseStates.size() > 2) {
+                        throw new IncompleteParseException();
+                    }
+
+                    return parseStates.pop();
+                }
                 else {
-                    throw new UnsupportedActionException(action, parseStates.peek().state());
+                    if(currentToken.equals(EOF)) {
+                        throw new IncompleteParseException();
+                    }
+
+                    throw new SyntaxError(currentToken, parseStates.peek().state());
                 }   
             }
         }
         catch(Exception e) {
-            throw new ParseFailedException(e, currentParseToken); //SyntaxError
+            throw new ParseFailedException(e, currentParseToken);
         }
 
         return parseStates.pop();

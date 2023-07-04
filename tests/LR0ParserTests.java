@@ -41,7 +41,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getGetState();
+        Set<State> expectedStateSet = grammar.getStates();
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -54,9 +54,9 @@ public class LR0ParserTests {
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
-        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
+        Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -94,8 +94,8 @@ public class LR0ParserTests {
         
         ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
 
-        ParseState expectedParseState = grammar.getParseRoot("1+0*1");
-        assertEquals(expectedParseState, generatedParseRoot);
+        ParseState expectedParseRoot = grammar.getParseRoot("1+0*1");
+        assertEquals(expectedParseRoot, generatedParseRoot);
     }
 
     @Test
@@ -150,7 +150,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getGetState();
+        Set<State> expectedStateSet = grammar.getStates();
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -163,9 +163,9 @@ public class LR0ParserTests {
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
-        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
+        Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -195,7 +195,7 @@ public class LR0ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getGetState();
+        Set<State> expectedStateSet = grammar.getStates();
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -208,9 +208,9 @@ public class LR0ParserTests {
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
-        Map<State, Action> generatedActionTable = syntaxAnalyser.getActionTable();
+        Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Action> expectedActionTable = grammar.getActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -260,8 +260,8 @@ public class LR0ParserTests {
         
         ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
 
-        ParseState expectedParseState = grammar.getParseRoot("XToYToX");
-        assertEquals(expectedParseState, generatedParseRoot);
+        ParseState expectedParseRoot = grammar.getParseRoot("XToYToX");
+        assertEquals(expectedParseRoot, generatedParseRoot);
     }
 
     @Test

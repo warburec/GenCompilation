@@ -13,7 +13,7 @@ public class SLR1Parser extends SyntaxAnalyser {
     protected Map<NonTerminal, Set<ProductionRule>> productionMap;
     protected Set<State> states;
     protected State rootState;
-    protected Map<State, Action> actionTable;
+    protected Map<State, Map<Token, Action>> actionTable;
     protected Map<State, Map<NonTerminal, State>> gotoTable;
     protected ProductionRule acceptRule;
 
@@ -256,17 +256,17 @@ public class SLR1Parser extends SyntaxAnalyser {
                         continue;
                     }
 
-                    ReduceAction reductionAction = new ReduceAction(position.rule());
+                    Reduction reductionAction = new Reduction(position.rule());
 
-                    if(actionTable.get(state) != null) {
-                        List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
-                        conflicts.add(((ReduceAction)actionTable.get(state)).reductionRule());
-                        conflicts.add(reductionAction.reductionRule());
+                    // if(!actionTable.get(state).isEmpty()) {
+                    //     List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
+                    //     conflicts.add(((Reduction)actionTable.get(state)).reductionRule());
+                    //     conflicts.add(reductionAction.reductionRule());
 
-                        throw new NonDeterminismException(conflicts, state);
-                    }
+                    //     throw new NonDeterminismException(conflicts, state);
+                    // }
 
-                    actionTable.put(state, reductionAction);
+                    // actionTable.put(state, reductionAction);
                 }
             }
 
@@ -285,8 +285,8 @@ public class SLR1Parser extends SyntaxAnalyser {
                 }
             }
 
-            if(shiftActions.size() > 0) {
-                actionTable.put(state, new ShiftAction(shiftActions));
+            for(Token token : shiftActions.keySet()) {
+                // actionTable.get(state). new Shift(shiftActions));
             }
             if(gotoActions.size() > 0) {
                 gotoTable.put(state, gotoActions);
@@ -294,7 +294,7 @@ public class SLR1Parser extends SyntaxAnalyser {
         }
     }
 
-    public Map<State, Action> getActionTable() {
+    public Map<State, Map<Token, Action>> getActionTable() {
         return actionTable;
     }
 
@@ -312,43 +312,43 @@ public class SLR1Parser extends SyntaxAnalyser {
 
         try {
             while(!accepted) {
-                Action action = actionTable.get(parseStates.peek().state());
+                // Action action = actionTable.get(parseStates.peek().state());
 
-                if(action instanceof ShiftAction) {
-                    ShiftAction shiftAction = (ShiftAction)action;
+                // if(action instanceof Shift) {
+                //     Shift shiftAction = (Shift)action;
 
-                    if(currentToken.equals(EOF)) {
-                        if(parseStates.peek().state().getPositions()
-                            .contains(new GrammarPosition(acceptRule, 1))) { //Accept
-                            currentParseToken = -1;
-                            return parseStates.pop();
-                        }
-                        else {
-                            throw new IncompleteParseException();
-                        }
-                    }
+                //     if(currentToken.equals(EOF)) {
+                //         if(parseStates.peek().state().getPositions()
+                //             .contains(new GrammarPosition(acceptRule, 1))) { //Accept
+                //             currentParseToken = -1;
+                //             return parseStates.pop();
+                //         }
+                //         else {
+                //             throw new IncompleteParseException();
+                //         }
+                //     }
 
-                    parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
+                //     parseStates.add(new ShiftedState(shiftAction.getState(currentToken), currentToken));
 
-                    currentToken = getNextToken(input);
-                }
-                else if (action instanceof ReduceAction) {
-                    ReduceAction reduceAction = (ReduceAction)action;
+                //     currentToken = getNextToken(input);
+                // }
+                // else if (action instanceof Reduction) {
+                //     Reduction reduceAction = (Reduction)action;
 
-                    int stackSize = parseStates.size();
-                    int numOfElements = reduceAction.reductionRule().productionSequence().length;
-                    List<ParseState> statesToReduce = new ArrayList<>(parseStates.subList(stackSize - numOfElements, stackSize));
+                //     int stackSize = parseStates.size();
+                //     int numOfElements = reduceAction.reductionRule().productionSequence().length;
+                //     List<ParseState> statesToReduce = new ArrayList<>(parseStates.subList(stackSize - numOfElements, stackSize));
 
-                    for(int i = 0; i < numOfElements; i++) {
-                        parseStates.remove(stackSize - 1 - i);
-                    }
+                //     for(int i = 0; i < numOfElements; i++) {
+                //         parseStates.remove(stackSize - 1 - i);
+                //     }
 
-                    State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
-                    parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
-                }
-                else {
-                    throw new UnsupportedActionException(action, parseStates.peek().state());
-                }   
+                //     State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
+                //     parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
+                // }
+                // else {
+                //     throw new UnsupportedActionException(action, parseStates.peek().state());
+                // }   
             }
         }
         catch(Exception e) {
