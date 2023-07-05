@@ -49,6 +49,7 @@ public class SLR1Parser extends LR0Parser {
         followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
     }
 
+    @SuppressWarnings("unused")
     private void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
             if(nonTerminal.getName().equals(null)) {
@@ -57,6 +58,7 @@ public class SLR1Parser extends LR0Parser {
         }
     }
 
+    @SuppressWarnings("unused")
     private void generateProductionMap() {
         productionMap = new HashMap<>();
 
@@ -77,7 +79,7 @@ public class SLR1Parser extends LR0Parser {
         }
     }
 
-
+    @SuppressWarnings("unused")
     private void generateStates() {
         states = new HashSet<>();
 

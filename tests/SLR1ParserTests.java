@@ -201,8 +201,8 @@ public class SLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarAction() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
-        GrammarParts grammarParts = grammar.getParts();
+        SLR1TestGrammar grammar = new BasicIdentifierGrammar();
+        GrammarParts grammarParts = ((LR0TestGrammar)grammar).getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -210,7 +210,7 @@ public class SLR1ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 

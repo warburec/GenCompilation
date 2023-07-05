@@ -7,6 +7,7 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
+//TODO: Seperate LR0 features and grammar features
 public abstract class LR0TestGrammar extends Grammar {
     private List<State> states = new ArrayList<>();
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>

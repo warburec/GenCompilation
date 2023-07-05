@@ -14,7 +14,7 @@ import syntax_analysis.parsing.*;
  * <statement> := identifier = <element> + <element>;
  * <element> := identifier | number
  */
-public class BasicIdentifierGrammar extends LR0TestGrammar {
+public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGrammar{
 
     Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
 
@@ -267,7 +267,6 @@ public class BasicIdentifierGrammar extends LR0TestGrammar {
         for(Token token : allTokens) {
             stateActions.put(token, new Reduction(getRule(2)));
         }
-
     }
 
     @Override
@@ -600,6 +599,60 @@ public class BasicIdentifierGrammar extends LR0TestGrammar {
             "\t}\n" +
             "}"
         );
+    }
+
+    @Override
+    public Map<State, Map<Token, Action>> getSLR1ActionTable() {
+        Map<State, Map<Token, Action>> actionTable = new HashMap<>();
+        for (State state : getStates()) {
+            actionTable.put(state, new HashMap<>());
+        }
+
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
+
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
+        stateActions.put(new EOF(), new Accept());
+
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Identifier("identifier"), new Reduction(getRule(1)));
+        stateActions.put(new EOF(), new Reduction(getRule(1)));
+
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new Token("="), new Shift(getState(4)));
+
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
+        stateActions.put(new Literal("number"), new Shift(getState(9)));
+
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new Token("+"), new Shift(getState(6)));
+
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
+        stateActions.put(new Literal("number"), new Shift(getState(9)));
+
+        stateActions = actionTable.get(getState(7));
+        stateActions.put(new Token(";"),new Shift( getState(11)));
+
+        stateActions = actionTable.get(getState(8));
+        stateActions.put(new Token("+"), new Reduction(getRule(3)));
+        stateActions.put(new Token(";"), new Reduction(getRule(3)));
+
+        stateActions = actionTable.get(getState(9));
+        stateActions.put(new Token("+"), new Reduction(getRule(4)));
+        stateActions.put(new Token(";"), new Reduction(getRule(4)));
+
+        stateActions = actionTable.get(getState(10));
+        stateActions.put(new Identifier("identifier"), new Reduction(getRule(0)));
+        stateActions.put(new EOF(), new Reduction(getRule(0)));
+
+        stateActions = actionTable.get(getState(11));
+        stateActions.put(new Identifier("identifier"), new Reduction(getRule(2)));
+        stateActions.put(new EOF(), new Reduction(getRule(2)));
+
+        return actionTable;
     }
 
 }
