@@ -124,7 +124,7 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 3),
             }),
-            getState(3)
+            getState(4)
         ));
 
         states.add(new State(
@@ -523,9 +523,10 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
 
     @Override
     public Map<State, Map<Token, Action>> getSLR1ActionTable() {
-        List<Token> allTokens = new ArrayList<>();
-        allTokens.addAll(tokens);
-        allTokens.add(new EOF());
+        Map<State, Map<Token, Action>> actionTable = new HashMap<>();
+        for (State state : getStates()) {
+            actionTable.put(state, new HashMap<>());
+        }
 
         Map<Token, Action> stateActions = actionTable.get(getState(0));
         stateActions.put(new Token("0"), new Shift(getState(7)));
@@ -534,40 +535,61 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
         stateActions = actionTable.get(getState(1));
         stateActions.put(new Token("*"), new Shift(getState(2)));
         stateActions.put(new Token("+"), new Shift(getState(4)));
-        stateActions.put(endOfFile, new Accept());
+        stateActions.put(new EOF(), new Accept());
         
         stateActions = actionTable.get(getState(2));
         stateActions.put(new Token("0"), new Shift(getState(7)));
         stateActions.put(new Token("1"), new Shift(getState(8)));
         
         stateActions = actionTable.get(getState(3));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(1)));
-        }
+        stateActions.put(new Token("+"), new Reduction(getRule(1)));
+        stateActions.put(new Token("*"), new Reduction(getRule(1)));
+        stateActions.put(new EOF(), new Reduction(getRule(1)));
         
         stateActions = actionTable.get(getState(4));
         stateActions.put(new Token("0"), new Shift(getState(7)));
         stateActions.put(new Token("1"), new Shift(getState(8)));
         
         stateActions = actionTable.get(getState(5));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(0)));
-        }
+        stateActions.put(new Token("+"), new Reduction(getRule(0)));
+        stateActions.put(new Token("*"), new Reduction(getRule(0)));
+        stateActions.put(new EOF(), new Reduction(getRule(0)));
         
         stateActions = actionTable.get(getState(6));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(2)));
-        }
+        stateActions.put(new Token("+"), new Reduction(getRule(2)));
+        stateActions.put(new Token("*"), new Reduction(getRule(2)));
+        stateActions.put(new EOF(), new Reduction(getRule(2)));
 
         stateActions = actionTable.get(getState(7));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(3)));
-        }
+        stateActions.put(new Token("+"), new Reduction(getRule(3)));
+        stateActions.put(new Token("*"), new Reduction(getRule(3)));
+        stateActions.put(new EOF(), new Reduction(getRule(3)));
 
         stateActions = actionTable.get(getState(8));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(4)));
-        }
+        stateActions.put(new Token("+"), new Reduction(getRule(4)));
+        stateActions.put(new Token("*"), new Reduction(getRule(4)));
+        stateActions.put(new EOF(), new Reduction(getRule(4)));
+
+        return actionTable;
     }
 
+    @Override
+    public Map<State, Map<NonTerminal, State>> setUpSLR1GotoTable() {
+        Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
+        for (State state : getStates()) {
+            gotoTable.put(state, new HashMap<>());
+        }
+
+        Map<NonTerminal, State> stateTransitions = gotoTable.get(getState(0));
+        stateTransitions.put(new NonTerminal("E"), getState(1));
+        stateTransitions.put(new NonTerminal("B"), getState(6));
+    
+        stateTransitions = gotoTable.get(getState(4));
+        stateTransitions.put(new NonTerminal("B"), getState(5));
+    
+        stateTransitions = gotoTable.get(getState(2));
+        stateTransitions.put(new NonTerminal("B"), getState(3));
+
+        return gotoTable;
+    }
 }
