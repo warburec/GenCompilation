@@ -243,28 +243,28 @@ public class LR0Parser extends SyntaxAnalyser {
         for(State state : states) {
             //Reductions
             for(GrammarPosition position : state.getPositions()) {
-                if(position.isClosed()) {
-                    if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
-                        actionTable.get(state).put(EOF, new Accept());
-                        continue;
-                    }
+                if(!position.isClosed()) { continue; }
 
-                    Reduction reductionAction = new Reduction(position.rule());
+                if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
+                    actionTable.get(state).put(EOF, new Accept());
+                    continue;
+                }
 
-                    if(!actionTable.get(state).isEmpty()) {
-                        List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
+                Reduction reductionAction = new Reduction(position.rule());
 
-                        Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
-                        conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
-                        conflicts.add(reductionAction.reductionRule());
+                if(!actionTable.get(state).isEmpty()) {
+                    List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
 
-                        throw new NonDeterminismException(conflicts, state);
-                    }
+                    Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
+                    conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
+                    conflicts.add(reductionAction.reductionRule());
 
-                    //Add reduction for all tokens (inc. EOF)
-                    for (Token token : allTokens) {
-                        actionTable.get(state).put(token, reductionAction);
-                    }
+                    throw new NonDeterminismException(conflicts, state);
+                }
+
+                //Add reduction for all tokens (inc. EOF)
+                for (Token token : allTokens) {
+                    actionTable.get(state).put(token, reductionAction);
                 }
             }
 

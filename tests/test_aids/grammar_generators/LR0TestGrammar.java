@@ -7,7 +7,7 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-public abstract class TestGrammar extends Grammar {
+public abstract class LR0TestGrammar extends Grammar {
     private List<State> states = new ArrayList<>();
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
     private Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap = new HashMap<>(); //Language, <Sentence, ruleConverterMap>
@@ -16,7 +16,7 @@ public abstract class TestGrammar extends Grammar {
     private Map<State, Map<Token, Action>> actionTable = new HashMap<>();
     private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
 
-    public TestGrammar() {
+    public LR0TestGrammar() {
         setUpTokens(tokens);
         sentinal = setUpSentinal();
         setUpNonTerminals(nonTerminals);

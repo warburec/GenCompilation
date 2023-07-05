@@ -13,7 +13,7 @@ import syntax_analysis.parsing.ParseState;
  * L → l L //Self-referential
  * L → o
  */
-public class SelfReferentialGrammar extends TestGrammar {
+public class SelfReferentialGrammar extends LR0TestGrammar {
 
     @Override
     protected void setUpTokens(List<Token> tokens) {

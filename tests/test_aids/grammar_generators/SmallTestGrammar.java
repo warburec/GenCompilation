@@ -14,7 +14,7 @@ import syntax_analysis.parsing.*;
  * B->0
  * B->1
  */
-public class SmallTestGrammar extends TestGrammar {
+public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar {
 
     @Override
     protected  void setUpTokens(List<Token> tokens) {
@@ -519,6 +519,55 @@ public class SmallTestGrammar extends TestGrammar {
             "\tprintf(1 + 0 * 1);\n" +
             "}"
         );
+    }
+
+    @Override
+    public Map<State, Map<Token, Action>> getSLR1ActionTable() {
+        List<Token> allTokens = new ArrayList<>();
+        allTokens.addAll(tokens);
+        allTokens.add(new EOF());
+
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Token("*"), new Shift(getState(2)));
+        stateActions.put(new Token("+"), new Shift(getState(4)));
+        stateActions.put(endOfFile, new Accept());
+        
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+        
+        stateActions = actionTable.get(getState(3));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(1)));
+        }
+        
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+        
+        stateActions = actionTable.get(getState(5));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(0)));
+        }
+        
+        stateActions = actionTable.get(getState(6));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(2)));
+        }
+
+        stateActions = actionTable.get(getState(7));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(3)));
+        }
+
+        stateActions = actionTable.get(getState(8));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(4)));
+        }
     }
 
 }

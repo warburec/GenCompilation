@@ -13,7 +13,7 @@ import tests.test_aids.GrammarParts;
 import tests.test_aids.grammar_generators.*;
 import syntax_analysis.*;
 
-public class LR0ParserTests {
+public class SLR1ParserTests {
     
     @Test
     public void nonTerminalNull() {
@@ -24,7 +24,7 @@ public class LR0ParserTests {
         };
         ProductionRule[] productionRules = new ProductionRule[] {};
 
-        assertThrows(RuntimeException.class, () -> new LR0Parser(tokens,
+        assertThrows(RuntimeException.class, () -> new SLR1Parser(tokens,
                                                             nonTerminals,
                                                             productionRules,
                                                             sentinal));
@@ -35,7 +35,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -50,7 +50,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -65,7 +65,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -79,7 +79,7 @@ public class LR0ParserTests {
     public void parsingTestGrammarCompleteSentence() throws ParseFailedException {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -102,7 +102,7 @@ public class LR0ParserTests {
     public void parsingTestGrammarIncompleteSentence() {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -122,7 +122,7 @@ public class LR0ParserTests {
     public void parsingTestGrammarIncorrectSentence() {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -144,7 +144,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new SelfReferentialGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -159,7 +159,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new SelfReferentialGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -174,7 +174,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new SelfReferentialGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -189,7 +189,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new BasicIdentifierGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -204,7 +204,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new BasicIdentifierGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -219,7 +219,7 @@ public class LR0ParserTests {
         LR0TestGrammar grammar = new BasicIdentifierGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -233,7 +233,7 @@ public class LR0ParserTests {
     public void XToYToXGrammarCompleteSentence() throws ParseFailedException {
         LR0TestGrammar grammar = new BasicIdentifierGrammar();
         GrammarParts grammarParts = grammar.getParts();
-        LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),
                                                 grammarParts.sentinal());
@@ -295,7 +295,7 @@ public class LR0ParserTests {
         NonTerminal sentinel = new NonTerminal("S");
 
         assertThrows(NonDeterminismException.class, () -> {
-            new LR0Parser(productionRules, sentinel);
+            new SLR1Parser(productionRules, sentinel);
         });
     }
 }

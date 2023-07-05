@@ -14,7 +14,7 @@ import syntax_analysis.parsing.*;
  * <statement> := identifier = <element> + <element>;
  * <element> := identifier | number
  */
-public class BasicIdentifierGrammar extends TestGrammar {
+public class BasicIdentifierGrammar extends LR0TestGrammar {
 
     Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
 

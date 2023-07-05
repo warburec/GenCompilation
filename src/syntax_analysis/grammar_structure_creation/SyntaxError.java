@@ -1,7 +1,6 @@
 package syntax_analysis.grammar_structure_creation;
 
 import grammar_objects.Token;
-import tests.GrammarPositionTests;
 
 public class SyntaxError extends UnsupportedOperationException {
 
