@@ -14,25 +14,12 @@ public abstract class LR0TestGrammar extends Grammar {
     private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
 
     public LR0TestGrammar() {
-        setUpStates(states, new ProductionRule(null, new LexicalElement[] {sentinal}));
-
         for (State state : states) {
             actionTable.put(state, new HashMap<>());
             gotoTable.put(state, new HashMap<>());
         }
         setUpActionTable(actionTable, new EOF());
         setUpGotoTable(gotoTable);
-    }
-
-
-    protected abstract void setUpStates(List<State> states, ProductionRule extraRootRule);
-
-    public Set<State> getStates() {
-        return new HashSet<>(states);
-    }
-
-    protected State getState(int index) {
-        return states.get(index);
     }
 
 

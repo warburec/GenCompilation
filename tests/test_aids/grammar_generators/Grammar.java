@@ -4,6 +4,7 @@ import java.util.*;
 
 import code_generation.Generator;
 import grammar_objects.*;
+import syntax_analysis.grammar_structure_creation.State;
 import tests.test_aids.GrammarParts;
 
 public abstract class Grammar {
@@ -12,6 +13,8 @@ public abstract class Grammar {
     protected List<NonTerminal> nonTerminals = new ArrayList<>();
     protected List<ProductionRule> productionRules = new ArrayList<>();
     protected NonTerminal sentinal;
+
+    private List<State> states = new ArrayList<>();
 
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();                          //Language, <Sentence, Code>
     private Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap = new HashMap<>(); //Language, <Sentence, ruleConverterMap>
@@ -22,6 +25,8 @@ public abstract class Grammar {
         sentinal = setUpSentinal();
         setUpNonTerminals(nonTerminals);
         setUpProductionRules(productionRules);
+
+        setUpStates(states, new ProductionRule(null, new LexicalElement[] {sentinal}));
 
         setUpRuleConvertors(ruleConvertorMap);
         setUpCodeGenerations(codeGenerations);
@@ -39,13 +44,25 @@ public abstract class Grammar {
 
     public GrammarParts getParts() {
         return new GrammarParts(
-                        Set.copyOf(tokens), 
-                        Set.copyOf(nonTerminals), 
-                        Set.copyOf(productionRules), 
-                        sentinal
-                );
+            Set.copyOf(tokens), 
+            Set.copyOf(nonTerminals), 
+            Set.copyOf(productionRules), 
+            sentinal
+        );
     }
 
+
+    protected abstract void setUpStates(List<State> states, ProductionRule extraRootRule);
+
+    public Set<State> getStates() {
+        return new HashSet<>(states);
+    }
+
+    protected State getState(int index) {
+        return states.get(index);
+    }
+
+    
     protected abstract void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap);
 
     public String[] getGenerationBookends(String sentence, String language) {
