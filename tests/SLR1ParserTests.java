@@ -57,16 +57,6 @@ public class SLR1ParserTests {
         Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
         Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
-
-        for (State state : expectedActionTable.keySet()) {
-            Map<Token, Action> e = expectedActionTable.get(state);
-            Map<Token, Action> g = generatedActionTable.get(state);
-
-            for (Token token : e.keySet()) {
-                assertEquals(e.get(token), g.get(token));
-            }
-        }
-
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
@@ -166,8 +156,8 @@ public class SLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarAction() {
-        LR0TestGrammar grammar = new SelfReferentialGrammar();
-        GrammarParts grammarParts = grammar.getParts();
+        SLR1TestGrammar grammar = new SelfReferentialGrammar();
+        GrammarParts grammarParts = ((LR0TestGrammar)grammar).getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -175,7 +165,7 @@ public class SLR1ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 

@@ -573,23 +573,4 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
         return actionTable;
     }
 
-    @Override
-    public Map<State, Map<NonTerminal, State>> setUpSLR1GotoTable() {
-        Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
-        for (State state : getStates()) {
-            gotoTable.put(state, new HashMap<>());
-        }
-
-        Map<NonTerminal, State> stateTransitions = gotoTable.get(getState(0));
-        stateTransitions.put(new NonTerminal("E"), getState(1));
-        stateTransitions.put(new NonTerminal("B"), getState(6));
-    
-        stateTransitions = gotoTable.get(getState(4));
-        stateTransitions.put(new NonTerminal("B"), getState(5));
-    
-        stateTransitions = gotoTable.get(getState(2));
-        stateTransitions.put(new NonTerminal("B"), getState(3));
-
-        return gotoTable;
-    }
 }
