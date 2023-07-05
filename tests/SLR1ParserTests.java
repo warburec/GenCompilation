@@ -298,4 +298,49 @@ public class SLR1ParserTests {
             new SLR1Parser(productionRules, sentinel);
         });
     }
+
+    @Test
+    public void basicSLR1GrammarStates() {
+        Grammar grammar = new BasicSLR1Grammar();
+        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
+
+        Set<State> expectedStateSet = grammar.getStates();
+        assertEquals(expectedStateSet, generatedStates);
+    }
+
+    @Test
+    public void basicSLR1GrammarAction() {
+        SLR1TestGrammar grammar = new BasicSLR1Grammar();
+        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
+
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
+        assertEquals(expectedActionTable, generatedActionTable);
+    }
+
+    @Test
+    public void asicSLR1GrammarGoto() {
+        SLR1TestGrammar grammar = new BasicSLR1Grammar();
+        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
+
+        Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+        assertEquals(expectedGotoTable, generatedGotoTable);
+    }
 }

@@ -7,4 +7,5 @@ import syntax_analysis.grammar_structure_creation.*;
 
 public interface SLR1TestGrammar {
     public Map<State, Map<Token, Action>> getSLR1ActionTable();
+    public Map<State, Map<NonTerminal, State>> getGotoTable();
 }

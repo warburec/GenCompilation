@@ -122,17 +122,17 @@ public class BasicSLR1Grammar extends Grammar implements SLR1TestGrammar {
 
     @Override
     protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGenerationBookends'");
+        
     }
 
     @Override
     protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUpRuleConvertors'");
+        
     }
 
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUpCodeGenerations'");
+        
     }
 
     @Override
@@ -172,6 +172,26 @@ public class BasicSLR1Grammar extends Grammar implements SLR1TestGrammar {
         stateActions.put(new EOF(), new Reduction(getRule(2)));
 
         return actionTable;
+    }
+
+    @Override
+    public Map<State, Map<NonTerminal, State>> getGotoTable() {
+        Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
+        for (State state : getStates()) {
+            gotoTable.put(state, new HashMap<>());
+        }
+
+        Map<NonTerminal, State> currentGotoActions = gotoTable.get(getState(0));
+        currentGotoActions.put(new NonTerminal("S"), getState(1));
+        currentGotoActions.put(new NonTerminal("A"), getState(2));
+
+        currentGotoActions = gotoTable.get(getState(2));
+        currentGotoActions.put(new NonTerminal("A"), getState(3));
+
+        currentGotoActions = gotoTable.get(getState(4));
+        currentGotoActions.put(new NonTerminal("A"), getState(5));
+
+        return gotoTable;
     }
     
 }

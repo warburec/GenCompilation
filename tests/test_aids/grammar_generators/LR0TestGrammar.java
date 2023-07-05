@@ -8,13 +8,13 @@ import syntax_analysis.parsing.*;
 
 //TODO: Update for consistancy with SLR1TestGrammar
 public abstract class LR0TestGrammar extends Grammar {
-    private List<State> states = new ArrayList<>();
-
     private Map<State, Map<Token, Action>> actionTable = new HashMap<>();
     private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
 
     public LR0TestGrammar() {
-        for (State state : states) {
+        super();
+
+        for (State state : getStates()) {
             actionTable.put(state, new HashMap<>());
             gotoTable.put(state, new HashMap<>());
         }
