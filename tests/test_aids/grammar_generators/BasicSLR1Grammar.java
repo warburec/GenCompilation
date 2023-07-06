@@ -5,6 +5,9 @@ import java.util.*;
 import code_generation.Generator;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
+import syntax_analysis.parsing.ParseState;
+import syntax_analysis.parsing.ReducedState;
+import syntax_analysis.parsing.ShiftedState;
 
 /**
  * S –> AA    
@@ -193,5 +196,65 @@ public class BasicSLR1Grammar extends Grammar implements SLR1TestGrammar {
 
         return gotoTable;
     }
+
+    //TODO: Make functions into observes (move this method to outside the implementations)
+    @Override
+    public ParseState getParseRoot(String sentence) {
+        switch(sentence) {
+            case "CompleteSentence":
+                return completeSentenceParse();
+            
+            default:
+                throw new UnsupportedSentenceException("parse tree", sentence);
+        }
+    }
     
+    /**
+     * Parse tree for the sentence "CompleteSentence"
+     * @return The root ParseState of the tree
+     */
+    private ParseState completeSentenceParse() {
+        //TODO: Parse states
+        List<ParseState> parseStates = new ArrayList<>();
+
+        parseStates.add(new ShiftedState(getState(6), new Token("b")));
+
+
+        parseStates.add(new ReducedState(getState(2), getRule(2), Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(0)
+                                                                                                    })));      
+
+        parseStates.add(new ShiftedState(getState(4), new Token("a")));
+        parseStates.add(new ShiftedState(getState(4), new Token("a")));
+        parseStates.add(new ShiftedState(getState(4), new Token("a")));
+        parseStates.add(new ShiftedState(getState(6), new Token("b")));
+
+        
+        parseStates.add(new ReducedState(getState(5), getRule(2), Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(5)
+                                                                                                    })));
+        
+        parseStates.add(new ReducedState(getState(5), getRule(1), Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(4),
+                                                                                                        parseStates.get(6)
+                                                                                                    })));
+        
+        parseStates.add(new ReducedState(getState(5), getRule(1), Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(3),
+                                                                                                        parseStates.get(7)
+                                                                                                    })));
+        
+        parseStates.add(new ReducedState(getState(3), getRule(1), Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(2),
+                                                                                                        parseStates.get(8)
+                                                                                                    })));
+        
+        
+        parseStates.add(new ReducedState(getState(1), getRule(0), Arrays.asList(new ParseState[] {
+                                                                                                        parseStates.get(1),
+                                                                                                        parseStates.get(9)
+                                                                                                    })));
+
+        return parseStates.get(parseStates.size() - 1);
+        }
 }

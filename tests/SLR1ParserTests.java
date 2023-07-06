@@ -330,7 +330,7 @@ public class SLR1ParserTests {
     }
 
     @Test
-    public void asicSLR1GrammarGoto() {
+    public void basicSLR1GrammarGoto() {
         SLR1TestGrammar grammar = new BasicSLR1Grammar();
         GrammarParts grammarParts = ((Grammar)grammar).getParts();
 
@@ -342,5 +342,27 @@ public class SLR1ParserTests {
 
         Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
         assertEquals(expectedGotoTable, generatedGotoTable);
+    }
+
+    @Test
+    public void basicSLR1GrammarCompleteSentence() throws ParseFailedException {
+        SLR1TestGrammar grammar = new BasicSLR1Grammar();
+        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+        SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Token[] inputTokens = new Token[] {
+            new Token("b"),
+            new Token("a"),
+            new Token("a"),
+            new Token("a"),
+            new Token("b")
+        };
+        
+        ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
+
+        ParseState expectedParseRoot = grammar.getParseRoot("CompleteSentence");
+        assertEquals(expectedParseRoot, generatedParseRoot);
     }
 }
