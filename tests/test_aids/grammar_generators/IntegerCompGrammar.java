@@ -9,6 +9,30 @@ import semantic_analysis.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 
+// statement_list -> statement_list statement
+// statement_list -> statement
+// statement -> assignment ;
+// statement -> if_statement
+// if_statement -> if ( condition ) { statement_list }
+// if_statement -> if_statement else { statement_list }
+// condition -> identifier conditional_operator identifier
+// condition -> identifier conditional_operator numConstant
+// conditional_operator -> >
+// conditional_operator -> >=
+// conditional_operator -> ==
+// conditional_operator -> !=
+// conditional_operator -> <=
+// assignment -> identifier = expression
+// expression -> val identifier
+// expression -> expression + identifier
+// expression -> expression - identifier
+// expression -> expression * identifier
+// expression -> expression / identifier
+// expression -> numConstant
+// expression -> expression + numConstant
+// expression -> expression - numConstant
+// expression -> expression * numConstant
+// expression -> expression / numConstant
 public class IntegerCompGrammar extends LR0TestGrammar {
 
     Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
@@ -65,21 +89,20 @@ public class IntegerCompGrammar extends LR0TestGrammar {
             new NonTerminal("statement list"), 
             new LexicalElement[] {
                 new NonTerminal("statement list"),
-                new NonTerminal("statement"),
-                new Token(";")
+                new NonTerminal("statement")
         }));
         
         productionRules.add(new ProductionRule(
             new NonTerminal("statement list"), 
             new LexicalElement[] {
-                new NonTerminal("statement"),
-                new Token(";")
+                new NonTerminal("statement")
         }));
         
         productionRules.add(new ProductionRule(
             new NonTerminal("statement"), 
             new LexicalElement[] {
-                new NonTerminal("assignment")
+                new NonTerminal("assignment"),
+                new Token(";")
         }));
         
         productionRules.add(new ProductionRule(
@@ -284,9 +307,9 @@ public class IntegerCompGrammar extends LR0TestGrammar {
 
         TypeChecker typeChecker = (TypeChecker)semanticAnalyser;
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration()+ ";\n"; }); //<statement list> := <statement list> <statement>;
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + ";\n"; }); //<statement list> := <statement>;
-        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //<statement> := <assignment>
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration()+ "\n"; }); //<statement list> := <statement list> <statement>
+        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + "\n"; }); //<statement list> := <statement>
+        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration() + ";"; }); //<statement> := <assignment>;
         ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //<statement> := <if statement>
         ruleConvertor.put(getRule(4), (elements) -> { 
             String generation =  "if(" + elements[2].getGeneration() + ") {\n";

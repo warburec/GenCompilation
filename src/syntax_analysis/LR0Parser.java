@@ -144,10 +144,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
     private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
-        State foundLink = null;
-
-        GrammarPosition position = currentPositions.get(0);
-        State stateFound = getStateContainingPosition(position);
+        State stateFound = getStateContainingPositions(currentPositions);
 
         if(stateFound != null) {
             Route newRoute = new Route(stateFound, elementTraversed);
@@ -156,31 +153,17 @@ public class LR0Parser extends SyntaxAnalyser {
             currentPositions.remove(currentPositions.size() - 1);
         }
 
-        if(currentPositions.size() == 0) { return currentPositions; }
-
-        foundLink = stateFound;
-
-        for(int i = 0; i < currentPositions.size(); i++) {
-            position = currentPositions.get(i);
-
-            stateFound = getStateContainingPosition(position);
-
-            if(stateFound != foundLink) {
-                throw new NonDeterminismException(elementTraversed, currentPositions, parentState);
-            }
-        }
-
         return currentPositions;
     }
 
     /**
-     * Finds the state containing the given position
+     * Finds the state containing all of the given positions
      * @param position The position to be found
      * @return The state containing the position, or null if no state is found
      */
-    private State getStateContainingPosition(GrammarPosition position) {
+    private State getStateContainingPositions(List<GrammarPosition> positions) {
         for (State state : states) {
-            if(state.getPositions().contains(position)) {
+            if(state.getPositions().containsAll(positions)) {
                 return state;
             }
         }
