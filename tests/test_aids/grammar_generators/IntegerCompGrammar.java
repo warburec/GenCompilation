@@ -2,6 +2,7 @@ package tests.test_aids.grammar_generators;
 
 import java.util.*;
 
+import code_generation.BasicCodeGenerator;
 import code_generation.Generator;
 import code_generation.IdentifierGeneration;
 import grammar_objects.*;
@@ -37,10 +38,10 @@ public class IntegerCompGrammar extends LR0TestGrammar {
 
     Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
 
-    public IntegerCompGrammar(SemanticAnalyser semanticAnalyser) {
+    public IntegerCompGrammar() {
         super();
 
-        setUpSemanticRuleConvertors(semanticRuleConvertorMap, semanticAnalyser);
+        setUpSemanticRuleConvertors(semanticRuleConvertorMap);
     }
 
     @Override
@@ -289,10 +290,10 @@ public class IntegerCompGrammar extends LR0TestGrammar {
         generationBookendMap.put("Java", new HashMap<>());
         generationBookendMap.get("Java").put("JavaConversion", new String[] {
             "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n",
+            "    public static void main(String[] args) {\n",
 
-            "\t\tSystem.out.println(x);\n" +
-            "\t}\n" +
+            "        System.out.println(x);\n" +
+            "    }\n" +
             "}"
         });
     }
@@ -302,24 +303,26 @@ public class IntegerCompGrammar extends LR0TestGrammar {
 
     }
 
-    protected void setUpSemanticRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap, SemanticAnalyser semanticAnalyser) {
+    protected void setUpSemanticRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
         ruleConvertorMap.put("Java", new HashMap<>());
 
-        TypeChecker typeChecker = (TypeChecker)semanticAnalyser;
+        TypeChecker typeChecker = new TypeChecker();
+
         HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration()+ "\n"; }); //<statement list> := <statement list> <statement>
+        ruleConvertor.put(BasicCodeGenerator.ROOT_RULE, (elements) -> { return "        " + elements[0].getGeneration().stripTrailing().replaceAll("\n", "\n        ") + "\n"; });
+        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + "\n"; }); //<statement list> := <statement list> <statement>
         ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + "\n"; }); //<statement list> := <statement>
         ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration() + ";"; }); //<statement> := <assignment>;
-        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //<statement> := <if statement>
+        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration() + "\n"; }); //<statement> := <if statement>
         ruleConvertor.put(getRule(4), (elements) -> { 
-            String generation =  "if(" + elements[2].getGeneration() + ") {\n";
-            generation += elements[5].getGeneration().replaceAll("\n", "\n\t\t\t");
-            return generation + "}\n";
+            String generation =  "\nif(" + elements[2].getGeneration() + ") {\n    ";
+            generation += elements[5].getGeneration().stripTrailing().replaceAll("\n", "\n    ");
+            return generation + "\n}";
         }); //<if statement> := if(<condition>) {<statement list>}
         ruleConvertor.put(getRule(5), (elements) -> {
-            String generation =  elements[0].getGeneration() + "else {\n";
-            generation += elements[3].getGeneration().replaceAll("\n", "\n\t\t\t");
-            return generation + "}\n";
+            String generation =  elements[0].getGeneration() + "\nelse {\n    ";
+            generation += elements[3].getGeneration().stripTrailing().replaceAll("\n", "\n    ");
+            return generation + "\n}";
         }); //<if statement> := <if statement> else {<statement list>}
         ruleConvertor.put(getRule(6), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //<condition> := identifier <conditional operator> identifier
         ruleConvertor.put(getRule(7), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //<condition> := identifier <conditional operator> numConstant

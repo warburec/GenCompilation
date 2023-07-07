@@ -6,13 +6,15 @@ import grammar_objects.*;
 import syntax_analysis.parsing.*;
 
 public class BasicCodeGenerator implements CodeGenerator {
+    public static ProductionRule ROOT_RULE = null;
+
     protected Map<ProductionRule, Generator> ruleConvertor;
     protected String preGeneration;
     protected String postGeneration;
 
     /**
      * 
-     * @param ruleConvertor A map of production rules and generation functions to produce strings for them
+     * @param ruleConvertor A map of production rules and generation functions to produce strings for them, map ROOT_RULE to a Generator function to alter the entire generated code
      * @param preGeneration A string that will precede the generated code
      * @param postGeneration A string that will follow the generated code
      */
@@ -68,6 +70,11 @@ public class BasicCodeGenerator implements CodeGenerator {
 
                 throw new UnrecognisedParseStateException(currentState.getParseState());
             }
+        }
+
+        Generator rootGenerator = ruleConvertor.get(ROOT_RULE);
+        if(rootGenerator != null) {
+            currentlyBuiltCode = new NonTerminalGeneration(rootGenerator.generateCode(new CodeElement[] { currentlyBuiltCode }));
         }
 
         return preGeneration + currentlyBuiltCode.getGeneration() + postGeneration;
