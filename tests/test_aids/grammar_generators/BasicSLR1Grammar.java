@@ -197,7 +197,7 @@ public class BasicSLR1Grammar extends Grammar implements SLR1TestGrammar {
         return gotoTable;
     }
 
-    //TODO: Make functions into observes (move this method to outside the implementations)
+    //TODO: Make functions into observers (move this method to outside the implementations)
     @Override
     public ParseState getParseRoot(String sentence) {
         switch(sentence) {
@@ -214,7 +214,6 @@ public class BasicSLR1Grammar extends Grammar implements SLR1TestGrammar {
      * @return The root ParseState of the tree
      */
     private ParseState completeSentenceParse() {
-        //TODO: Parse states
         List<ParseState> parseStates = new ArrayList<>();
 
         parseStates.add(new ShiftedState(getState(6), new Token("b")));
