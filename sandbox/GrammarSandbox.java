@@ -1,4 +1,3 @@
-
 public class GrammarSandbox {
     
     // @Test
@@ -6,9 +5,7 @@ public class GrammarSandbox {
     //     String language = "Java";
     //     String sentence = "JavaConversion";
 
-    //     TypeChecker typeChecker = new TypeChecker();
-
-    //     IntegerCompGrammar grammar = new IntegerCompGrammar(typeChecker);
+    //     IntegerCompGrammar grammar = new IntegerCompGrammar();
     //     GrammarParts grammarParts = grammar.getParts();
     //     SyntaxAnalyser syntaxAnalyser = new LR0Parser(
     //         grammarParts.tokens(), 
@@ -22,13 +19,13 @@ public class GrammarSandbox {
     //          * x = 1;
     //          * y = 2;
     //          * if(x <= y) {
-    //          *  x = val y *  val y;
+    //          *  x = val y * y;
     //          * }
     //          * else {
     //          *  x = -10;
     //          * }
-    //          * y = 5 + val x;
-    //          * x = val x * val y;
+    //          * y = 5 + x;
+    //          * x = val x * y;
     //          */
     //         parseRoot = syntaxAnalyser.analyse(new Token[] {
     //             new Identifier("identifier", "int", "x"),
@@ -51,7 +48,6 @@ public class GrammarSandbox {
     //             new Token("val"),
     //             new Identifier("identifier", "int", "y"),
     //             new Token("*"),
-    //             new Token("val"),
     //             new Identifier("identifier", "int", "y"),
     //             new Token(";"),
     //             new Token("}"),
@@ -66,7 +62,6 @@ public class GrammarSandbox {
     //             new Token("="),
     //             new Literal("numConstant", "5"),
     //             new Token("+"),
-    //             new Token("val"),
     //             new Identifier("identifier", "int", "x"),
     //             new Token(";"),
     //             new Identifier("identifier", "int", "x"),
@@ -74,7 +69,6 @@ public class GrammarSandbox {
     //             new Token("val"),
     //             new Identifier("identifier", "int", "x"),
     //             new Token("*"),
-    //             new Token("val"),
     //             new Identifier("identifier", "int", "y"),
     //             new Token(";")
     //         });
