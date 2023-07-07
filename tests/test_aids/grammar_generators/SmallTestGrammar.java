@@ -14,7 +14,7 @@ import syntax_analysis.parsing.*;
  * B->0
  * B->1
  */
-public class SmallTestGrammar extends TestGrammar {
+public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar {
 
     @Override
     protected  void setUpTokens(List<Token> tokens) {
@@ -124,7 +124,7 @@ public class SmallTestGrammar extends TestGrammar {
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 3),
             }),
-            getState(3)
+            getState(4)
         ));
 
         states.add(new State(
@@ -176,39 +176,52 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
-        Map<Token, State> currentStateActions = new HashMap<>();
+    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        List<Token> allTokens = new ArrayList<>();
+        allTokens.addAll(tokens);
+        allTokens.add(endOfFile);
 
-        currentStateActions.put(new Token("0"), getState(7));
-        currentStateActions.put(new Token("1"), getState(8));
-        actionTable.put(getState(0), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
 
-        currentStateActions.put(new Token("*"), getState(2));
-        currentStateActions.put(new Token("+"), getState(4));
-        actionTable.put(getState(1), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Token("*"), new Shift(getState(2)));
+        stateActions.put(new Token("+"), new Shift(getState(4)));
+        stateActions.put(endOfFile, new Accept());
         
-        currentStateActions.put(new Token("0"), getState(7));
-        currentStateActions.put(new Token("1"), getState(8));
-        actionTable.put(getState(2), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
         
-        actionTable.put(getState(3), new ReduceAction(getRule(1)));
+        stateActions = actionTable.get(getState(3));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(1)));
+        }
         
-        currentStateActions.put(new Token("0"), getState(7));
-        currentStateActions.put(new Token("1"), getState(8));
-        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
         
-        actionTable.put(getState(5), new ReduceAction(getRule(0)));
+        stateActions = actionTable.get(getState(5));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(0)));
+        }
         
-        actionTable.put(getState(6), new ReduceAction(getRule(2)));
+        stateActions = actionTable.get(getState(6));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(2)));
+        }
 
-        actionTable.put(getState(7), new ReduceAction(getRule(3)));
+        stateActions = actionTable.get(getState(7));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(3)));
+        }
 
-        actionTable.put(getState(8), new ReduceAction(getRule(4)));
-
+        stateActions = actionTable.get(getState(8));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(4)));
+        }
     }
 
     @Override
@@ -506,6 +519,58 @@ public class SmallTestGrammar extends TestGrammar {
             "\tprintf(1 + 0 * 1);\n" +
             "}"
         );
+    }
+
+    @Override
+    public Map<State, Map<Token, Action>> getSLR1ActionTable() {
+        Map<State, Map<Token, Action>> actionTable = new HashMap<>();
+        for (State state : getStates()) {
+            actionTable.put(state, new HashMap<>());
+        }
+
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Token("*"), new Shift(getState(2)));
+        stateActions.put(new Token("+"), new Shift(getState(4)));
+        stateActions.put(new EOF(), new Accept());
+        
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+        
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new Token("+"), new Reduction(getRule(1)));
+        stateActions.put(new Token("*"), new Reduction(getRule(1)));
+        stateActions.put(new EOF(), new Reduction(getRule(1)));
+        
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+        
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new Token("+"), new Reduction(getRule(0)));
+        stateActions.put(new Token("*"), new Reduction(getRule(0)));
+        stateActions.put(new EOF(), new Reduction(getRule(0)));
+        
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Token("+"), new Reduction(getRule(2)));
+        stateActions.put(new Token("*"), new Reduction(getRule(2)));
+        stateActions.put(new EOF(), new Reduction(getRule(2)));
+
+        stateActions = actionTable.get(getState(7));
+        stateActions.put(new Token("+"), new Reduction(getRule(3)));
+        stateActions.put(new Token("*"), new Reduction(getRule(3)));
+        stateActions.put(new EOF(), new Reduction(getRule(3)));
+
+        stateActions = actionTable.get(getState(8));
+        stateActions.put(new Token("+"), new Reduction(getRule(4)));
+        stateActions.put(new Token("*"), new Reduction(getRule(4)));
+        stateActions.put(new EOF(), new Reduction(getRule(4)));
+
+        return actionTable;
     }
 
 }

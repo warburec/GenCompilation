@@ -13,7 +13,7 @@ import syntax_analysis.parsing.ParseState;
  * L → l L //Self-referential
  * L → o
  */
-public class SelfReferentialGrammar extends TestGrammar {
+public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGrammar {
 
     @Override
     protected void setUpTokens(List<Token> tokens) {
@@ -167,36 +167,48 @@ public class SelfReferentialGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
-        Map<Token, State> currentStateActions = new HashMap<>();
+    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        List<Token> allTokens = new ArrayList<>();
+        allTokens.addAll(tokens);
+        allTokens.add(endOfFile);
 
-        currentStateActions.put(new Token("h"), getState(2));
-        actionTable.put(getState(0), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("h"), new Shift(getState(2)));
 
         //Accept EOF at state 1
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(endOfFile, new Accept());
 
-        currentStateActions.put(new Token("a"), getState(4));
-        actionTable.put(getState(2), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("a"), new Shift(getState(4)));
 
-        actionTable.put(getState(3), new ReduceAction(getRule(0)));
+        stateActions = actionTable.get(getState(3));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(0)));
+        }
 
-        currentStateActions.put(new Token("l"), getState(6));
-        currentStateActions.put(new Token("o"), getState(8));
-        actionTable.put(getState(4), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("l"), new Shift(getState(6)));
+        stateActions.put(new Token("o"), new Shift(getState(8)));
 
-        actionTable.put(getState(5), new ReduceAction(getRule(1)));
+        stateActions = actionTable.get(getState(5));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(1)));
+        }
 
-        currentStateActions.put(new Token("l"), getState(6));
-        currentStateActions.put(new Token("o"), getState(8));
-        actionTable.put(getState(6), new ShiftAction(new HashMap<>(currentStateActions)));
-        currentStateActions.clear();
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Token("l"), new Shift(getState(6)));
+        stateActions.put(new Token("o"), new Shift(getState(8)));
 
-        actionTable.put(getState(7), new ReduceAction(getRule(2)));
+        stateActions = actionTable.get(getState(7));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(2)));
+        }
 
-        actionTable.put(getState(8), new ReduceAction(getRule(3)));
+        stateActions = actionTable.get(getState(8));
+        for(Token token : allTokens) {
+            stateActions.put(token, new Reduction(getRule(3)));
+        }
     }
 
     @Override
@@ -238,6 +250,46 @@ public class SelfReferentialGrammar extends TestGrammar {
     @Override
     protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
         
+    }
+
+    @Override
+    public Map<State, Map<Token, Action>> getSLR1ActionTable() {
+        Map<State, Map<Token, Action>> actionTable = new HashMap<>();
+        for (State state : getStates()) {
+            actionTable.put(state, new HashMap<>());
+        }
+
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("h"), new Shift(getState(2)));
+
+        //Accept EOF at state 1
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new EOF(), new Accept());
+
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("a"), new Shift(getState(4)));
+
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new EOF(), new Reduction(getRule(0)));
+
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("l"), new Shift(getState(6)));
+        stateActions.put(new Token("o"), new Shift(getState(8)));
+
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new EOF(), new Reduction(getRule(1)));
+
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Token("l"), new Shift(getState(6)));
+        stateActions.put(new Token("o"), new Shift(getState(8)));
+
+        stateActions = actionTable.get(getState(7));
+        stateActions.put(new EOF(), new Reduction(getRule(2)));
+
+        stateActions = actionTable.get(getState(8));
+        stateActions.put(new EOF(), new Reduction(getRule(3)));
+
+        return actionTable;
     }
     
 }

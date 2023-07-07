@@ -9,7 +9,7 @@ import semantic_analysis.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 
-public class IntegerCompGrammar extends TestGrammar {
+public class IntegerCompGrammar extends LR0TestGrammar {
 
     Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
 
@@ -249,7 +249,7 @@ public class IntegerCompGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Action> actionTable) {
+    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
     }
 
     @Override

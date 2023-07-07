@@ -43,6 +43,10 @@ public class Token extends LexicalElement {
     }
     
     public String getPositionString() {
+        if(positionType == null) {
+            return null;
+        }
+
         switch(positionType) {
             case LineAndColumn:
                 return "line: " + lineNumber + ", column: " + columnNumber;

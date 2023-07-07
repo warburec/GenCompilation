@@ -3,50 +3,53 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.*;
+import helperObjects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-//TODO: Highlight non-deterministic rules, show users where rules could be changed to become left or right-recursive to work as intended
-public class LR0Parser extends SyntaxAnalyser {
+public class SLR1Parser extends LR0Parser {
 
-    protected Map<NonTerminal, Set<ProductionRule>> productionMap;
-    protected Set<State> states;
-    protected State rootState;
-    protected Map<State, Map<Token, Action>> actionTable;
-    protected Map<State, Map<NonTerminal, State>> gotoTable;
-    protected ProductionRule acceptRule;
-
-    public static final Token EOF = new EOF();
+    protected HashMap<NonTerminal, Set<Token>> firstSets;  //A map containing the first sets for all non-terminals
+    protected HashMap<NonTerminal, Set<Token>> followSets;   //A map containing the follow sets for all non-terminals
 
     private int currentParseToken = -1;
 
-    public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
+    public SLR1Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         initialise();
     }
 
-    public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
+    public SLR1Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
         initialise();
     }
 
-    public LR0Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
+    public SLR1Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
         initialise();
     }
 
-    public LR0Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
+    public SLR1Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
         initialise();
     }
 
     private void initialise() {
-        checkForInvalidNonTerminals();
-        generateProductionMap();
-        generateStates();
+        generateFirstSets();
+        generateFollowSets();
+
         generateActionAndGotoTables();
     }
 
+    private void generateFirstSets() {
+        firstSets = FirstSetGenerator.generate(productionRules, nonTerminals);
+    }
+
+    private void generateFollowSets() {
+        followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
+    }
+
+    @SuppressWarnings("unused")
     private void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
             if(nonTerminal.getName().equals(null)) {
@@ -55,6 +58,7 @@ public class LR0Parser extends SyntaxAnalyser {
         }
     }
 
+    @SuppressWarnings("unused")
     private void generateProductionMap() {
         productionMap = new HashMap<>();
 
@@ -75,7 +79,7 @@ public class LR0Parser extends SyntaxAnalyser {
         }
     }
 
-
+    @SuppressWarnings("unused")
     private void generateStates() {
         states = new HashSet<>();
 
@@ -245,6 +249,9 @@ public class LR0Parser extends SyntaxAnalyser {
             for(GrammarPosition position : state.getPositions()) {
                 if(!position.isClosed()) { continue; }
 
+                NonTerminal nonTerminal = position.rule().nonTerminal();
+                Set<Token> followingTokens = followSets.get(nonTerminal);
+                
                 if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
                     actionTable.get(state).put(EOF, new Accept());
                     continue;
@@ -252,19 +259,21 @@ public class LR0Parser extends SyntaxAnalyser {
 
                 Reduction reductionAction = new Reduction(position.rule());
 
-                if(!actionTable.get(state).isEmpty()) {
-                    List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
+                Map<Token, Action> stateActions = actionTable.get(state);
 
-                    Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
-                    conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
-                    conflicts.add(reductionAction.reductionRule());
+                for(Token token : followingTokens) {
+                    if(stateActions.get(token) == null) {
+                        stateActions.put(token, reductionAction);
+                    }
+                    else {
+                        List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
 
-                    throw new NonDeterminismException(conflicts, state);
-                }
+                        Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
+                        conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
+                        conflicts.add(reductionAction.reductionRule());
 
-                //Add reduction for all tokens (inc. EOF)
-                for (Token token : allTokens) {
-                    actionTable.get(state).put(token, reductionAction);
+                        throw new NonDeterminismException(conflicts, state);
+                    }
                 }
             }
 

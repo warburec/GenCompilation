@@ -41,20 +41,19 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
             string += "null";
         }
         else {
-            string += "<" + nonTerminal.toString() + ">";
+            string += nonTerminal.toString();
         }
 
         string += " := ";
 
-        for (LexicalElement lexicalElement : productionSequence) {
-            if(lexicalElement == null) { string += "null";  }
+        for (int i = 0; i < productionSequence.length - 1; i++) {
+            if(productionSequence[i] == null) { string += "null";  }
+            
+            string += productionSequence[i].toString() + " ";
+        }
 
-            if(lexicalElement instanceof NonTerminal) {
-                string += "<" +lexicalElement.toString() + "> ";
-            }
-            else {
-                string += lexicalElement.toString() + " ";
-            }
+        if(productionSequence.length > 0) {
+            string += productionSequence[productionSequence.length - 1].toString();
         }
 
         string.stripTrailing();
