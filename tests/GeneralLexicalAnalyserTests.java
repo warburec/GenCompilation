@@ -439,4 +439,6 @@ public class GeneralLexicalAnalyserTests {
             assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
         }
     }
+
+    //TODO: Test/tokenise strings with whitespace/strongly reserved characters in them e.g. " \n";
 }

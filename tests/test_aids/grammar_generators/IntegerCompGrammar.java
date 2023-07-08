@@ -24,7 +24,7 @@ import syntax_analysis.parsing.ParseState;
 // conditional_operator -> !=
 // conditional_operator -> <=
 // assignment -> identifier = expression
-// expression -> val identifier
+// expression -> identifier
 // expression -> expression + identifier
 // expression -> expression - identifier
 // expression -> expression * identifier
@@ -59,7 +59,6 @@ public class IntegerCompGrammar extends LR0TestGrammar {
         tokens.add(new Token("!="));
         tokens.add(new Token("<="));
         tokens.add(new Token("="));
-        tokens.add(new Token("val"));
         tokens.add(new Token("+"));
         tokens.add(new Token("-"));
         tokens.add(new Token("*"));
@@ -191,7 +190,6 @@ public class IntegerCompGrammar extends LR0TestGrammar {
         productionRules.add(new ProductionRule(
             new NonTerminal("expression"), 
             new LexicalElement[] {
-                new Token("val"),
                 new Identifier("identifier")
         }));
 
@@ -336,13 +334,14 @@ public class IntegerCompGrammar extends LR0TestGrammar {
 
             IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
             if(!typeChecker.isDeclared(identifier)) {
+                typeChecker.declare(identifier);
                 generation += identifier.getType() + " ";
             }
             
             generation += elements[0].getGeneration();
             return generation + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); 
         }); //<assignment> := identifier = <expression>
-        ruleConvertor.put(getRule(14), (elements) -> { return elements[1].getGeneration(); }); // <expression> := val identifier
+        ruleConvertor.put(getRule(14), (elements) -> { return elements[0].getGeneration(); }); // <expression> := val identifier
         ruleConvertor.put(getRule(15), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> + identifier
         ruleConvertor.put(getRule(16), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> - identifier
         ruleConvertor.put(getRule(17), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> * identifier

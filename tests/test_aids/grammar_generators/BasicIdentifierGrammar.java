@@ -544,7 +544,7 @@ public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGr
             IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
             if(!typeChecker.isDeclared(identifier)) {
                 identifierType = identifier.getType() + " ";
-                typeChecker.setDeclared(identifier);
+                typeChecker.declare(identifier);
             }
 
             return "\t\t" + identifierType + elements[0].getGeneration() + " " + 

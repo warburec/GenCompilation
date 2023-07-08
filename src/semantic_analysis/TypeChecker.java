@@ -1,7 +1,6 @@
 package semantic_analysis;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import code_generation.IdentifierGeneration;
 
@@ -17,7 +16,7 @@ public class TypeChecker implements SemanticAnalyser {
         return declaredIdentifiers.contains(identifier);
     }
 
-    public void setDeclared(IdentifierGeneration identfier) {
+    public void declare(IdentifierGeneration identfier) {
         declaredIdentifiers.add(identfier);
     }
     
