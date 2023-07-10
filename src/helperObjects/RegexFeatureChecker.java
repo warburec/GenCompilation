@@ -21,7 +21,9 @@ public class RegexFeatureChecker {
         //Split at (?<!\()\? "?" (not a lookahead)
         //Split at matches of ((?<!\\)\+(?![^(]*\))) "+" not in brackets
 
-        //Remove all remaining "+" (within brackets) and {1[,.*]?}
+        //Remove all remaining "+" (within brackets) and {1}
+        
+        //Split at {1,.*}
 
         //Split at \[+.*(?<!\\)\*.*\]+|\(+.*(?<!\\)\*.*\)+ any brackets with * inside
 
