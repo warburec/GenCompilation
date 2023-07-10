@@ -28,7 +28,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      *  @param whitespaceDelimiters All string to be considered as whitespace (Will not be tokenised)
      *  @param stronglyReservedWords Words that cannot be part of a user-definable token. Examples: operators, punctuation, etc. (Not including whitespace)
      *  @param weaklyReservedWords Words that will be tokenised if they do not appear as part of a user-definable token
-     *  @param dynamicTokenRegex A map of classes for dynamic tokens (including identifiers and literals) and the regex that must be met in order to parse them. Note: All potential token sets from the regex must be mutually exclusive
+     *  @param dynamicTokenRegex The regex for dynamic tokens (including identifiers and literals) along with a tuple of the class name and grammatical name of each token. Note: All potential token sets from the regex must be mutually exclusive
     */
     public GeneralLexicalAnalyser(
         String[] whitespaceDelimiters,
@@ -104,8 +104,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     private void validateDynamicTokens() {
-        // User-definables/dynamic tokens must have mutually exclusive regex
-        //TODO
+        //TODO: User-definables/dynamic tokens must have mutually exclusive regex
     }
 
     private void generateDynamicRegexPatterns(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegexStringBased) {
@@ -117,6 +116,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
     }
 
+    //TODO: Suppress skipping characters when whithin token bookends, e.g. '"' and '"' for strings
+    //It may be useful to warn users of dynamic tokens that do not have bookends, thus not allowing them to contain strongly reserved words
+    //It may also be useful to allow users to disallow strongly reserved words even if there are specific bookends 
     @Override
     public Token[] analyse(String sentence) {
         List<Token> tokenList = new LinkedList<>();

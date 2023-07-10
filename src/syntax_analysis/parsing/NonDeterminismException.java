@@ -42,7 +42,7 @@ public class NonDeterminismException extends RuntimeException {
     private String getPositionMessage() {
         String msg = super.getMessage();
 
-        msg += "\nThe states causing ambiguity are:\n";
+        msg += "\nThe grammar positions causing ambiguity are:\n";
 
         for (GrammarPosition grammarPosition : conflictingPositions) {
             msg += "\t" + grammarPosition.toString() + "\n";
@@ -52,7 +52,7 @@ public class NonDeterminismException extends RuntimeException {
     }
 
     private String getRulesMessage() {
-        String msg = "Non-determinism was found in the rules :\n";
+        String msg = "Non-deterministic rules found :\n";
 
         for (ProductionRule rule : conflictingRules) {
             msg += "\t" + rule.toString() + "\n";
