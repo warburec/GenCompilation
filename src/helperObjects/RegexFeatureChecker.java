@@ -4,9 +4,9 @@ import java.util.*;
 
 public class RegexFeatureChecker {
 
-    //Works for simple bookends.
-    //TODO: Increase complexity to any definite characters
+    // Works for simple bookends.
     /**
+     * Produces regex for all starting and ending definite tokens (cannot be ommitted or repeated an unknown number of times)
      * @param regex The regex to be evaluated
      * @return Regex of definite starting and ending characters, null if bookends could not be found
      */
@@ -14,14 +14,10 @@ public class RegexFeatureChecker {
         String startRegex;
         String endRegex;
 
-        //TODO: Alter all regex to not be incorrectly affected by \ characters
-        //All splits remove the delimiters used
-
-        //TODO: Check all regex works in java
         String rule = "";
 
-        //Split at (?<!\()\? "?" (not a lookahead)
-        String[] splitString = regex.split("(?<!\\()\\?");
+        //Split at \\?[^()]\?|\\[()]\? ".?" (not a lookahead or brackets)
+        String[] splitString = regex.split("\\\\?[^()]\\?|\\\\[()]\\?");
         startRegex = splitString[0];
         endRegex = splitString[splitString.length - 1];
 
@@ -37,6 +33,7 @@ public class RegexFeatureChecker {
         startRegex = startRegex.replaceAll(rule, "");
         endRegex = endRegex.replaceAll(rule, "");
         
+        //TODO: Try removing
         //Split at {1,.*}
         rule = "\\{1,.*\\}";
         splitString = startRegex.split(rule);
@@ -47,20 +44,20 @@ public class RegexFeatureChecker {
         //Split at top-level brackets containing '*'
         splitString = splitAtBracketsWithStars(startRegex);
         startRegex = splitString[0];
-        splitString = splitAtBracketsWithStars(startRegex);
+        splitString = splitAtBracketsWithStars(endRegex);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at (\\?[^])]\*)|(\\\)\*) removing any characters before '*' (not including brackets unless escaped)
-        rule = "(\\\\?[^])]\\*)|(\\\\\\)\\*)";
+        //Split at (\\?[^])\\]\*)|(\\\)\*) removing any characters before '*' (not including brackets unless escaped)
+        rule = "(\\\\?[^])\\\\]\\*)|(\\\\\\)\\*)";
         splitString = startRegex.split(rule);
         startRegex = splitString[0];
         splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at matching brackets before "*" and {.*[,...]?} (convert latter to just the lower bound)
+        //Split at matching brackets before "*", "?" and {.*[,...]?} (convert latter to just the lower bound)
         splitString = splitAtIndefiniteGroupRepititions(startRegex);
         startRegex = splitString[0];
-        splitString = splitAtIndefiniteGroupRepititions(startRegex);
+        splitString = splitAtIndefiniteGroupRepititions(endRegex);
         endRegex = splitString[splitString.length - 1];
 
         if(startRegex.equals("") || endRegex.equals("")) { return null; }
@@ -146,7 +143,7 @@ public class RegexFeatureChecker {
                 continue;
             }
 
-            if(regex.charAt(i) == '*') {
+            if(regex.charAt(i) == '*' || regex.charAt(i) == '?') {
                 splitParts.add(regex.substring(beginning, i + 1));
                 
                 beginning = i + 1;

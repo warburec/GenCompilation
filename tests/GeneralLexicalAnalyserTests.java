@@ -440,5 +440,51 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
+    @Test
+    public void standardStringMatches() {
+        String sentence =
+        "\"ab cde\" \n" +
+        "\"bcd\n" +
+        "dcb cdb\" + zzz";
+
+        String[] delims = new String[] {
+            " ", "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+        };
+
+        String[] weaklyReserved = new String[] {
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
+        dynamicTokenRegex.put("[^\"].*[^\"]", new NotEmptyTuple<String, String>("Identifier", "ident"));
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new Literal("string", "\"ab cde\"", 1, 1),
+            new Literal("string", "\"bcd\ndcb cdb\"", 2, 1),
+            new Identifier("identifier", "zzz", 3, 11)
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
+
     //TODO: Test/tokenise strings with whitespace/strongly reserved characters in them e.g. " \n";
 }

@@ -4,6 +4,13 @@ public class Literal extends Token {
     private String type;
     private String value;
 
+    public Literal(String grammaticalName, String value, int lineNum, int columnNum) {
+        super(grammaticalName, lineNum, columnNum);
+
+        this.type = null;
+        this.value = value;
+    }
+
     public Literal(String grammaticalName, String type, String value) {
         super(grammaticalName);
 

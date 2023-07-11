@@ -151,4 +151,19 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void slashesBeforImportantParts() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "\\?\\*\\(\\)?\\[\\]*\\*\\{4\\}";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "\\?\\*\\",
+            "\\*\\{4\\}"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }
