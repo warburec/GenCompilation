@@ -41,7 +41,7 @@ public class RegexFeatureCheckerTests {
     @Test
     public void brackets() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
-        String regex = "(abc)(def)*(ghi)+";
+        String regex = "(abc)(def)*(fed)*(ghi)+";
 
         NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
 
@@ -162,6 +162,51 @@ public class RegexFeatureCheckerTests {
         NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
             "\\?\\*\\",
             "\\*\\{4\\}"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    @Test
+    public void repeatingGroups() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "(abc){4}(zz(z*)z){7}[abc]{3}";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "(abc){4}",
+            "[abc]{3}"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    @Test
+    public void indefiniteEndOneOrMore() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "a.*cb+";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "a",
+            "b"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    @Test
+    public void indefiniteEndRepitition() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "a.*cb{1,7}";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "a",
+            "b"
         );
 
         assertEquals(expectedBookends, actualBookends);
