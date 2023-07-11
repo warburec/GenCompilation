@@ -16,8 +16,8 @@ public class RegexFeatureChecker {
 
         String rule = "";
 
-        //Split at \\?[^()]\?|\\[()]\? ".?" (not a lookahead or brackets)
-        String[] splitString = regex.split("\\\\?[^()]\\?|\\\\[()]\\?");
+        //Split at (?:\\)?[^()\\]\?|(?:\\)[()]\? ".?" (not a lookahead or brackets)
+        String[] splitString = regex.split("(?:\\\\)?[^()\\\\]\\?|(?:\\\\)[()]\\?");
         startRegex = splitString[0];
         endRegex = splitString[splitString.length - 1];
 
@@ -47,8 +47,8 @@ public class RegexFeatureChecker {
         splitString = splitAtBracketsContainingIndefinite(endRegex);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at (\\?[^])\\]\*)|(\\\)\*) removing any characters before '*' (not including brackets unless escaped)
-        rule = "(\\\\?[^])\\\\]\\*)|(\\\\\\)\\*)";
+        //Split at (\\?[^])\\]\*)|(\\[)\]]\*) removing any characters before '*' (not including brackets unless escaped)
+        rule = "(\\\\?[^])\\\\]\\*)|(\\\\[)\\]]\\*)";
         splitString = startRegex.split(rule);
         startRegex = splitString[0];
         splitString = endRegex.split(rule);
@@ -180,21 +180,22 @@ public class RegexFeatureChecker {
 
             if(regex.charAt(i) == '}') {
                 String range = regex.substring(startRepitition, i + 1);
-                String splitRange = range.split(",", 1)[0];
+                String[] splitRange = range.split(",", 2);
 
-                if(splitRange.charAt(splitRange.length() - 1) == '}') {
+                if(splitRange[0].charAt(splitRange[0].length() - 1) == '}') {
                     startRepitition = -1;
 
-                    if(regex.charAt(i - splitRange.length() - 1) == ')') {
+                    if(regex.charAt(i - splitRange[0].length() - 1) == ')') {
                         startBracketPos = -1;
                     }
 
                     continue;
                 }
 
-                splitParts.add(
-                    regex.substring(0, (i - range.length()) + splitRange.length()) + "}"
-                );
+                String remainder = regex.substring(i + 1, regex.length());
+                regex = regex.substring(0, (i - range.length()) + splitRange[0].length() + 1) + "}" + remainder;
+
+                i = i - splitRange[1].length();
 
                 startRepitition = -1;
                 continue;

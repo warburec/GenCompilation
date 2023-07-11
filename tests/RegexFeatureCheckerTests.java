@@ -160,7 +160,7 @@ public class RegexFeatureCheckerTests {
         NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
 
         NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
-            "\\?\\*\\",
+            "\\?\\*\\(",
             "\\*\\{4\\}"
         );
 
