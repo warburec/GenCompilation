@@ -121,4 +121,34 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void definiteRangeInBrackets() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "(ab|(cd){3}).*end";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "(ab|(cd){3})",
+            "end"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    @Test
+    public void indefiniteRangeInBrackets() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "(ab|(cd){3,7}).*end";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "(ab|(cd){3})",
+            "end"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }

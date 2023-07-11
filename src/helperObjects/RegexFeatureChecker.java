@@ -17,42 +17,51 @@ public class RegexFeatureChecker {
         //TODO: Alter all regex to not be incorrectly affected by \ characters
         //All splits remove the delimiters used
 
+        //TODO: Check all regex works in java
+        String rule = "";
+
         //Split at (?<!\()\? "?" (not a lookahead)
         String[] splitString = regex.split("(?<!\\()\\?");
         startRegex = splitString[0];
         endRegex = splitString[splitString.length - 1];
 
         //Split at matches of ((?<!\\)\+(?![^(]*\))) "+" not in brackets
-        splitString = startRegex.split("((?<!\\\\)\\+(?![^(]*\\)))");
+        rule = "((?<!\\\\)\\+(?![^(]*\\)))";
+        splitString = startRegex.split(rule);
         startRegex = splitString[0];
-        splitString = endRegex.split("((?<!\\\\)\\+(?![^(]*\\)))");
+        splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
         //Remove all remaining "+" (within brackets) and {1}
-        startRegex = startRegex.replaceAll("\\+|\\{1\\}", "");
-        endRegex = endRegex.replaceAll("\\+|\\{1\\}", "");
+        rule = "\\+|\\{1\\}";
+        startRegex = startRegex.replaceAll(rule, "");
+        endRegex = endRegex.replaceAll(rule, "");
         
         //Split at {1,.*}
-        splitString = startRegex.split("\\{1,.*\\}");
+        rule = "\\{1,.*\\}";
+        splitString = startRegex.split(rule);
         startRegex = splitString[0];
-        splitString = endRegex.split("\\{1,.*\\}");
+        splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at \[+.*(?<!\\)\*.*\]+|\(+.*(?<!\\)\*.*\)+ any brackets with * inside
-        splitString = startRegex.split("\\[+.*(?<!\\\\)\\*.*\\]+|\\(+.*(?<!\\\\)\\*.*\\)+");
+        //Split at top-level brackets containing '*'
+        splitString = splitAtBracketsWithStars(startRegex);
         startRegex = splitString[0];
-        splitString = endRegex.split("\\[+.*(?<!\\\\)\\*.*\\]+|\\(+.*(?<!\\\\)\\*.*\\)+");
+        splitString = splitAtBracketsWithStars(startRegex);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at (?![]|)]\*)(?!\\.\*)(?=.\*) removing any * characters (not including brackets)
-        splitString = startRegex.split("(?![]|)]\\*)(?!\\\\.\\*)(?=.\\*)");
+        //Split at (\\?[^])]\*)|(\\\)\*) removing any characters before '*' (not including brackets unless escaped)
+        rule = "(\\\\?[^])]\\*)|(\\\\\\)\\*)";
+        splitString = startRegex.split(rule);
         startRegex = splitString[0];
-        splitString = endRegex.split("(?![]|)]\\*)(?!\\\\.\\*)(?=.\\*)");
+        splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
         //Split at matching brackets before "*" and {.*[,...]?} (convert latter to just the lower bound)
-        startRegex = removeIndefiniteRepititions(startRegex);
-        endRegex = removeIndefiniteRepititions(endRegex);
+        splitString = splitAtIndefiniteGroupRepititions(startRegex);
+        startRegex = splitString[0];
+        splitString = splitAtIndefiniteGroupRepititions(startRegex);
+        endRegex = splitString[splitString.length - 1];
 
         if(startRegex.equals("") || endRegex.equals("")) { return null; }
         if(startRegex.equals(regex)) { return null; }
@@ -60,48 +69,122 @@ public class RegexFeatureChecker {
         return new NotEmptyTuple<String,String>(startRegex, endRegex);
     }
 
-    private String removeIndefiniteRepititions(String regex) {
-        String stringStart = "";
+    private String[] splitAtBracketsWithStars(String regex) {
+        List<String> stringParts = new ArrayList<>();
+
+        int beginning = 0;
+        int bracketStart = -1;
+        int numLeftBrackets = 0;
+        int numRightBrackets = 0;
+
+        boolean checkForSplit = false;
+        boolean starFound = false;
+
+        for (int i = 0; i < regex.length(); i++) {
+            if(i != 0 && regex.charAt(i - 1) == '\\') { continue; }
+
+            if(bracketStart == -1) {
+                if(regex.charAt(i) == '(' || regex.charAt(i) == '[') {
+                    bracketStart = i;
+                    numLeftBrackets = 1;
+                }
+                continue;
+            }
+            
+            if(regex.charAt(i) == '*' && regex.charAt(i - 1) == '\\') {
+                starFound = true;
+                continue;
+            }
+
+            if(regex.charAt(i) == '(' || regex.charAt(i) == '[') {
+
+                numLeftBrackets++;
+                
+                if(numLeftBrackets == numRightBrackets) {
+                    checkForSplit = true;
+                }
+            }
+            else if(regex.charAt(i) == ')' || regex.charAt(i) == ']') {
+
+                numLeftBrackets++;
+
+                if(numLeftBrackets == numRightBrackets) {
+                    checkForSplit = true;
+                }
+            }
+
+            if(checkForSplit) {
+                if(starFound) {
+                    stringParts.add(regex.substring(beginning, bracketStart));
+                }
+                
+                checkForSplit = false;
+                bracketStart = -1;
+                beginning = i + 1;
+            }
+        }
+
+        stringParts.add(regex.substring(beginning, regex.length()));
+
+        return stringParts.toArray(new String[stringParts.size()]);
+    }
+
+    private String[] splitAtIndefiniteGroupRepititions(String regex) {
+        List<String> splitParts = new ArrayList<>();
+
+        int beginning = 0;
         int startBracketPos = -1;
         int startRepitition = -1;
 
         for (int i = 0; i < regex.length(); i++) {
+            if(i != 0 && regex.charAt(i - 1) == '\\') { continue; }
+
             if(startBracketPos == -1 && 
-                regex.charAt(i) == '(' || regex.charAt(i) == '[') 
+                (regex.charAt(i) == '(' || regex.charAt(i) == '[')) 
             {
                 startBracketPos = i;
                 continue;
             }
 
             if(regex.charAt(i) == '*') {
-                stringStart = regex.substring(0, i + 1);
-                break;
+                splitParts.add(regex.substring(beginning, i + 1));
+                
+                beginning = i + 1;
+                startBracketPos = -1;
+                startRepitition = -1;
+                continue;
             }
 
-            if(regex.charAt(i) == '{' && regex.charAt(i - 1) != '\\') {
+            if(regex.charAt(i) == '{') {
                 startRepitition = i;
             }
 
-            if(regex.charAt(i) == '}' && regex.charAt(i - 1) != '\\') {
+            if(regex.charAt(i) == '}') {
                 String range = regex.substring(startRepitition, i + 1);
                 String splitRange = range.split(",", 1)[0];
 
-                if(splitRange.charAt(splitRange.length()) == '}') {
+                if(splitRange.charAt(splitRange.length() - 1) == '}') {
                     startRepitition = -1;
 
-                    if(splitRange.charAt(i - splitRange.length() - 1) == ')') {
+                    if(regex.charAt(i - splitRange.length() - 1) == ')') {
                         startBracketPos = -1;
                     }
 
                     continue;
                 }
 
-                stringStart = regex.substring(0, (i - range.length()) + splitRange.length()) + "}";
-                break;
+                splitParts.add(
+                    regex.substring(0, (i - range.length()) + splitRange.length()) + "}"
+                );
+
+                startRepitition = -1;
+                continue;
             }
         }
 
-        return stringStart;
+        splitParts.add(regex.substring(beginning, regex.length()));
+
+        return splitParts.toArray(new String[splitParts.size()]);
     };
 
 }
