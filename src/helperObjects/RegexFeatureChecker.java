@@ -21,25 +21,21 @@ public class RegexFeatureChecker {
         startRegex = splitString[0];
         endRegex = splitString[splitString.length - 1];
 
-        //Split at matches of ((?<!\\)\+(?![^(]*\))) "+" not in brackets
-        rule = "((?<!\\\\)\\+(?![^(]*\\)))";
+        //Split at matches of (?=[\\]?[^\\)]\+) before ".+" not behind brackets
+        rule = "(?=[\\\\]?[^\\\\)]\\+)";
         splitString = startRegex.split(rule);
         startRegex = splitString[0];
         splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        //Remove all remaining "+" (within brackets) and {1}
-        rule = "\\+|\\{1\\}";
-        startRegex = startRegex.replaceAll(rule, "");
-        endRegex = endRegex.replaceAll(rule, "");
-        
-        //TODO: Try removing
-        //Split at {1,.*}
-        rule = "\\{1,.*\\}";
-        splitString = startRegex.split(rule);
-        startRegex = splitString[0];
-        splitString = endRegex.split(rule);
-        endRegex = splitString[splitString.length - 1];
+        //Remove end "+"
+        if(startRegex.equals("") || endRegex.equals("")) { return null; }
+        if(startRegex.charAt(startRegex.length() - 1) == '+') {
+            startRegex = startRegex.substring(0, startRegex.length() - 1);
+        }
+        if(endRegex.charAt(endRegex.length() - 1) == '+') {
+            endRegex = endRegex.substring(0, endRegex.length() - 1);
+        }
 
         //Split at top-level brackets containing '*' or '?'
         splitString = splitAtBracketsContainingIndefinite(startRegex);
@@ -54,11 +50,16 @@ public class RegexFeatureChecker {
         splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at matching brackets before "*", "?" and {.*[,...]?} (convert latter to just the lower bound)
-        splitString = splitAtIndefiniteGroupRepititions(startRegex);
+        //Split at matching brackets before "*", "?", "+"(keep brackets) and {.*[,...]?} (convert latter to just the lower bound)
+        splitString = splitAtGroupRepititions(startRegex);
         startRegex = splitString[0];
-        splitString = splitAtIndefiniteGroupRepititions(endRegex);
-        endRegex = splitString[splitString.length - 1];
+        splitString = splitAtGroupRepititions(endRegex);
+        endRegex = splitString[splitString.length - 1];        
+
+        //Remove {1}
+        rule = "{1}";
+        startRegex = startRegex.replace(rule, "");
+        endRegex = endRegex.replace(rule, "");
 
         if(startRegex.equals("") || endRegex.equals("")) { return null; }
         if(startRegex.equals(regex)) { return null; }
@@ -113,7 +114,24 @@ public class RegexFeatureChecker {
             if(checkForSplit) {
                 if(indefiniteFound) {
                     stringParts.add(regex.substring(beginning, bracketStart));
-                    beginning = i + 1;
+
+                    //Remove following quantifier if given
+                    if(regex.charAt(i + 1) == '*' || regex.charAt(i + 1) == '?') {
+                        beginning = i + 2;
+                        i++;
+                    }
+                    else if(regex.charAt(i + 1) == '{') {
+                        i += 2;
+                        while(regex.charAt(i) != '}') {
+                            i++;
+                        }
+                        i++;
+
+                        beginning = i;                        
+                    }
+                    else {
+                        beginning = i + 1;
+                    }
                 }
                 
                 checkForSplit = false;
@@ -128,7 +146,7 @@ public class RegexFeatureChecker {
         return stringParts.toArray(new String[stringParts.size()]);
     }
 
-    private String[] splitAtIndefiniteGroupRepititions(String regex) {
+    private String[] splitAtGroupRepititions(String regex) {
         List<String> splitParts = new ArrayList<>();
 
         int beginning = 0;
@@ -137,6 +155,8 @@ public class RegexFeatureChecker {
 
         int numLeftBrackets = 0;
         int numRightBrackets = 0;
+
+        boolean suppressLastPart = false;
 
         for (int i = 0; i < regex.length(); i++) {
             if(i != 0 && regex.charAt(i - 1) == '\\') { continue; }
@@ -159,11 +179,23 @@ public class RegexFeatureChecker {
 
                 if(i == regex.length() - 1) { continue; }
 
-                if(regex.charAt(i + 1) == '*' || regex.charAt(i + 1) == '?') {
+                if(regex.charAt(i + 1) == '*' || 
+                    regex.charAt(i + 1) == '?')
+                {
                     splitParts.add(regex.substring(beginning, startBracketPos));
                     
                     i++;
                     beginning = i + 1;
+                }
+                else if(regex.charAt(i + 1) == '+') {
+                    splitParts.add(regex.substring(beginning, i + 1));
+                    
+                    i++;
+                    beginning = i + 1;
+
+                    if(beginning == regex.length()) {
+                        suppressLastPart = true;
+                    }
                 }
 
                 startBracketPos = -1;
@@ -185,7 +217,9 @@ public class RegexFeatureChecker {
                 if(splitRange[0].charAt(splitRange[0].length() - 1) == '}') {
                     startRepitition = -1;
 
-                    if(regex.charAt(i - splitRange[0].length() - 1) == ')') {
+                    if(i > splitRange[0].length() + 1 && 
+                        regex.charAt((i - splitRange[0].length()) - 1) == ')')
+                    {
                         startBracketPos = -1;
                     }
 
@@ -202,7 +236,9 @@ public class RegexFeatureChecker {
             }
         }
 
-        splitParts.add(regex.substring(beginning, regex.length()));
+        if(!suppressLastPart) {
+            splitParts.add(regex.substring(beginning, regex.length()));
+        }
 
         return splitParts.toArray(new String[splitParts.size()]);
     };

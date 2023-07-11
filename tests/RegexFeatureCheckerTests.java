@@ -211,4 +211,34 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void indefiniteOneOrMoreNotAtEnd() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "a.*cb+d";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "a",
+            "bd"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    @Test
+    public void indefiniteRepititionNotAtEnd() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "a.*cb{1,7}d";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "a",
+            "bd"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }
