@@ -50,16 +50,20 @@ public class RegexFeatureChecker {
         splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        //Split at matching brackets before "*", "?", "+"(keep brackets) and {.*[,...]?} (convert latter to just the lower bound)
-        splitString = splitAtGroupRepititions(startRegex);
-        startRegex = splitString[0];
-        splitString = splitAtGroupRepititions(endRegex);
-        endRegex = splitString[splitString.length - 1];        
-
         //Remove {1}
         rule = "{1}";
         startRegex = startRegex.replace(rule, "");
         endRegex = endRegex.replace(rule, "");
+
+        //Handle at matching brackets before "*", "?", "+"(keep brackets) and forms of {.*[,...]?}
+        splitString = handleGroupRepititions(startRegex);
+        startRegex = splitString[0];
+        splitString = handleGroupRepititions(endRegex);
+        endRegex = splitString[splitString.length - 1];
+
+        //Remove "+"
+        startRegex = startRegex.replace("+", "");
+        endRegex = endRegex.replace("+", "");
 
         if(startRegex.equals("") || endRegex.equals("")) { return null; }
         if(startRegex.equals(regex)) { return null; }
@@ -146,101 +150,166 @@ public class RegexFeatureChecker {
         return stringParts.toArray(new String[stringParts.size()]);
     }
 
-    private String[] splitAtGroupRepititions(String regex) {
-        List<String> splitParts = new ArrayList<>();
-
-        int beginning = 0;
-        int startBracketPos = -1;
-        int startRepitition = -1;
+    private String[] handleGroupRepititions(String regex) {
+        QuantifierCheckFeatures features = new QuantifierCheckFeatures(regex);
 
         int numLeftBrackets = 0;
         int numRightBrackets = 0;
 
-        boolean suppressLastPart = false;
+        for (; features.currentPosition < features.regex.length(); features.currentPosition++) {
+            char currentChar = features.currentChar();
 
-        for (int i = 0; i < regex.length(); i++) {
-            if(i != 0 && regex.charAt(i - 1) == '\\') { continue; }
+            if(features.currentPosition > 0 && features.getCharAt(features.currentPosition - 1) == '\\') {
+                continue;
+            }
 
-            if(regex.charAt(i) == '(' || regex.charAt(i) == '[')
-            {
+            if(currentChar == '(' || currentChar == '[') {
                 numLeftBrackets++;
 
-                if(startBracketPos == -1) {
-                    startBracketPos = i;
+                if(features.bracketStart == -1) {
+                    features.bracketStart = features.currentPosition;
                 }
-
+                
                 continue;
             }
-            
-            if(regex.charAt(i) == ')' || regex.charAt(i) == ']') {
+
+            if(currentChar == ')' || currentChar == ']') {
                 numRightBrackets++;
 
-                if(numLeftBrackets != numRightBrackets) { continue; }
-
-                if(i == regex.length() - 1) { continue; }
-
-                if(regex.charAt(i + 1) == '*' || 
-                    regex.charAt(i + 1) == '?')
-                {
-                    splitParts.add(regex.substring(beginning, startBracketPos));
-                    
-                    i++;
-                    beginning = i + 1;
-                }
-                else if(regex.charAt(i + 1) == '+') {
-                    splitParts.add(regex.substring(beginning, i + 1));
-                    
-                    i++;
-                    beginning = i + 1;
-
-                    if(beginning == regex.length()) {
-                        suppressLastPart = true;
-                    }
-                }
-
-                startBracketPos = -1;
-                startRepitition = -1;
-                numLeftBrackets = 0;
-                numRightBrackets = 0;
-
-                continue;
-            }
-
-            if(regex.charAt(i) == '{') {
-                startRepitition = i;
-            }
-
-            if(regex.charAt(i) == '}') {
-                String range = regex.substring(startRepitition, i + 1);
-                String[] splitRange = range.split(",", 2);
-
-                if(splitRange[0].charAt(splitRange[0].length() - 1) == '}') {
-                    startRepitition = -1;
-
-                    if(i > splitRange[0].length() + 1 && 
-                        regex.charAt((i - splitRange[0].length()) - 1) == ')')
-                    {
-                        startBracketPos = -1;
+                if(numLeftBrackets == numRightBrackets){
+                    try {
+                        handleQuantified(features);
+                    } catch (StringIndexOutOfBoundsException e) {
+                        //Do nothing, end of string
                     }
 
-                    continue;
+                    numLeftBrackets = 0;
+                    numRightBrackets = 0;
+
+                    features.bracketStart = -1;
                 }
-
-                String remainder = regex.substring(i + 1, regex.length());
-                regex = regex.substring(0, (i - range.length()) + splitRange[0].length() + 1) + "}" + remainder;
-
-                i = i - splitRange[1].length();
-
-                startRepitition = -1;
-                continue;
             }
         }
 
-        if(!suppressLastPart) {
-            splitParts.add(regex.substring(beginning, regex.length()));
+        if(features.currentPosition == features.regex.length()) {
+            features.regexParts.add(features.regex.substring(features.currentPartBeginning, features.regex.length()));
         }
 
-        return splitParts.toArray(new String[splitParts.size()]);
+        return features.regexParts.toArray(new String[features.regexParts.size()]);
     };
 
+    private void handleQuantified(QuantifierCheckFeatures features) {
+        QuantifierType quantifierType = checkQuantified(features);
+
+        switch(quantifierType) {
+            case ZeroOrMore: {
+                features.regexParts.add(
+                    features.regex.substring(features.currentPartBeginning, features.bracketStart)
+                );
+
+                features.currentPosition += 1;
+                features.currentPartBeginning = features.currentPosition + 1;
+
+                return;
+            }
+
+            case OneOrMore: {
+                features.regexParts.add(
+                    features.regex.substring(features.currentPartBeginning, features.currentPosition + 1)
+                );
+
+                features.currentPosition += 1;
+                features.currentPartBeginning = features.currentPosition + 1;
+
+                return;
+            }
+
+            case ZeroRep: {
+                features.regexParts.add(
+                    features.regex.substring(features.currentPartBeginning, features.bracketStart)
+                );
+
+                features.currentPosition += 3;
+                features.currentPartBeginning = features.currentPosition + 1;
+
+                return;
+            }
+
+            case OneRep: {
+                features.regex = features.regex.substring(0, features.currentPosition) + 
+                    features.regex.substring(features.currentPosition + 4, features.regex.length() + 1);
+                return;
+            }
+
+            case Range: {
+
+                return;
+            }
+
+            default:
+                return;
+        }
+    }
+
+    private QuantifierType checkQuantified(QuantifierCheckFeatures features) {
+        char nextChar = features.nextChar();
+
+        switch(nextChar) {
+            case '*':
+                return QuantifierType.ZeroOrMore;
+            case '?':
+                return QuantifierType.ZeroOrMore;
+            case '+':
+                return QuantifierType.OneOrMore;
+            case '{':
+            {
+                int closingIndex = features.regex.indexOf("}", features.currentPosition + 1);
+                String repitition = features.regex.substring(features.currentPosition + 1, closingIndex + 1);
+
+                switch(repitition) {
+                    case "{0}":
+                        return QuantifierType.ZeroRep;
+                    case "{1}":
+                        return QuantifierType.OneRep;
+                    default:
+                        return QuantifierType.Range;
+                }
+            }
+            default:
+                return QuantifierType.None;
+        }
+    }
+
+    private class QuantifierCheckFeatures {
+        public int currentPartBeginning = 0;
+        public int bracketStart = -1;
+        public int currentPosition = 0;
+        public String regex;
+        public List<String> regexParts = new ArrayList<>();
+
+        public QuantifierCheckFeatures(String regex) {
+            this.regex = regex;
+        }
+
+        public char currentChar() {
+            return regex.charAt(currentPosition);
+        }
+
+        public char nextChar() {
+            return regex.charAt(currentPosition + 1);
+        }
+
+        public char getCharAt(int index) {
+            return regex.charAt(index);
+        }
+    }
+
+    private enum QuantifierType {
+        None,
+        ZeroOrMore,
+        OneOrMore,
+        ZeroRep,
+        OneRep,
+        Range
+    }
 }

@@ -241,4 +241,19 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void zeroOrMoreRepetitions() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "aa{0,7}.*b{0,}b";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "a",
+            "b"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }
