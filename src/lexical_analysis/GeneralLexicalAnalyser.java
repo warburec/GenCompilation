@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import grammar_objects.*;
 import helperObjects.NotEmptyTuple;
+import helperObjects.RegexFeatureChecker;
 import helperObjects.Tuple;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
@@ -17,6 +18,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     private Map<String, List<Integer>> whitespaceNewlinePositions;
     private Map<String, List<Integer>> stronglyReservedWordNewlinePositions;
     private Map<String, List<Integer>> weaklyReservedWordNewlinePositions;
+
+    private Map<String, String> dynamicRegexBookends;
 
     /**
      *  User-definables/dynamic tokens must have mutually exclusive regex
@@ -77,7 +80,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         this.stronglyReservedWords = stronglyReservedWords;
         this.weaklyReservedWords = weaklyReservedWords;
 
-        validateDynamicTokens();
+        preprocessDynamicTokenRegex(dynamicTokenRegex);
+
         cacheNewlinePositions(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords);
         generateDynamicRegexPatterns(dynamicTokenRegex);
     }
@@ -103,8 +107,19 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
     }
 
-    private void validateDynamicTokens() {
+    private void preprocessDynamicTokenRegex(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex) {
         //TODO: User-definables/dynamic tokens must have mutually exclusive regex
+
+        RegexFeatureChecker featureChecker = new RegexFeatureChecker();
+        dynamicRegexBookends = new HashMap<>();
+
+        for (String regex : dynamicTokenRegex.keySet()) {
+            Tuple<String, String> bookends = featureChecker.produceBookends(regex);
+
+            if(dynamicRegexBookends.containsKey(bookends.value1())) { throw new MutualInclusionException();}
+
+            dynamicRegexBookends.put(bookends.value1(), bookends.value2());
+        }
     }
 
     private void generateDynamicRegexPatterns(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegexStringBased) {
@@ -349,5 +364,12 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         StrongWord,
         WeakWord,
         Dynamic
+    }
+
+    public class MutualInclusionException extends RuntimeException {
+        public MutualInclusionException() {
+            super("Not all dynamic token lexemes are mutually exclusive");
+            //TODO: Highlight rules causing conflict
+        }
     }
 }

@@ -286,4 +286,16 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void numberTest() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "[0-9]+[\\\\.[0.9]+]?";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = null;
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }
