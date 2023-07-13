@@ -50,15 +50,15 @@ public class RegexFeatureChecker {
         splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        //Remove {1}
-        rule = "{1}";
-        startRegex = startRegex.replace(rule, "");
-        endRegex = endRegex.replace(rule, "");
+        // //Remove {1}
+        // rule = "{1}";
+        // startRegex = startRegex.replace(rule, "");
+        // endRegex = endRegex.replace(rule, "");
 
         //Handle at matching brackets before "*", "?", "+"(keep brackets) and forms of {.*[,...]?}
-        splitString = handleGroupRepititions(startRegex);
+        splitString = handleGroupRepititions(startRegex, BookendType.Start);
         startRegex = splitString[0];
-        splitString = handleGroupRepititions(endRegex);
+        splitString = handleGroupRepititions(endRegex, BookendType.End);
         endRegex = splitString[splitString.length - 1];
 
         //Remove "+"
@@ -150,7 +150,7 @@ public class RegexFeatureChecker {
         return stringParts.toArray(new String[stringParts.size()]);
     }
 
-    private String[] handleGroupRepititions(String regex) {
+    private String[] handleGroupRepititions(String regex, BookendType bookendType) {
         QuantifierCheckFeatures features = new QuantifierCheckFeatures(regex);
 
         int numLeftBrackets = 0;
@@ -178,7 +178,7 @@ public class RegexFeatureChecker {
 
                 if(numLeftBrackets == numRightBrackets){
                     try {
-                        handleQuantified(features);
+                        handleQuantified(features, bookendType);
                     } catch (StringIndexOutOfBoundsException e) {
                         //Do nothing, end of string
                     }
@@ -198,7 +198,7 @@ public class RegexFeatureChecker {
         return features.regexParts.toArray(new String[features.regexParts.size()]);
     };
 
-    private void handleQuantified(QuantifierCheckFeatures features) {
+    private void handleQuantified(QuantifierCheckFeatures features, BookendType bookendType) {
         QuantifierType quantifierType = checkQuantified(features);
 
         switch(quantifierType) {
@@ -236,14 +236,65 @@ public class RegexFeatureChecker {
             }
 
             case OneRep: {
-                features.regex = features.regex.substring(0, features.currentPosition) + 
-                    features.regex.substring(features.currentPosition + 4, features.regex.length() + 1);
+                features.regex = features.regex.substring(0, features.currentPosition + 1) + 
+                    features.regex.substring(features.currentPosition + 4, features.regex.length());
                 return;
             }
 
             case Range: {
+                int closingIndex = features.regex.indexOf("}", features.currentPosition + 1);
+                String range = features.regex.substring(features.currentPosition + 1, closingIndex + 1);
 
-                return;
+                String lowerBound = range.split(",")[0];
+
+                switch(lowerBound) {
+                    case "{0": {
+                        features.regexParts.add(
+                            features.regex.substring(features.currentPartBeginning, features.bracketStart)
+                        );
+
+                        features.currentPosition += range.length();
+                        features.currentPartBeginning = features.currentPosition + 1;
+
+                        return;
+                    }
+
+                    case "{1": {
+                        features.regex = features.regex.substring(0, features.currentPosition) + 
+                            features.regex.substring(features.currentPosition + range.length(), features.regex.length());
+                        return;
+                    }
+
+                    default: { //{n,...}
+                        if(lowerBound.endsWith("}")) {
+                            lowerBound = lowerBound.substring(0, lowerBound.length() - 1);
+                        }
+
+                        switch(bookendType) {
+                            case Start: {
+                                features.regexParts.add(
+                                    features.regex.substring(features.currentPartBeginning, features.currentPosition + 1) + lowerBound + "}"
+                                );
+
+                                features.currentPosition += range.length();
+                                features.currentPartBeginning = features.currentPosition + 1;
+
+                                return;
+                            }
+
+                            case End: {
+                                features.regexParts.add(
+                                    features.regex.substring(features.currentPartBeginning, features.bracketStart)
+                                );
+
+                                features.regex = features.regex.substring(0, features.currentPosition + 1) + 
+                                    lowerBound + "}" +
+                                    features.regex.substring(features.currentPosition + range.length() + 1, features.regex.length());
+                                return;
+                            }
+                        }
+                    }
+                }
             }
 
             default:
@@ -311,5 +362,10 @@ public class RegexFeatureChecker {
         ZeroRep,
         OneRep,
         Range
+    }
+
+    private enum BookendType {
+        Start,
+        End
     }
 }

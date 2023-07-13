@@ -256,4 +256,21 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void startAndEndRepititions() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "a{4,7}.*b{4,7}";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "a{4}",
+            "b{4}"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    //TODO: Handle (a|b{4}|c{3,5}) correctly at start and end
 }
