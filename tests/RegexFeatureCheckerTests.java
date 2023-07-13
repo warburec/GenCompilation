@@ -272,5 +272,18 @@ public class RegexFeatureCheckerTests {
         assertEquals(expectedBookends, actualBookends);
     }
 
-    //TODO: Handle (a|b{4}|c{3,5}) correctly at start and end
+    @Test
+    public void rangeChoices() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "(a|b{4}|c{3,5})b.*b(a|b{4}|c{3,5})";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "(a|b{4}|c{3})",
+            "(a|b{4}|c{3})"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }

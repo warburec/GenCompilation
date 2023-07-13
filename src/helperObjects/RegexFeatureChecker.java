@@ -16,6 +16,8 @@ public class RegexFeatureChecker {
 
         String rule = "";
 
+        //TODO: Try putting limits on start splits
+
         //Split at (?:\\)?[^()\\]\?|(?:\\)[()]\? ".?" (not a lookahead or brackets)
         String[] splitString = regex.split("(?:\\\\)?[^()\\\\]\\?|(?:\\\\)[()]\\?");
         startRegex = splitString[0];
@@ -50,11 +52,6 @@ public class RegexFeatureChecker {
         splitString = endRegex.split(rule);
         endRegex = splitString[splitString.length - 1];
 
-        // //Remove {1}
-        // rule = "{1}";
-        // startRegex = startRegex.replace(rule, "");
-        // endRegex = endRegex.replace(rule, "");
-
         //Handle at matching brackets before "*", "?", "+"(keep brackets) and forms of {.*[,...]?}
         splitString = handleGroupRepititions(startRegex, BookendType.Start);
         startRegex = splitString[0];
@@ -64,6 +61,20 @@ public class RegexFeatureChecker {
         //Remove "+"
         startRegex = startRegex.replace("+", "");
         endRegex = endRegex.replace("+", "");
+
+        //Remove {1}, .{0}
+        rule = "\\{1\\}|\\\\?.\\{0\\}";
+        startRegex = startRegex.replaceAll(rule, "");
+        endRegex = endRegex.replaceAll(rule, "");
+
+        //Split at .{0,[0-9]*}, .{1,[0-9]*}, .{n(,[0-9]*)?} based on bookend type
+        //Start: split at start .{0,...}, end of . for .{1,...}
+        rule = "\\\\?.\\{0,[0-9]*\\}|(?=\\{1(?:,[0-9]*)?\\})";
+        splitString = startRegex.split(rule);
+        startRegex = splitString[0];
+        //TODO: Split at end of .{n for .{n,...} + }
+
+        //TODO: End: split at end .{0,...}, start of . for .{1,...} keep ., start of . for .{n,...} keep .{n}
 
         if(startRegex.equals("") || endRegex.equals("")) { return null; }
         if(startRegex.equals(regex)) { return null; }
