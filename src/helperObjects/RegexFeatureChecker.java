@@ -18,13 +18,13 @@ public class RegexFeatureChecker {
 
         //TODO: Try putting limits on start splits
 
-        //Split at (?:\\)?[^()\\]\?|(?:\\)[()]\? ".?" (not a lookahead or brackets)
-        String[] splitString = regex.split("(?:\\\\)?[^()\\\\]\\?|(?:\\\\)[()]\\?");
+        //Split at (?:\\)?[^()\]\\]\?|(?:\\)[()\]]\? ".?" (not a lookahead or brackets)
+        String[] splitString = regex.split("(?:\\\\)?[^()\\]\\\\]\\?|(?:\\\\)[()\\]]\\?");
         startRegex = splitString[0];
         endRegex = splitString[splitString.length - 1];
 
-        //Split at matches of (?=[\\]?[^\\)]\+) before ".+" not behind brackets
-        rule = "(?=[\\\\]?[^\\\\)]\\+)";
+        //Split at matches of (?=[\\]?[^\\\)\]]\+)|(?=\\[)\]]\+) before ".+" not behind brackets
+        rule = "(?=[\\\\]?[^\\\\\\)\\]]\\+)|(?=\\\\[)\\]]\\+)";
         splitString = startRegex.split(rule);
         startRegex = splitString[0];
         splitString = endRegex.split(rule);

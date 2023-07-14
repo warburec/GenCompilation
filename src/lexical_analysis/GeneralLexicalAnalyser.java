@@ -115,6 +115,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
         for (String regex : dynamicTokenRegex.keySet()) {
             Tuple<String, String> bookends = featureChecker.produceBookends(regex);
+            if(bookends == null) { continue; }
 
             if(dynamicRegexBookends.containsKey(bookends.value1())) { throw new MutualInclusionException();}
 
@@ -139,7 +140,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
 
-        StrongResRemovalHolder holder = new StrongResRemovalHolder();
+        StronglyResRemovalHolder holder = new StronglyResRemovalHolder();
 
         //Note: These mark the current position of analysis, not the position for tokens (these will be offset backwards from this position)
         //These are also 1-indexed
@@ -158,6 +159,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             removeStronglyReservedEnding(currentTokStr, holder);
 
             if(holder.removalType == RemovalType.None) { continue; }
+
+            //TODO: Check startcurrentTokStr for bookend instances
 
             if(!holder.prefix.equals("")) {
                 tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
@@ -203,6 +206,18 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return tokenList.toArray(new Token[tokenList.size()]);
     }
 
+    private String matchStartingBookend(String currentTokStr) {
+        for (String startBookend : dynamicRegexBookends.keySet()) {
+            if(currentTokStr.matches(startBookend)) { return startBookend; }
+        }
+
+        return null;
+    }
+
+    private boolean matchesEndBookend(String endString, String startBookend) {
+        return endString.matches(dynamicRegexBookends.get(startBookend));
+    }
+
     /**
      * Gets the ending position of the analyser if the position was displayed on-screen
      * @param string The string to be analysed
@@ -232,7 +247,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      * @param string The string to be altered
      * @param holder A holder object to hold the string split at reserved words and the type of removal that occurred
      */
-    private void removeStronglyReservedEnding(String string, StrongResRemovalHolder holder) {
+    private void removeStronglyReservedEnding(String string, StronglyResRemovalHolder holder) {
         int stringLen = string.length();
 
         for (String delimiter : whitespaceDelimiters) {
@@ -347,7 +362,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return builder.toString();
     }
     
-    private class StrongResRemovalHolder {
+    private class StronglyResRemovalHolder {
         public String prefix;
         public String suffix;
         public RemovalType removalType;

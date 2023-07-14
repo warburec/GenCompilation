@@ -486,5 +486,47 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
-    //TODO: Test/tokenise strings with whitespace/strongly reserved characters in them e.g. " \n";
+     @Test
+    public void contiguousDynamics() {
+        String sentence =
+        "\"a\"{b}{cd}\"e\"";
+
+        String[] delims = new String[] {
+        };
+
+        String[] stronglyReserved = new String[] {
+        };
+
+        String[] weaklyReserved = new String[] {
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
+        dynamicTokenRegex.put("\\{.*\\}", new NotEmptyTuple<String, String>("Identifier", "single set"));
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new Literal("string", "\"a\"", 1, 1),
+            new Identifier("single set", "{b}", 1, 4),
+            new Identifier("single set", "{cd}", 1, 7),
+            new Literal("string", "\"e\"", 1, 11),
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
 }
