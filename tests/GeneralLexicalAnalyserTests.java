@@ -486,7 +486,7 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
-     @Test
+    @Test
     public void contiguousDynamics() {
         String sentence =
         "\"a\"{b}{cd}\"e\"";
@@ -520,6 +520,58 @@ public class GeneralLexicalAnalyserTests {
             new Identifier("single set", "{b}", 1, 4),
             new Identifier("single set", "{cd}", 1, 7),
             new Literal("string", "\"e\"", 1, 11),
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
+
+    @Test
+    public void dynamicsFromStrongWords() {
+        String sentence =
+        "forwhile = 0;\n";
+
+        String[] delims = new String[] {
+            " ",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "=",
+            ";"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for",
+            "while"
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
+        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
+        dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new Identifier("identifier", "forwhile", 1, 1),
+            new Token("=", 1, 10),
+            new Literal("number", "0", 1, 12),
+            new Token(";", 1, 13),
         };
 
         assertArrayEquals(expected, actual);

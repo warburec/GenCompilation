@@ -4,11 +4,16 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import grammar_objects.*;
-import helperObjects.NotEmptyTuple;
-import helperObjects.RegexFeatureChecker;
-import helperObjects.Tuple;
+import helperObjects.*;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
+
+    /*
+     * Notes:
+     *  It may be possible to make exceptions such that tokenising a strongly reserved word can be paused until it is definitely not a dynaic token bookend
+     *      [This may remove the need for strongly and weakly reserved words
+     *      Allowing analysis of sCode{//Code}e \n e //Text tagged with "e" (Like html tags)
+     */
 
     private String[] whitespaceDelimiters;
     private String[] stronglyReservedWords;
@@ -29,7 +34,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      *  Line numbers will be made according to "\n" instances. Note: These do not have to be considered as whitespace in the grammar
      * 
      *  @param whitespaceDelimiters All string to be considered as whitespace (Will not be tokenised)
-     *  @param stronglyReservedWords Words that cannot be part of a user-definable token. Examples: operators, punctuation, etc. (Not including whitespace)
+     *  @param stronglyReservedWords Words that cannot be part of any user-definable token bookends (start and end). Examples: operators, punctuation, etc. (Not including whitespace)
      *  @param weaklyReservedWords Words that will be tokenised if they do not appear as part of a user-definable token
      *  @param dynamicTokenRegex The regex for dynamic tokens (including identifiers and literals) along with a tuple of the class name and grammatical name of each token. Note: All potential token sets from the regex must be mutually exclusive
     */
