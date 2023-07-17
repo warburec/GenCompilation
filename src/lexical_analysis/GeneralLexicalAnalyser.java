@@ -24,7 +24,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     private Map<String, List<Integer>> stronglyReservedWordNewlinePositions;
     private Map<String, List<Integer>> weaklyReservedWordNewlinePositions;
 
-    private Map<String, String> dynamicRegexBookends;
+    private DynamicRegexBookends dynamicRegexBookends;
 
     /**
      *  User-definables/dynamic tokens must have mutually exclusive regex
@@ -116,15 +116,19 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         //TODO: User-definables/dynamic tokens must have mutually exclusive regex
 
         RegexFeatureChecker featureChecker = new RegexFeatureChecker();
-        dynamicRegexBookends = new HashMap<>();
+        dynamicRegexBookends = new DynamicRegexBookends();
 
         for (String regex : dynamicTokenRegex.keySet()) {
             Tuple<String, String> bookends = featureChecker.produceBookends(regex);
             if(bookends == null) { continue; }
 
-            if(dynamicRegexBookends.containsKey(bookends.value1())) { throw new MutualInclusionException();}
-
-            dynamicRegexBookends.put(bookends.value1(), bookends.value2());
+            Tuple<String, String> tokenDetails = dynamicTokenRegex.get(regex);
+            dynamicRegexBookends.addBookends(
+                bookends.value1(), 
+                bookends.value2(),
+                tokenDetails.value1(),
+                tokenDetails.value2()
+            );
         }
     }
 
@@ -137,15 +141,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
     }
 
-    //TODO: Suppress skipping characters when whithin token bookends, e.g. '"' and '"' for strings
     //It may be useful to warn users of dynamic tokens that do not have bookends, thus not allowing them to contain strongly reserved words
     //It may also be useful to allow users to disallow strongly reserved words even if there are specific bookends 
     @Override
     public Token[] analyse(String sentence) {
-        List<Token> tokenList = new LinkedList<>();
         char[] sentenceChars = sentence.toCharArray();
 
-        StronglyResRemovalHolder holder = new StronglyResRemovalHolder();
+        StronglyResRemovalHolder strongRemovalholder = new StronglyResRemovalHolder();
+        TokenisationHolder tokenHolder = new TokenisationHolder();
 
         //Note: These mark the current position of analysis, not the position for tokens (these will be offset backwards from this position)
         //These are also 1-indexed
@@ -154,73 +157,150 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
         ArrayList<Character> currentCharList = new ArrayList<>();
         String currentTokStr = "";
-        for (char c : sentenceChars) {
-            currentCharList.add(c);
+        for(int i = 0; i < sentenceChars.length; i++) {
+            currentCharList.add(sentenceChars[i]);
             
             columnNum++;
 
             currentTokStr = getStringRepresentation(currentCharList);
 
-            removeStronglyReservedEnding(currentTokStr, holder);
+            if(tokenHolder.suppressReservedWords) {
+                //Add characters until end regex match
+                //TODO: Handle end of file
+                String endMatch = null;
+                while(endMatch == null) {
+                    i++;
+                    currentCharList.add(sentenceChars[i]);
+            
+                    columnNum++;
 
-            if(holder.removalType == RemovalType.None) { continue; }
+                    currentTokStr = getStringRepresentation(currentCharList);
 
-            //TODO: Check startcurrentTokStr for bookend instances
+                    endMatch = findEndingRegex(tokenHolder.endBookends, currentTokStr);
+                }
 
-            if(!holder.prefix.equals("")) {
-                tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
+                tokenHolder.tokenList.add(tokenise(currentTokStr, tokenHolder.startBookend, endMatch, lineNum, columnNum));
 
-                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, StringType.Dynamic, lineNum, columnNum - holder.suffix.length());
-                lineNum = endPos.value1();
-                columnNum = endPos.value2() + holder.suffix.length();
+                tokenHolder.suppressReservedWords = false;
+            }
+            else {
+                removeStronglyReservedEnding(currentTokStr, strongRemovalholder);
             }
 
-            StringType suffixType = StringType.Delimiter;
-            if(holder.removalType == RemovalType.StronglyReserved) {
-                tokenList.add(tokeniseStronglyReserved(holder.suffix, lineNum, columnNum  + 1 - holder.suffix.length())); //+1 for 1-indexing
-                suffixType = StringType.StrongWord;
+            if(strongRemovalholder.removalType == RemovalType.None) { continue; }
+
+            if(strongRemovalholder.prefix.equals("")) {
+                tokenHolder.tokenList.add(tokeniseStronglyReserved(
+                    strongRemovalholder.suffix,
+                    lineNum,
+                    columnNum + 1 - strongRemovalholder.suffix.length() //+1 for 1-indexing
+                ));
+                continue;
             }
+            
+            tokeniseSection(strongRemovalholder.prefix, lineNum, columnNum, tokenHolder);
 
-            if(!holder.suffix.equals("")) {
-                Tuple<Integer, Integer> endPos = getEndingPosition(holder.suffix, suffixType, lineNum, columnNum);
-                lineNum = endPos.value1();
-                columnNum = endPos.value2();
-            }
-
-            currentCharList.clear();
-        }
-
-        if(!currentCharList.isEmpty()) {
-            currentTokStr = getStringRepresentation(currentCharList);
-
-            removeStronglyReservedEnding(currentTokStr, holder);
-
-            if(!holder.prefix.equals("")) {
-                tokenList.add(produceToken(holder.prefix, lineNum, columnNum + 1 - currentTokStr.length())); //+1 for 1-indexing
-
-                Tuple<Integer, Integer> endPos = getEndingPosition(holder.prefix, StringType.Dynamic, lineNum, columnNum - holder.suffix.length());
-                lineNum = endPos.value1();
-                columnNum = endPos.value2() + holder.suffix.length();
-            }
-
-            if(holder.removalType == RemovalType.StronglyReserved) {
-                tokenList.add(tokeniseStronglyReserved(holder.suffix, lineNum, columnNum + 1 - holder.suffix.length())); //+1 for 1-indexing
+            if(!tokenHolder.suppressReservedWords) {
+                tokenHolder.tokenList.add(tokeniseStronglyReserved(
+                    strongRemovalholder.suffix,
+                    lineNum,
+                    columnNum + 1 - strongRemovalholder.suffix.length() //+1 for 1-indexing
+                ));
             }
         }
 
-        return tokenList.toArray(new Token[tokenList.size()]);
+        return tokenHolder.tokenList.toArray(new Token[tokenHolder.tokenList.size()]);
     }
 
-    private String matchStartingBookend(String currentTokStr) {
-        for (String startBookend : dynamicRegexBookends.keySet()) {
-            if(currentTokStr.matches(startBookend)) { return startBookend; }
-        }
+    private void tokeniseSection(String regex, int endinglineNum, int endingColumnNum, TokenisationHolder holder) {
+        while(true) {
+            BookendDetails startBookend = findStartingBookend(regex);
 
+            //TODO: Handle weakly reserved words
+            
+            //Due to assumption that two non-bookended dynamic tokens cannot be adjacent. If this changes, change this to tokenise without using bookends
+            if(startBookend == null) { throw new LexicalError("No start bookend found"); }
+
+            if(startBookend.position != BookendPosition.Start) {
+                holder.tokenList.add(tokeniseWithoutBookends(regex.substring(0, startBookend.startIndex)));
+                regex = regex.substring(startBookend.startIndex);
+            }
+
+            String afterStart = regex.substring(startBookend.length);
+            BookendDetails endBookend = findMatchingEndBookend(startBookend.regex, afterStart);
+
+            if(endBookend == null) {
+                //Not closed bookends
+                holder.suppressReservedWords = true;
+                holder.startBookend = startBookend.regex;
+                holder.endBookends = dynamicRegexBookends.getEndRegex(startBookend.regex);
+                return;
+            }
+            else {
+                holder.tokenList.add(tokenise(
+                    regex.substring(0, endBookend.startIndex + endBookend.length), 
+                    startBookend.regex, 
+                    endBookend.regex,
+                    endinglineNum,
+                    endingColumnNum
+                ));
+
+                regex = regex.substring(endBookend.startIndex + endBookend.length);
+
+                if(regex == "") { return; }
+            }
+        }
+    }
+
+    private BookendDetails findStartingBookend(String string) {
         return null;
     }
 
-    private boolean matchesEndBookend(String endString, String startBookend) {
-        return endString.matches(dynamicRegexBookends.get(startBookend));
+    private BookendDetails findMatchingEndBookend(String startBookendRegex, String string) {
+        Set<String> potentialEnds = dynamicRegexBookends.getEndRegex(startBookendRegex);
+
+        int shortestLength = -1;
+        String fullStringMatch = "";
+        String endingRegexMatched = "";
+        int indexOfEnding = -1;
+        int lengthOfEnding = -1;
+
+        for(String ending : potentialEnds) {
+            String[] splitString = string.split(ending +"|(?<=" + ending + ")", 2);
+            String beforeEnding = splitString[0];
+            String endingMatch = splitString[1];
+
+            int fullLength = beforeEnding.length() + endingMatch.length();
+
+            if(fullLength < shortestLength || shortestLength == -1) {
+                shortestLength = fullLength;
+                fullStringMatch = beforeEnding + endingMatch;
+                indexOfEnding = beforeEnding.length();
+                lengthOfEnding = endingMatch.length();
+                endingRegexMatched = ending;
+            }
+        }
+
+        if(fullStringMatch.equals(string)) {
+            return null;
+        }
+
+        BookendPosition endPosition = BookendPosition.Middle;
+        if(indexOfEnding + lengthOfEnding == string.length()) {
+            endPosition = BookendPosition.End;
+        }
+
+        return new BookendDetails(endingRegexMatched, indexOfEnding, lengthOfEnding, endPosition);
+    }
+
+    private String findEndingRegex(Set<String> endBookends, String string) {
+        for (String ending : endBookends) {
+            if(string.matches(".*" + ending + "\\Z")) {
+                return ending;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -346,6 +426,26 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         throw new RuntimeException("No dynamic token lexemes matched the string \"" + string + "\" at line " + lineNum + " column " + columnNum);
     }
 
+
+    private Token tokenise(String string, String startBookend, String endBookend, int lineNum, int columnNum) {
+        //Get type and grammar name of token
+        Tuple <String, String> tokenDetails = dynamicRegexBookends.getTokenDetails(startBookend, endBookend);
+
+        //Don't forget reserved words
+        return DynamicTokenFactory.create(
+            tokenDetails.value1(),
+            tokenDetails.value2(),
+            string,
+            lineNum,
+            columnNum
+        );
+    }
+
+    private Token tokeniseWithoutBookends(String substring) {
+        return null;
+    }
+
+
     private Token matchWeaklyReservedWord(String string, int lineNum, int columnNum) {
         for (String weakWord : weaklyReservedWords) {
             if(string.equals(weakWord)) {
@@ -367,10 +467,37 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return builder.toString();
     }
     
+    private class TokenisationHolder {
+        public List<Token> tokenList = new LinkedList<>();
+        public boolean suppressReservedWords = false;
+        public String startBookend;
+        public Set<String> endBookends = new HashSet<>();
+    }
+
     private class StronglyResRemovalHolder {
         public String prefix;
         public String suffix;
         public RemovalType removalType;
+    }
+
+    private class BookendDetails {
+        public BookendPosition position;
+        public String regex;
+        public int length;
+        public int startIndex;
+
+        public BookendDetails(String regex, int startIndex, int length, BookendPosition position) {
+            this.position = position;
+            this.regex = regex;
+            this.length = length;
+            this.startIndex = startIndex;
+        }
+    }
+
+    private enum BookendPosition {
+        Start,
+        Middle,
+        End
     }
 
     private enum RemovalType {
@@ -390,6 +517,66 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         public MutualInclusionException() {
             super("Not all dynamic token lexemes are mutually exclusive");
             //TODO: Highlight rules causing conflict
+        }
+    }
+
+    private class DynamicRegexBookends {
+        private Map<String, Set<String>> startToEnd;
+        private Map<String, Set<String>> endToStart;
+        private Map<NotEmptyTuple<String,String>, NotEmptyTuple<String,String>> bookendsToDetails; //Bookends -> <Type, GrammaticalName>
+
+        public DynamicRegexBookends() {
+            startToEnd = new HashMap<>();
+            endToStart = new HashMap<>();
+            bookendsToDetails = new HashMap<>();
+        }
+
+        public void addBookends(String start, String end, String tokenType, String grammaticalName) {
+            NotEmptyTuple<String,String> bookendTuple = new NotEmptyTuple<String,String>(start, end);
+            NotEmptyTuple<String,String> existingDetails = bookendsToDetails.get(bookendTuple);
+
+            if(existingDetails != null) {
+                throw new BookendConflict(existingDetails.value2(), grammaticalName, bookendTuple);
+            }
+
+            Set<String> startSet = startToEnd.get(start);
+            Set<String> endSet = endToStart.get(end);
+
+            if(startSet == null) {
+                startToEnd.put(start, new HashSet<>());
+                startToEnd.get(start).add(end);
+            }
+            else {
+                startSet.add(end);
+            }
+
+            if(endSet == null) {
+                endToStart.put(end, new HashSet<>());
+                endToStart.get(end).add(start);
+            }
+            else {
+                endSet.add(end);
+            }
+
+            bookendsToDetails.put(bookendTuple, new NotEmptyTuple<String,String>(tokenType, grammaticalName));
+        }
+        
+        public Set<String> getEndRegex(String startBookend) {
+            return startToEnd.get(startBookend);
+        }
+
+        public Set<String> getStartRegex(String endBookend) {
+            return endToStart.get(endBookend);
+        }
+
+        public Tuple<String,String> getTokenDetails(String startBookend, String endBookend) {
+            return bookendsToDetails.get(new NotEmptyTuple<String,String>(startBookend, endBookend));
+        }
+    }
+
+    public class BookendConflict extends LexicalError {
+        public BookendConflict(String name1, String name2, Tuple<String, String> bookends) {
+            super("The tokens \"" + name1 + "\" and \"" + name2 + "\" have the same bookends <\"" + bookends.value1() + "\", \"" + bookends.value2() + "\">");
         }
     }
 }

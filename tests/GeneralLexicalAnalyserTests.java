@@ -581,4 +581,5 @@ public class GeneralLexicalAnalyserTests {
             assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
         }
     }
+
 }
