@@ -475,7 +475,7 @@ public class GeneralLexicalAnalyserTests {
         Token[] expected = new Token[] {
             new Literal("string", "\"ab cde\"", 1, 1),
             new Literal("string", "\"bcd\ndcb cdb\"", 2, 1),
-            new Identifier("identifier", "zzz", 3, 11)
+            new Identifier("ident", "zzz", 3, 11)
         };
 
         assertArrayEquals(expected, actual);
