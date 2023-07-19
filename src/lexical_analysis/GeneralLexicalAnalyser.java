@@ -163,18 +163,15 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         ArrayList<Character> currentCharList = new ArrayList<>();
         String currentTokStr = "";
         for(int i = 0; i < sentenceChars.length; i++) {
-            currentCharList.add(sentenceChars[i]);
-            
-            columnNum++;
-
-            currentTokStr = getStringRepresentation(currentCharList);
-
             if(tokenHolder.suppressReservedWords) {
                 //Add characters until end regex match
-                try {
-                    String endMatch = findEndingRegex(tokenHolder.endBookends, currentTokStr);
+                boolean matchFound = false;
+                String firstMatch = "";
 
-                    while(endMatch == null) {
+                try {
+                    String endMatch = "";
+
+                    while(true) {
                         i++;
                         currentCharList.add(sentenceChars[i]);
                 
@@ -183,21 +180,50 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                         currentTokStr = getStringRepresentation(currentCharList);
 
                         endMatch = findEndingRegex(tokenHolder.endBookends, currentTokStr);
+
+                        if(matchFound) {
+                            if(endMatch != firstMatch) {
+                                i--;
+                                currentTokStr = currentTokStr.substring(0, currentTokStr.length() - 1);
+                                break;
+                            }
+                        }
+                        else {
+                            if(endMatch != null) {
+                                matchFound = true;
+                                firstMatch = endMatch;
+                            }
+                        }
                     }
 
-                    tokenHolder.tokenList.add(tokenise(currentTokStr, tokenHolder.startBookend, endMatch, lineNum, columnNum));
+                    tokenHolder.tokenList.add(tokenise(currentTokStr, tokenHolder.startBookend, firstMatch, lineNum, columnNum));
 
                     tokenHolder.suppressReservedWords = false;
                     currentCharList.clear();
                     continue;
                 }
                 catch(ArrayIndexOutOfBoundsException e) {
-                    throw new LexicalError("Token ended prematurely at line:" + lineNum + ", column:" + columnNum + " (end of file)");
+                    if(matchFound) {
+                        tokenHolder.tokenList.add(tokenise(currentTokStr, tokenHolder.startBookend, firstMatch, lineNum, columnNum));
+
+                        tokenHolder.suppressReservedWords = false;
+                        currentCharList.clear();
+                    }
+                    else {
+                        throw new LexicalError("Token ended prematurely at line:" + lineNum + ", column:" + columnNum + " (end of file)");
+                    }
+
+                    break;
                 }
             }
-            else {
-                removeStronglyReservedEnding(currentTokStr, strongRemovalholder);
-            }
+
+            currentCharList.add(sentenceChars[i]);
+            
+            columnNum++;
+
+            currentTokStr = getStringRepresentation(currentCharList);
+
+            removeStronglyReservedEnding(currentTokStr, strongRemovalholder);
 
             if(strongRemovalholder.removalType == RemovalType.None) { continue; }
 
@@ -224,9 +250,13 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                     lineNum,
                     columnNum + 1 - strongRemovalholder.suffix.length() //+1 for 1-indexing
                 ));
-
-                currentCharList.clear();
             }
+
+            currentCharList.clear();
+        }
+
+        if(currentCharList.size() != 0) {
+            tokenHolder.tokenList.add(tokenise(currentTokStr, lineNum, columnNum));
         }
 
         return tokenHolder.tokenList.toArray(new Token[tokenHolder.tokenList.size()]);
