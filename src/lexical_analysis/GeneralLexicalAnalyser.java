@@ -168,14 +168,6 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                     while(true) {
                         i++;
                         currentCharList.add(sentenceChars[i]);
-                
-                        if(sentenceChars[i] == '\n') {
-                            tokenHolder.lineNum++;
-                            tokenHolder.columnNum = 0;
-                        }
-                        else {
-                            tokenHolder.columnNum++;
-                        }
 
                         currentTokStr = getStringRepresentation(currentCharList);
 
@@ -197,14 +189,13 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                     }
                 }
                 catch(ArrayIndexOutOfBoundsException e) {
-                    if(!matchFound) {
-                        throw new LexicalError("Token ended prematurely at line:" + tokenHolder.lineNum + ", column:" + tokenHolder.columnNum + " (end of file)");
-                    }
-
-                    break;
+                    if(matchFound) { break; }
+                    
+                    throw new LexicalError("Token ended prematurely at line:" + tokenHolder.lineNum + ", column:" + tokenHolder.columnNum + " (end of file)");
                 }
                 
                 tokenHolder.tokenList.add(tokenise(currentTokStr, tokenHolder.startBookend, firstMatch, tokenHolder));
+                updateDisplayPosition(tokenHolder, currentTokStr, StringType.Dynamic);
 
                 tokenHolder.suppressReservedWords = false;
                 currentCharList.clear();
@@ -213,42 +204,31 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             }
 
             currentCharList.add(sentenceChars[i]);
-            
-            if(sentenceChars[i] == '\n') {
-                tokenHolder.lineNum++;
-                tokenHolder.columnNum = 0;
-            }
-            else {
-                tokenHolder.columnNum++;
-            }
 
             currentTokStr = getStringRepresentation(currentCharList);
 
             removeStronglyReservedEnding(currentTokStr, strongRemovalholder);
 
             if(strongRemovalholder.removalType == RemovalType.None) { continue; }
+            
+            if(!strongRemovalholder.prefix.equals("")) {
+                tokeniseSection(strongRemovalholder.prefix, tokenHolder);
+            }
 
-            if(strongRemovalholder.prefix.equals("")) {
-                if(strongRemovalholder.removalType == RemovalType.StronglyReserved) {
-                    tokenHolder.tokenList.add(tokeniseStronglyReserved(
-                        strongRemovalholder.suffix,
-                        tokenHolder
-                    ));
-                }
-                
-                currentCharList.clear();
+            if(tokenHolder.suppressReservedWords) {
                 continue;
             }
-            
-            tokeniseSection(strongRemovalholder.prefix, tokenHolder);
 
-            if(!tokenHolder.suppressReservedWords && 
-                strongRemovalholder.removalType != RemovalType.Delimiter
-            ) {
+            if(strongRemovalholder.removalType == RemovalType.StronglyReserved) {
                 tokenHolder.tokenList.add(tokeniseStronglyReserved(
                     strongRemovalholder.suffix,
                     tokenHolder
                 ));
+
+                updateDisplayPosition(tokenHolder, strongRemovalholder.suffix, StringType.StrongWord);
+            }
+            else {
+                updateDisplayPosition(tokenHolder, strongRemovalholder.suffix, StringType.Delimiter);
             }
 
             currentCharList.clear();
@@ -278,6 +258,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 }
 
                 tokenHolder.tokenList.add(newToken);
+                updateDisplayPosition(tokenHolder, regex, StringType.Dynamic);
+                
                 return;
             }
 
@@ -294,6 +276,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
                 if(token != null) {
                     tokenHolder.tokenList.add(token);
+                    updateDisplayPosition(tokenHolder, regex, StringType.Dynamic);
                     return;
                 }
 
@@ -344,6 +327,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                     tokenHolder
                 ));
 
+                updateDisplayPosition(tokenHolder, regex, StringType.Dynamic);
                 return;
             }
             
@@ -356,12 +340,16 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 regex.substring(endOfStartIndex + index)
             ); //TODO: Alter to use the same endBookend, not just any potential one , only useful for length
 
+            String stringToTokenise = regex.substring(0, endOfStartIndex + index + finalMatch.length);
+
             tokenHolder.tokenList.add(tokenise(
-                regex.substring(0, endOfStartIndex + index + finalMatch.length), 
+                stringToTokenise, 
                 startBookend.regex, 
                 endBookend.regex,
                 tokenHolder
             ));
+
+            updateDisplayPosition(tokenHolder, stringToTokenise, StringType.Dynamic);
 
             regex = regex.substring(endOfStartIndex + index + finalMatch.length);
         }
@@ -583,7 +571,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     private Token tokeniseWithoutBookends(String substring) {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
 
@@ -591,11 +579,26 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         for (String weakWord : weaklyReservedWords) {
             if(string.equals(weakWord)) {
                 tokenHolder.tokenList.add(new Token(string, tokenHolder.lineNum, tokenHolder.columnNum)); //TODO: Consider allowing users to define subtypes of Token to use (factory)
+
+                updateDisplayPosition(tokenHolder, weakWord, StringType.WeakWord);
                 return true;
             }
         }
 
         return false;
+    }
+
+    private void updateDisplayPosition(TokenisationHolder tokenHolder, String analysedWord, StringType wordType) {
+        List<Integer> newlines = getNewlinePositions(analysedWord, wordType);
+        tokenHolder.lineNum += newlines.size();
+
+        if(newlines.size() != 0) {
+            tokenHolder.columnNum = analysedWord.length();
+            tokenHolder.columnNum -= newlines.get(newlines.size() - 1);
+        }
+        else {
+            tokenHolder.columnNum += analysedWord.length();
+        }
     }
 
     private String getStringRepresentation(ArrayList<Character> list)
@@ -618,7 +621,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         //Note: These mark the current position of analysis, not the position for tokens (these will be offset backwards from this position)
         //These are also 1-indexed
         public int lineNum = 1;
-        public int columnNum = 0;
+        public int columnNum = 1;
     }
 
     private class StronglyResRemovalHolder {

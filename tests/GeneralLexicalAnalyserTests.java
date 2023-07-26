@@ -440,6 +440,7 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
+    //TODO: Fix .equals for identifiers (should use exactly equals)
     @Test
     public void standardStringMatches() {
         String sentence =
@@ -452,6 +453,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         String[] stronglyReserved = new String[] {
+            "+"
         };
 
         String[] weaklyReserved = new String[] {
@@ -475,6 +477,7 @@ public class GeneralLexicalAnalyserTests {
         Token[] expected = new Token[] {
             new Literal("string", "\"ab cde\"", 1, 1),
             new Literal("string", "\"bcd\ndcb cdb\"", 2, 1),
+            new Token("+", 3, 9),
             new Identifier("ident", "zzz", 3, 11)
         };
 
