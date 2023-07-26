@@ -440,6 +440,7 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
+    //TODO: Fix .equals for identifiers (should use exactly equals)
     @Test
     public void standardStringMatches() {
         String sentence =
@@ -452,6 +453,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         String[] stronglyReserved = new String[] {
+            "+"
         };
 
         String[] weaklyReserved = new String[] {
@@ -475,7 +477,8 @@ public class GeneralLexicalAnalyserTests {
         Token[] expected = new Token[] {
             new Literal("string", "\"ab cde\"", 1, 1),
             new Literal("string", "\"bcd\ndcb cdb\"", 2, 1),
-            new Identifier("identifier", "zzz", 3, 11)
+            new Token("+", 3, 9),
+            new Identifier("ident", "zzz", 3, 11)
         };
 
         assertArrayEquals(expected, actual);
@@ -486,7 +489,7 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
-     @Test
+    @Test
     public void contiguousDynamics() {
         String sentence =
         "\"a\"{b}{cd}\"e\"";
@@ -529,4 +532,57 @@ public class GeneralLexicalAnalyserTests {
             assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
         }
     }
+
+    @Test
+    public void dynamicsFromStrongWords() {
+        String sentence =
+        "forwhile = 0;\n";
+
+        String[] delims = new String[] {
+            " ",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "=",
+            ";"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for",
+            "while"
+        };
+
+        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<String, NotEmptyTuple<String, String>>();
+        
+        dynamicTokenRegex.put("[^\"0-9].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
+        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
+        dynamicTokenRegex.put("[0-9]+[\\.[0.9]+]?", new NotEmptyTuple<String, String>("Literal", "number"));
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new Identifier("identifier", "forwhile", 1, 1),
+            new Token("=", 1, 10),
+            new Literal("number", "0", 1, 12),
+            new Token(";", 1, 13),
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
+
 }

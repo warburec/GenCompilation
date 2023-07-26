@@ -15,7 +15,7 @@ public class DynamicTokenFactory {
             case "Identifier":
                 return new Identifier(grammaticalName, instanceName, instanceName, lineNum, columnNum);
             case "Literal":
-                return new Literal(grammaticalName, instanceName);
+                return new Literal(grammaticalName, instanceName, lineNum, columnNum);
             default:
                 throw new RuntimeException(type + " type not found");
         }
