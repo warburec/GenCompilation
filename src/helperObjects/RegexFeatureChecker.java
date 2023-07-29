@@ -1,6 +1,7 @@
 package helperObjects;
 
 import java.util.*;
+import java.util.regex.*;
 
 public class RegexFeatureChecker {
 
@@ -9,8 +10,11 @@ public class RegexFeatureChecker {
      * Produces regex for all starting and ending definite tokens (cannot be ommitted or repeated an unknown number of times)
      * @param regex The regex to be evaluated
      * @return Regex of definite starting and ending characters, null if bookends could not be found
+     * @throws PatternSyntaxException Thrown when the input is invalid regex
      */
-    public NotEmptyTuple<String, String> produceBookends(String regex) {
+    public NotEmptyTuple<String, String> produceBookends(String regex) throws PatternSyntaxException {
+        checkRegexIsValid(regex);
+        
         String startRegex;
         String endRegex;
 
@@ -94,6 +98,10 @@ public class RegexFeatureChecker {
         fullEndRegex = fullEndRegex.substring(1);
 
         return new NotEmptyTuple<String,String>(fullStartRegex, fullEndRegex);
+    }
+
+    private void checkRegexIsValid(String regex) throws PatternSyntaxException {
+        Pattern.compile(regex);
     }
 
     private String[] splitAtOr(String regex) {
