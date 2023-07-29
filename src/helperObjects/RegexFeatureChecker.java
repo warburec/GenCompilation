@@ -16,70 +16,114 @@ public class RegexFeatureChecker {
 
         String rule = "";
 
-        //TODO: Try putting limits on start splits
+        String[] splitAtOrs = splitAtOr(regex);
 
-        //Split at (?:\\)?[^()\]\\]\?|(?:\\)[()\]]\? ".?" (not a lookahead or brackets)
-        String[] splitString = regex.split("(?:\\\\)?[^()\\]\\\\]\\?|(?:\\\\)[()\\]]\\?");
-        startRegex = splitString[0];
-        endRegex = splitString[splitString.length - 1];
+        String fullStartRegex = "";
+        String fullEndRegex = "";
 
-        //Split at matches of (?=[\\]?[^\\\)\]]\+)|(?=\\[)\]]\+) before ".+" not behind brackets
-        rule = "(?=[\\\\]?[^\\\\\\)\\]]\\+)|(?=\\\\[)\\]]\\+)";
-        splitString = startRegex.split(rule);
-        startRegex = splitString[0];
-        splitString = endRegex.split(rule);
-        endRegex = splitString[splitString.length - 1];
+        for(String regexPart : splitAtOrs) {
+            //TODO: Try putting limits on start splits
 
-        //Remove end "+"
-        if(startRegex.equals("") || endRegex.equals("")) { return null; }
-        if(startRegex.charAt(startRegex.length() - 1) == '+') {
-            startRegex = startRegex.substring(0, startRegex.length() - 1);
+            //Split at (?:\\)?[^()\]\\]\?|(?:\\)[()\]]\? ".?" (not a lookahead or brackets)
+            String[] splitString = regexPart.split("(?:\\\\)?[^()\\]\\\\]\\?|(?:\\\\)[()\\]]\\?");
+            startRegex = splitString[0];
+            endRegex = splitString[splitString.length - 1];
+
+            //Split at matches of (?=[\\]?[^\\\)\]]\+)|(?=\\[)\]]\+) before ".+" not behind brackets
+            rule = "(?=[\\\\]?[^\\\\\\)\\]]\\+)|(?=\\\\[)\\]]\\+)";
+            splitString = startRegex.split(rule);
+            startRegex = splitString[0];
+            splitString = endRegex.split(rule);
+            endRegex = splitString[splitString.length - 1];
+
+            //Remove end "+"
+            if(startRegex.equals("") || endRegex.equals("")) { return null; }
+            if(startRegex.charAt(startRegex.length() - 1) == '+') {
+                startRegex = startRegex.substring(0, startRegex.length() - 1);
+            }
+            if(endRegex.charAt(endRegex.length() - 1) == '+') {
+                endRegex = endRegex.substring(0, endRegex.length() - 1);
+            }
+
+            //Split at top-level brackets containing '*' or '?'
+            splitString = splitAtBracketsContainingIndefinite(startRegex);
+            startRegex = splitString[0];
+            splitString = splitAtBracketsContainingIndefinite(endRegex);
+            endRegex = splitString[splitString.length - 1];
+
+            //Split at (\\?[^])\\]\*)|(\\[)\]]\*) removing any characters before '*' (not including brackets unless escaped)
+            rule = "(\\\\?[^])\\\\]\\*)|(\\\\[)\\]]\\*)";
+            splitString = startRegex.split(rule);
+            startRegex = splitString[0];
+            splitString = endRegex.split(rule);
+            endRegex = splitString[splitString.length - 1];
+
+            //Handle at matching brackets before "*", "?", "+"(keep brackets) and forms of {.*[,...]?}
+            splitString = handleGroupRepititions(startRegex, BookendType.Start);
+            startRegex = splitString[0];
+            splitString = handleGroupRepititions(endRegex, BookendType.End);
+            endRegex = splitString[splitString.length - 1];
+
+            //Remove "+"
+            startRegex = startRegex.replace("+", "");
+            endRegex = endRegex.replace("+", "");
+
+            //Remove {1}, .{0}
+            rule = "\\{1\\}|\\\\?.\\{0\\}";
+            startRegex = startRegex.replaceAll(rule, "");
+            endRegex = endRegex.replaceAll(rule, "");
+
+            //Split at .{0,[0-9]*}, .{1,[0-9]*}, .{n(,[0-9]*)?} based on bookend type
+            //Start: split at start .{0,...}, end of . for .{1,...}
+            rule = "\\\\?.\\{0,[0-9]*\\}|(?=\\{1(?:,[0-9]*)?\\})";
+            splitString = startRegex.split(rule);
+            startRegex = splitString[0];
+            //TODO: Split at end of .{n for .{n,...} + }
+
+            //TODO: End: split at end .{0,...}, start of . for .{1,...} keep ., start of . for .{n,...} keep .{n}
+
+            if(startRegex.equals("") || endRegex.equals("")) { return null; }
+            if(startRegex.equals(regexPart)) { return null; }
+
+            fullStartRegex += "|" + startRegex;
+            fullEndRegex += "|" + endRegex;
         }
-        if(endRegex.charAt(endRegex.length() - 1) == '+') {
-            endRegex = endRegex.substring(0, endRegex.length() - 1);
+
+        // Remove leading '|'
+        fullStartRegex = fullStartRegex.substring(1);
+        fullEndRegex = fullEndRegex.substring(1);
+
+        return new NotEmptyTuple<String,String>(fullStartRegex, fullEndRegex);
+    }
+
+    private String[] splitAtOr(String regex) {
+        List<String> sections = new ArrayList<>();
+
+        String currentString = "";
+        int numOfBrackets = 0;
+
+        for (int i = 0; i < regex.length(); i++) {
+            char currentChar = regex.charAt(i);
+
+            if(currentChar == '\\') {
+                currentString += currentChar;
+                i++;
+                currentChar = regex.charAt(i);
+            }
+            else if(currentChar == '(' || currentChar == '[') { numOfBrackets++; }
+            else if(currentChar == ')' || currentChar == ']') { numOfBrackets--; }
+            else if(currentChar == '|' && numOfBrackets == 0) {
+                sections.add(currentString);
+                currentString = "";
+                continue;
+            }
+
+            currentString += currentChar;
         }
 
-        //Split at top-level brackets containing '*' or '?'
-        splitString = splitAtBracketsContainingIndefinite(startRegex);
-        startRegex = splitString[0];
-        splitString = splitAtBracketsContainingIndefinite(endRegex);
-        endRegex = splitString[splitString.length - 1];
+        sections.add(currentString);
 
-        //Split at (\\?[^])\\]\*)|(\\[)\]]\*) removing any characters before '*' (not including brackets unless escaped)
-        rule = "(\\\\?[^])\\\\]\\*)|(\\\\[)\\]]\\*)";
-        splitString = startRegex.split(rule);
-        startRegex = splitString[0];
-        splitString = endRegex.split(rule);
-        endRegex = splitString[splitString.length - 1];
-
-        //Handle at matching brackets before "*", "?", "+"(keep brackets) and forms of {.*[,...]?}
-        splitString = handleGroupRepititions(startRegex, BookendType.Start);
-        startRegex = splitString[0];
-        splitString = handleGroupRepititions(endRegex, BookendType.End);
-        endRegex = splitString[splitString.length - 1];
-
-        //Remove "+"
-        startRegex = startRegex.replace("+", "");
-        endRegex = endRegex.replace("+", "");
-
-        //Remove {1}, .{0}
-        rule = "\\{1\\}|\\\\?.\\{0\\}";
-        startRegex = startRegex.replaceAll(rule, "");
-        endRegex = endRegex.replaceAll(rule, "");
-
-        //Split at .{0,[0-9]*}, .{1,[0-9]*}, .{n(,[0-9]*)?} based on bookend type
-        //Start: split at start .{0,...}, end of . for .{1,...}
-        rule = "\\\\?.\\{0,[0-9]*\\}|(?=\\{1(?:,[0-9]*)?\\})";
-        splitString = startRegex.split(rule);
-        startRegex = splitString[0];
-        //TODO: Split at end of .{n for .{n,...} + }
-
-        //TODO: End: split at end .{0,...}, start of . for .{1,...} keep ., start of . for .{n,...} keep .{n}
-
-        if(startRegex.equals("") || endRegex.equals("")) { return null; }
-        if(startRegex.equals(regex)) { return null; }
-
-        return new NotEmptyTuple<String,String>(startRegex, endRegex);
+        return sections.toArray(new String[sections.size()]);
     }
 
     private String[] splitAtBracketsContainingIndefinite(String regex) {
