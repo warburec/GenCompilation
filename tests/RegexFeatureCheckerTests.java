@@ -298,4 +298,19 @@ public class RegexFeatureCheckerTests {
 
         assertEquals(expectedBookends, actualBookends);
     }
+
+    @Test
+    public void multipleRegex() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "\".*\"|'.*'";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String, String>(
+            "\"|'",
+            "\"|'"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
 }
