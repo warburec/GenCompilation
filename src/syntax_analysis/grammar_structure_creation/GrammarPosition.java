@@ -1,9 +1,23 @@
 package syntax_analysis.grammar_structure_creation;
 
-import grammar_objects.LexicalElement;
-import grammar_objects.ProductionRule;
+import grammar_objects.*;
 
-public record GrammarPosition(ProductionRule rule, int position) {
+public class GrammarPosition{
+    ProductionRule rule;
+    int position;
+    
+    public GrammarPosition(ProductionRule rule, int position) {
+        this.rule = rule;
+        this.position = position;
+    }
+
+    public ProductionRule getRule() {
+        return rule;
+    }
+
+    public int getPosition() {
+        return position;
+    }
     
     public boolean isClosed() {
         return position == rule.productionSequence().length;

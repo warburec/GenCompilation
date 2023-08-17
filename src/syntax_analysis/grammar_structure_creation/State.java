@@ -6,12 +6,12 @@ import java.util.Map.*;
 import grammar_objects.*;
 
 public class State {
-    private Set<GrammarPosition> positions;
+    private Set<? extends GrammarPosition> positions;
     private State parentState;
 
     private Set<Route> branches;
 
-    public State(Set<GrammarPosition> positions, State parentState) {
+    public State(Set<? extends GrammarPosition> positions, State parentState) {
         if(positions == null) { positions = new HashSet<>(); }
         
         this.positions = positions;
@@ -20,7 +20,7 @@ public class State {
         branches = new HashSet<>();
     }
 
-    public Set<GrammarPosition> getPositions() {
+    public Set<? extends GrammarPosition> getPositions() {
         return positions;
     }
 

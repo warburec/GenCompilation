@@ -49,8 +49,8 @@ public class SLR1Parser extends LR0Parser {
         followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
     }
 
-    @SuppressWarnings("unused")
-    private void checkForInvalidNonTerminals() {
+    @Override
+    protected void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
             if(nonTerminal.getName().equals(null)) {
                 throw new RuntimeException("Grammar cannot include a null non-terminal");
@@ -58,8 +58,8 @@ public class SLR1Parser extends LR0Parser {
         }
     }
 
-    @SuppressWarnings("unused")
-    private void generateProductionMap() {
+    @Override
+    protected void generateProductionMap() {
         productionMap = new HashMap<>();
 
         for (NonTerminal nonTerminal : nonTerminals) {
@@ -79,8 +79,8 @@ public class SLR1Parser extends LR0Parser {
         }
     }
 
-    @SuppressWarnings("unused")
-    private void generateStates() {
+    @Override
+    protected void generateStates() {
         states = new HashSet<>();
 
         NonTerminal start = null;
@@ -92,7 +92,7 @@ public class SLR1Parser extends LR0Parser {
         rootState = createState(null, List.of(new GrammarPosition[] {startPosition}), null);
     }
 
-    private State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
+    protected State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
         List<GrammarPosition> currentPositions = startPositions;
 
         if(elemantTraversed != null) {
@@ -147,7 +147,7 @@ public class SLR1Parser extends LR0Parser {
         return nextPositions;
     }
 
-    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
+    protected List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
         State foundLink = null;
 
         GrammarPosition position = currentPositions.get(0);
@@ -249,7 +249,7 @@ public class SLR1Parser extends LR0Parser {
             for(GrammarPosition position : state.getPositions()) {
                 if(!position.isClosed()) { continue; }
 
-                NonTerminal nonTerminal = position.rule().nonTerminal();
+                NonTerminal nonTerminal = position.getRule().nonTerminal();
                 Set<Token> followingTokens = followSets.get(nonTerminal);
                 
                 if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
@@ -257,7 +257,7 @@ public class SLR1Parser extends LR0Parser {
                     continue;
                 }
 
-                Reduction reductionAction = new Reduction(position.rule());
+                Reduction reductionAction = new Reduction(position.getRule());
 
                 Map<Token, Action> stateActions = actionTable.get(state);
 
