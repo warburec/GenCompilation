@@ -71,11 +71,12 @@ public class GrammarPosition{
             string += production[i].toString() + " ";
         }
 
+        string = string.substring(0, string.length() - 1);
+
         if(position == production.length) {
             string += "•";
         }
 
-        string.stripTrailing();
         return string;
     }
 }
