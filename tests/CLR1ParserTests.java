@@ -400,6 +400,7 @@ public class CLR1ParserTests {
         };
         NonTerminal sentinel = new NonTerminal("S");
 
+
         CLR1Parser syntaxAnalyser = new CLR1Parser(tokens,
                                                 nonTerminals,
                                                 productionRules,
@@ -407,4 +408,59 @@ public class CLR1ParserTests {
         
         //TODO: Ensure tables are correct (not that they just don't throw errors)
     }
+
+    @Test
+    public void CLR1BasicParsing() throws ParseFailedException {
+        ProductionRule[] productionRules = new ProductionRule[] {
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new NonTerminal("X"),
+                    new NonTerminal("X")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("X"),
+                new LexicalElement[] {
+                    new Token("a"),
+                    new NonTerminal("X")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("X"),
+                new LexicalElement[] {
+                    new Token("b")
+                }
+            )
+        };
+        Token[] tokens = new Token[] {
+            new Token("a"),
+            new Token("b")
+        };
+        NonTerminal[] nonTerminals = new NonTerminal[] {
+            new NonTerminal("S"),
+            new NonTerminal("X")
+        };
+        NonTerminal sentinel = new NonTerminal("S");
+
+        CLR1Parser syntaxAnalyser = new CLR1Parser(tokens,
+                                                nonTerminals,
+                                                productionRules,
+                                                sentinel);
+        
+        Token[] sentence = new Token[] {
+            new Token("a", 1, 1),
+            new Token("a", 1, 2),
+            new Token("b", 1, 3),
+            new Token("a", 1, 4),
+            new Token("a", 1, 5),
+            new Token("a", 1, 6),
+            new Token("b", 1, 7),
+        };
+
+
+        assertNotNull(syntaxAnalyser.analyse(sentence));
+        //TODO: Ensure tables/parse states are correct (not that they just don't throw errors and aren't null)
+    }
+    //TODO: Make tests to parse sentences that would cause SLR1 issues
 }
