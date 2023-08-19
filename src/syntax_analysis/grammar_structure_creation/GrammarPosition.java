@@ -2,9 +2,9 @@ package syntax_analysis.grammar_structure_creation;
 
 import grammar_objects.*;
 
-public class GrammarPosition{
-    ProductionRule rule;
-    int position;
+public class GrammarPosition {
+    protected ProductionRule rule;
+    protected int position;
     
     public GrammarPosition(ProductionRule rule, int position) {
         this.rule = rule;
@@ -47,6 +47,21 @@ public class GrammarPosition{
     public int hashCode() {
         int hashCode = position;
         return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+
+        if(!(obj instanceof GrammarPosition)) {
+            return false;
+        }
+        
+        GrammarPosition otherPos = (GrammarPosition)obj;
+
+        return this.rule.equals(otherPos.rule) && this.position == otherPos.position;
     }
 
     @Override
