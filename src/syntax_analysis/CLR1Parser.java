@@ -1,7 +1,6 @@
 package syntax_analysis;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import grammar_objects.*;
 import helperObjects.*;
@@ -10,8 +9,7 @@ import syntax_analysis.parsing.*;
 
 public class CLR1Parser extends SLR1Parser {
 
-    protected HashMap<NonTerminal, Set<Token>> firstSets;  //A map containing the first sets for all non-terminals
-    protected HashMap<NonTerminal, Set<Token>> followSets;   //A map containing the follow sets for all non-terminals
+    // protected HashMap<NonTerminal, Set<Token>> firstSets;  //A map containing the first sets for all non-terminals
 
     private int currentParseToken = -1;
 
@@ -19,37 +17,27 @@ public class CLR1Parser extends SLR1Parser {
 
     public CLR1Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
     }
 
     public CLR1Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
     }
 
     public CLR1Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
     }
 
     public CLR1Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
     }
 
-    private void initialise() {
+    @Override
+    protected void initialise() {
         generateFirstSets();
-        generateFollowSets();
-
-        generateActionAndGotoTables();
     }
 
     private void generateFirstSets() {
         firstSets = FirstSetGenerator.generate(productionRules, nonTerminals);
-    }
-
-    private void generateFollowSets() {
-        followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
     }
 
     @Override
@@ -148,6 +136,7 @@ public class CLR1Parser extends SLR1Parser {
                 nextPositions.add(currentPosition.getNextPosition());
             }
         }
+
         return nextPositions;
     }
 
@@ -274,8 +263,8 @@ public class CLR1Parser extends SLR1Parser {
         return states;
     }
 
-
-    private void generateActionAndGotoTables() {
+    @Override
+    protected void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 
@@ -293,8 +282,7 @@ public class CLR1Parser extends SLR1Parser {
             for(GrammarPosition position : state.getPositions()) {
                 if(!position.isClosed()) { continue; }
 
-                NonTerminal nonTerminal = position.getRule().nonTerminal();
-                Set<Token> followingTokens = followSets.get(nonTerminal);
+                Set<Token> followingTokens = ((CLR1Position)position).followSet;
                 
                 if(position.equals(new CLR1Position(acceptRule, 1, Set.of(EOF)))) { //Full accept Position
                     actionTable.get(state).put(EOF, new Accept());
@@ -461,6 +449,11 @@ public class CLR1Parser extends SLR1Parser {
         }
 
         @Override
+        public GrammarPosition getNextPosition() {
+            return new CLR1Position(rule, position + 1, followSet);
+        }
+    
+        @Override
         public boolean equals(Object obj) {
             if(!(obj instanceof CLR1Position)) { return false; }
 
@@ -497,7 +490,7 @@ public class CLR1Parser extends SLR1Parser {
                 string += token.toString() + "/";
             }
 
-            return string.substring(0, string.length() - 2);
+            return string.substring(0, string.length() - 1);
         }
     }
 }

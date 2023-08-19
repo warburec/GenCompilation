@@ -16,29 +16,24 @@ public class SLR1Parser extends LR0Parser {
 
     public SLR1Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
     }
 
     public SLR1Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
     }
 
     public SLR1Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
     }
 
     public SLR1Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
     }
 
-    private void initialise() {
+    @Override
+    protected void initialise() {
         generateFirstSets();
         generateFollowSets();
-
-        generateActionAndGotoTables();
     }
 
     private void generateFirstSets() {
@@ -230,8 +225,8 @@ public class SLR1Parser extends LR0Parser {
         return states;
     }
 
-
-    private void generateActionAndGotoTables() {
+    @Override
+    protected void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 

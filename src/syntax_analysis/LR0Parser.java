@@ -21,30 +21,35 @@ public class LR0Parser extends SyntaxAnalyser {
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
     public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
     public LR0Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
     public LR0Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
-    private void initialise() {
+    private void setUp() {
         checkForInvalidNonTerminals();
         generateProductionMap();
+
+        initialise();
+
         generateStates();
         generateActionAndGotoTables();
     }
+
+    protected void initialise() {}
 
     protected void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
@@ -209,7 +214,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generateActionAndGotoTables() {
+    protected void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 
