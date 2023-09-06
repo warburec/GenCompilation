@@ -116,8 +116,7 @@ public class CLR1ParserTests {
         };
         
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
-        throw exception;
-        //assertTrue(exception.getCause() instanceof IncompleteParseException);
+        assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
 
     @Test
