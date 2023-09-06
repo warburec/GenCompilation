@@ -1,7 +1,6 @@
 package syntax_analysis;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import grammar_objects.*;
 import helperObjects.*;
@@ -256,11 +255,11 @@ public class CLR1Parser extends SLR1Parser {
         List<GrammarPosition> startPositions,
         LinkedListHashMap<GrammarPosition, Set<Token>> positions
     ) {
-        for(GrammarPosition position : startPositions) {
-            Set<Token> newEOFSet = new HashSet<Token>();
-            newEOFSet.add(EOF);
+        for(int i = 0; i < startPositions.size(); i++) {
+            CLR1Position clr1Position = (CLR1Position)startPositions.get(i);
+            Set<Token> lookahead = clr1Position.getFollowSet();
 
-            positions.put(position, newEOFSet);
+            positions.put(clr1Position, lookahead);
         }
     }
     
