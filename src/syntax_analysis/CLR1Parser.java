@@ -1,6 +1,7 @@
 package syntax_analysis;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import grammar_objects.*;
 import helperObjects.*;
@@ -140,7 +141,11 @@ public class CLR1Parser extends SLR1Parser {
         return nextPositions;
     }
 
-    protected List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
+    protected List<GrammarPosition> createParentGraphBranches(
+        State parentState, 
+        LexicalElement elementTraversed, 
+        List<GrammarPosition> currentPositions
+    ) {
         State foundLink = null;
 
         GrammarPosition firstPosition = currentPositions.get(0);
@@ -189,39 +194,61 @@ public class CLR1Parser extends SLR1Parser {
     }
 
     /**
-     * Expands the existing positions given based on the production rules.
+     * Expands the existing positions given based on the production rules, taking CLR the follow sets into account.
      * All espansions will be positioned at the start of the production sequences.
      * @param startPositions The positions to be expanded
      */
     private List<GrammarPosition> expandPositions(List<GrammarPosition> startPositions) {
-        Set<NonTerminal> seenNonTerminals = new HashSet<>();
+        LinkedListHashMap<GrammarPosition, Set<Token>> positionMap = new LinkedListHashMap<>();
+        initialiseLookaheadSets(startPositions, positionMap);
+        
+        LinkedMapIterator<GrammarPosition, Set<Token>> positionIterator = new LinkedMapIterator<>(positionMap);
 
-        List<GrammarPosition> positionsList = new ArrayList<>(startPositions);
-
-        int i = 0;
-        while(i < positionsList.size()) {
-            GrammarPosition position = positionsList.get(i);
-            if(position.isClosed()) { i++; continue; }
+        while(positionIterator.hasNext()) {
+            GrammarPosition position = positionIterator.next();
+            if(position.isClosed()) { continue; }
 
             LexicalElement nextElement = position.getNextElement();
-            if(!(nextElement instanceof NonTerminal)) { i++; continue; }
+            if(!(nextElement instanceof NonTerminal)) { continue; }
 
             NonTerminal nextNonTerminal = (NonTerminal)nextElement;
-            if(seenNonTerminals.contains(nextNonTerminal)) { i++; continue; }
 
             Set<Token> lookahead = computeLookahead(position);
 
             for(ProductionRule rule : productionMap.get(nextNonTerminal)) {
-                GrammarPosition newPosition = new CLR1Position(rule, 0, lookahead);
-                positionsList.add(newPosition);
+                GrammarPosition newPosition = new GrammarPosition(rule, 0);
+                positionIterator.appendEntry(newPosition, lookahead);
             }
-
-            seenNonTerminals.add(nextNonTerminal);
-
-            i++;
         }
 
-        return positionsList;
+        return combinePosAndLookahead(positionMap);
+    }
+
+    private List<GrammarPosition> combinePosAndLookahead(LinkedListHashMap<GrammarPosition, Set<Token>> positionMap) {
+        List<GrammarPosition> positionsWithLookahead = new ArrayList<>(positionMap.size());
+        GrammarPosition[] finalPositions = (GrammarPosition[])positionMap.toArray();
+
+        for(GrammarPosition positionKey : finalPositions) {
+            Set<Token> lookahead = positionMap.get(positionKey);
+            positionsWithLookahead.add(new CLR1Position(
+                positionKey.getRule(),
+                positionKey.getPosition(),
+                lookahead
+            ));
+        }
+        return positionsWithLookahead;
+    }
+
+    private void initialiseLookaheadSets(
+        List<GrammarPosition> startPositions,
+        LinkedListHashMap<GrammarPosition, Set<Token>> positions
+    ) {
+        for(GrammarPosition position : startPositions) {
+            Set<Token> newEOFSet = new HashSet<Token>();
+            newEOFSet.add(EOF);
+
+            positions.put(position, newEOFSet);
+        }
     }
     
     private Set<Token> computeLookahead(GrammarPosition position) {
@@ -272,7 +299,7 @@ public class CLR1Parser extends SLR1Parser {
         allTokens.addAll(tokens);
         allTokens.add(EOF);
 
-        for (State state : states) {
+        for(State state : states) {
             actionTable.put(state, new HashMap<>());
             gotoTable.put(state, new HashMap<>());
         }
