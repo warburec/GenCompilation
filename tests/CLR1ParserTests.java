@@ -100,7 +100,7 @@ public class CLR1ParserTests {
     // }
 
     @Test
-    public void parsingTestGrammarIncompleteSentence() {
+    public void parsingTestGrammarIncompleteSentence() throws ParseFailedException {
         LR0TestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -116,7 +116,8 @@ public class CLR1ParserTests {
         };
         
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
-        assertTrue(exception.getCause() instanceof IncompleteParseException);
+        throw exception;
+        //assertTrue(exception.getCause() instanceof IncompleteParseException);
     }
 
     @Test

@@ -29,7 +29,7 @@ public class LinkedMapIterator <T, E> implements Iterator<T> {
      * @param key A key to be added
      * @param value A value to be added
      */
-    public void appendEntry(T key, E value) {
+    public void add(T key, E value) {
         linkedMap.put(key, value);
     }
 }

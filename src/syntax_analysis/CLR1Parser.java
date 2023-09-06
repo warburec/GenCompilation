@@ -223,7 +223,14 @@ public class CLR1Parser extends SLR1Parser {
 
             for(ProductionRule rule : productionMap.get(nextNonTerminal)) {
                 GrammarPosition newPosition = new GrammarPosition(rule, 0);
-                positionIterator.appendEntry(newPosition, lookahead);
+                Set<Token> existingTokens = positionMap.get(newPosition);
+                
+                if(existingTokens == null) {
+                    positionMap.put(newPosition, lookahead);
+                }
+                else {
+                    existingTokens.addAll(lookahead);
+                }
             }
         }
 
