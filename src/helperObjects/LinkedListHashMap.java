@@ -72,8 +72,9 @@ public class LinkedListHashMap <T, E> implements Map<T, E>, Iterable<T> {
     @Override
     public E put(T key, E value) {
         E previousValue = hashMap.put(key, value);
-        list.add(key);
+        if(previousValue != null) { return null; }
 
+        list.add(key);
         return previousValue;
     }
 

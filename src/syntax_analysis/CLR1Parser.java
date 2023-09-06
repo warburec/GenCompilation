@@ -213,7 +213,13 @@ public class CLR1Parser extends SLR1Parser {
 
             NonTerminal nextNonTerminal = (NonTerminal)nextElement;
 
-            Set<Token> lookahead = computeLookahead(position);
+            CLR1Position posCLR1 = new CLR1Position(
+                position.getRule(),
+                position.getPosition(),
+                positionMap.get(position)
+            );
+
+            Set<Token> lookahead = computeLookahead(posCLR1);
 
             for(ProductionRule rule : productionMap.get(nextNonTerminal)) {
                 GrammarPosition newPosition = new GrammarPosition(rule, 0);
@@ -226,7 +232,7 @@ public class CLR1Parser extends SLR1Parser {
 
     private List<GrammarPosition> combinePosAndLookahead(LinkedListHashMap<GrammarPosition, Set<Token>> positionMap) {
         List<GrammarPosition> positionsWithLookahead = new ArrayList<>(positionMap.size());
-        GrammarPosition[] finalPositions = (GrammarPosition[])positionMap.toArray();
+        GrammarPosition[] finalPositions = positionMap.toArray(new GrammarPosition[positionMap.size()]);
 
         for(GrammarPosition positionKey : finalPositions) {
             Set<Token> lookahead = positionMap.get(positionKey);
