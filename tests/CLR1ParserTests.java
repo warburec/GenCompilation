@@ -32,7 +32,7 @@ public class CLR1ParserTests {
 
     @Test
     public void smallTestGrammarStates() {
-        LR0TestGrammar grammar = new SmallTestGrammar();
+        SmallTestGrammar grammar = new SmallTestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -42,7 +42,7 @@ public class CLR1ParserTests {
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
         Set<State> expectedStateSet = grammar.getStates();
-        // assertEquals(expectedStateSet, generatedStates); //TODO: Create states and tables for CLR1, for all grammars
+        // assertEquals(expectedStateSet, generatedStates);
         assertTrue(generatedStates.size() >= expectedStateSet.size());
     }
 
@@ -152,7 +152,6 @@ public class CLR1ParserTests {
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
         Set<State> expectedStateSet = grammar.getCLR1States();
-
         assertEquals(expectedStateSet, generatedStates);
     }
 
@@ -315,7 +314,7 @@ public class CLR1ParserTests {
 
         Set<State> expectedStateSet = grammar.getStates();
         // assertEquals(expectedStateSet, generatedStates);
-        assertTrue(generatedStates.size() >= expectedStateSet.size());
+        assertTrue(generatedStates.size() >= expectedStateSet.size()); //TODO: Create test tables and states
     }
 
     // @Test
@@ -372,85 +371,28 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1Grammar() {
-        ProductionRule[] productionRules = new ProductionRule[] {
-            new ProductionRule(
-                new NonTerminal("S"),
-                new LexicalElement[] {
-                    new NonTerminal("X"),
-                    new NonTerminal("X")
-                }
-            ),
-            new ProductionRule(
-                new NonTerminal("X"),
-                new LexicalElement[] {
-                    new Token("a"),
-                    new NonTerminal("X")
-                }
-            ),
-            new ProductionRule(
-                new NonTerminal("X"),
-                new LexicalElement[] {
-                    new Token("b")
-                }
-            )
-        };
-        Token[] tokens = new Token[] {
-            new Token("a"),
-            new Token("b")
-        };
-        NonTerminal[] nonTerminals = new NonTerminal[] {
-            new NonTerminal("S"),
-            new NonTerminal("X")
-        };
-        NonTerminal sentinel = new NonTerminal("S");
+        BasicCLR1Grammar grammar = new BasicCLR1Grammar();
+        GrammarParts grammarParts = grammar.getParts();
 
+        CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        CLR1Parser syntaxAnalyser = new CLR1Parser(tokens,
-                                                nonTerminals,
-                                                productionRules,
-                                                sentinel);
-        
-        //TODO: Ensure tables are correct (not that they just don't throw errors)
+        Set<State> expectedStateSet = grammar.getStates();
+        assertEquals(expectedStateSet, generatedStates);
     }
 
     @Test
     public void CLR1BasicParsing() throws ParseFailedException {
-        ProductionRule[] productionRules = new ProductionRule[] {
-            new ProductionRule(
-                new NonTerminal("S"),
-                new LexicalElement[] {
-                    new NonTerminal("X"),
-                    new NonTerminal("X")
-                }
-            ),
-            new ProductionRule(
-                new NonTerminal("X"),
-                new LexicalElement[] {
-                    new Token("a"),
-                    new NonTerminal("X")
-                }
-            ),
-            new ProductionRule(
-                new NonTerminal("X"),
-                new LexicalElement[] {
-                    new Token("b")
-                }
-            )
-        };
-        Token[] tokens = new Token[] {
-            new Token("a"),
-            new Token("b")
-        };
-        NonTerminal[] nonTerminals = new NonTerminal[] {
-            new NonTerminal("S"),
-            new NonTerminal("X")
-        };
-        NonTerminal sentinel = new NonTerminal("S");
+        BasicCLR1Grammar grammar = new BasicCLR1Grammar();
+        GrammarParts grammarParts = grammar.getParts();
 
-        CLR1Parser syntaxAnalyser = new CLR1Parser(tokens,
-                                                nonTerminals,
-                                                productionRules,
-                                                sentinel);
+        CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
         
         Token[] sentence = new Token[] {
             new Token("a", 1, 1),

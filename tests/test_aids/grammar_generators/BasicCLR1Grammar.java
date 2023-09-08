@@ -208,18 +208,12 @@ public class BasicCLR1Grammar extends Grammar implements CLR1TestGrammar {
     
 
     @Override
-    protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGenerationBookends'");
-    }
+    protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {}
 
     @Override
-    protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUpRuleConvertors'");
-    }
+    protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {}
 
     @Override
-    protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
-        throw new UnsupportedOperationException("Unimplemented method 'setUpCodeGenerations'");
-    }
+    protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {}
 
 }
