@@ -142,7 +142,7 @@ public class CLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarStates() {
-        LR0TestGrammar grammar = new SelfReferentialGrammar();
+        SelfReferentialGrammar grammar = new SelfReferentialGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -151,9 +151,13 @@ public class CLR1ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getStates();
-        // assertEquals(expectedStateSet, generatedStates);
-        assertTrue(generatedStates.size() >= expectedStateSet.size());
+        Set<State> expectedStateSet = grammar.getCLR1States();
+
+        for(State s : generatedStates) {
+            assertTrue(expectedStateSet.contains(s));
+        }
+
+        assertEquals(expectedStateSet, generatedStates);
     }
 
     // @Test
