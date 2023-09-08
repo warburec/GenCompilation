@@ -116,7 +116,7 @@ public class CLR1ParserTests {
         };
         
         ParseFailedException exception = assertThrows(ParseFailedException.class, () -> syntaxAnalyser.analyse(inputTokens));
-        assertTrue(exception.getCause() instanceof IncompleteParseException);
+        assertTrue(exception.getCause() instanceof IncompleteParseException); //TODO: Fix assertion error when not debugging
     }
 
     @Test
@@ -152,10 +152,6 @@ public class CLR1ParserTests {
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
         Set<State> expectedStateSet = grammar.getCLR1States();
-
-        for(State s : generatedStates) {
-            assertTrue(expectedStateSet.contains(s));
-        }
 
         assertEquals(expectedStateSet, generatedStates);
     }

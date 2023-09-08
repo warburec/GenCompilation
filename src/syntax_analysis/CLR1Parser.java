@@ -425,7 +425,7 @@ public class CLR1Parser extends SLR1Parser {
                     if(currentToken.equals(EOF)) {
                         throw new IncompleteParseException();
                     }
-
+                    
                     throw new SyntaxError(currentToken, parseStates.peek().state());
                 }   
             }

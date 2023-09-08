@@ -14,6 +14,7 @@ import syntax_analysis.parsing.ParseState;
  * L → o
  */
 public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGrammar, CLR1TestGrammar {
+    List<State> clr1States;
 
     @Override
     protected void setUpTokens(List<Token> tokens) {
@@ -165,6 +166,7 @@ public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGr
             .addBranch(new Route(getState(6), new Token("l")));
 
 
+        clr1States = new ArrayList<>();
         setUpCLR1States(clr1States, extraRootRule);
     }
 
@@ -301,6 +303,7 @@ public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGr
         throw new UnsupportedOperationException("Unimplemented method 'getCLR1ActionTable'");
     }
 
+    //TODO: Make CLR1 setup more consistent with others
     @Override
     public Set<State> getCLR1States() {
         return new HashSet<State>(clr1States);

@@ -9,7 +9,6 @@ import syntax_analysis.parsing.ParseState;
 public interface CLR1TestGrammar {
     public Map<State, Map<Token, Action>> getCLR1ActionTable();
     public Map<State, Map<NonTerminal, State>> getGotoTable();
-    public List<State> clr1States = new ArrayList<>();
 
     /**
      * Gets the root parse state (and contained parse tree) for a given sentence
