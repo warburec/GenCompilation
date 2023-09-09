@@ -198,10 +198,10 @@ public class CLR1Parser extends SLR1Parser {
      * @param startPositions The positions to be expanded
      */
     private List<GrammarPosition> expandPositions(List<GrammarPosition> startPositions) {
-        LinkedListHashMap<GrammarPosition, Set<Token>> positionMap = new LinkedListHashMap<>();
+        LinkedListHashMap<GrammarPosition, CompositeSet<Token>> positionMap = new LinkedListHashMap<>(); //TODO: Consider a different method than using composite sets
         initialiseLookaheadSets(startPositions, positionMap);
         
-        LinkedMapIterator<GrammarPosition, Set<Token>> positionIterator = new LinkedMapIterator<>(positionMap);
+        LinkedMapIterator<GrammarPosition, CompositeSet<Token>> positionIterator = new LinkedMapIterator<>(positionMap);
 
         while(positionIterator.hasNext()) {
             GrammarPosition position = positionIterator.next();
@@ -215,20 +215,20 @@ public class CLR1Parser extends SLR1Parser {
             CLR1Position posCLR1 = new CLR1Position(
                 position.getRule(),
                 position.getPosition(),
-                positionMap.get(position)
+                positionMap.get(position).getValue()
             );
 
-            Set<Token> lookahead = computeLookahead(posCLR1);
+            CompositeSet<Token> lookahead = computeLookahead(posCLR1, positionMap.get(position));
 
             for(ProductionRule rule : productionMap.get(nextNonTerminal)) {
                 GrammarPosition newPosition = new GrammarPosition(rule, 0);
-                Set<Token> existingTokens = positionMap.get(newPosition);
+                CompositeSet<Token> existingTokens = positionMap.get(newPosition);
                 
                 if(existingTokens == null) {
                     positionMap.put(newPosition, lookahead);
                 }
                 else {
-                    existingTokens.addAll(lookahead);
+                    existingTokens.addSet(lookahead);
                 }
             }
         }
@@ -236,60 +236,66 @@ public class CLR1Parser extends SLR1Parser {
         return combinePosAndLookahead(positionMap);
     }
 
-    private List<GrammarPosition> combinePosAndLookahead(LinkedListHashMap<GrammarPosition, Set<Token>> positionMap) {
+    private List<GrammarPosition> combinePosAndLookahead(LinkedListHashMap<GrammarPosition, CompositeSet<Token>> positionMap) {
         List<GrammarPosition> positionsWithLookahead = new ArrayList<>(positionMap.size());
         GrammarPosition[] finalPositions = positionMap.toArray(new GrammarPosition[positionMap.size()]);
 
         for(GrammarPosition positionKey : finalPositions) {
-            Set<Token> lookahead = positionMap.get(positionKey);
+            Set<Token> lookahead = positionMap.get(positionKey).getValue();
             positionsWithLookahead.add(new CLR1Position(
                 positionKey.getRule(),
                 positionKey.getPosition(),
                 lookahead
             ));
         }
+        
         return positionsWithLookahead;
     }
 
     private void initialiseLookaheadSets(
         List<GrammarPosition> startPositions,
-        LinkedListHashMap<GrammarPosition, Set<Token>> positions
+        LinkedListHashMap<GrammarPosition, CompositeSet<Token>> positions
     ) {
         for(int i = 0; i < startPositions.size(); i++) {
             CLR1Position clr1Position = (CLR1Position)startPositions.get(i);
             Set<Token> lookahead = clr1Position.getFollowSet();
 
-            positions.put(clr1Position, lookahead);
+            positions.put(clr1Position, new CompositeSet<>(lookahead));
         }
     }
     
-    private Set<Token> computeLookahead(GrammarPosition position) {
+    private CompositeSet<Token> computeLookahead(GrammarPosition position, CompositeSet<Token> positionLookahead) {
         CLR1Position clrPosition = (CLR1Position)position;
         LexicalElement[] productionSequence = clrPosition.getRule().productionSequence();
 
-        Set<Token> lookahead = new HashSet<>(clrPosition.getFollowSet().size());
+        CompositeSet<Token> lookahead = new CompositeSet<>();
         int seqPosition = clrPosition.getPosition() + 1;
+
+        if(seqPosition >= productionSequence.length) {
+            lookahead.addSet(positionLookahead);
+            return lookahead;
+        }
 
         boolean keepLooking = true;
         do {
-            if(seqPosition >= productionSequence.length) { 
-                lookahead.addAll(clrPosition.getFollowSet()); 
-                return lookahead; 
-            }
-
             LexicalElement nextElement = productionSequence[seqPosition];
 
             if(nextElement instanceof Token) { 
-                lookahead.add((Token)nextElement); 
+                lookahead.addValue((Token)nextElement); 
                 return lookahead;
             }
 
             Set<Token> firstSet = firstSets.get((NonTerminal)nextElement);
 
-            lookahead.addAll(firstSet);
+            lookahead.addSet(firstSet);
 
             if(!firstSet.contains(emptyToken)) {
                 return lookahead;
+            }
+
+            if(seqPosition >= productionSequence.length) { 
+                lookahead.addSet(positionLookahead);
+                return lookahead; 
             }
 
             seqPosition++;
@@ -391,6 +397,7 @@ public class CLR1Parser extends SLR1Parser {
 
         try {
             while(!accepted) {
+                System.out.println(states.size());
                 Action action = actionTable.get(parseStates.peek().state()).get(currentToken);
 
                 if(action instanceof Shift) {
@@ -465,6 +472,121 @@ public class CLR1Parser extends SLR1Parser {
 
         public State getCurrentState() {
             return currentState;
+        }
+    }
+
+    private class CompositeSet <T> implements Set<T> {
+        private Set<Set<T>> sets = new HashSet<>();
+
+        public CompositeSet() {}
+
+        public CompositeSet(Set<T> set) {
+            sets.add(set);
+        }
+
+        public void addSet(Set<T> set) {
+            sets.add(set);
+        }
+
+        public void addValue(T value) {
+            sets.add(Set.of(value));
+        }
+
+        public Set<T> getValue() {
+            return combineSets();
+        }
+
+        private Set<T> combineSets() {
+            Set<T> tokens = new HashSet<>();
+
+            for (Set<T> set : sets) {
+                tokens.addAll(set);
+            }
+
+            return tokens;
+        }
+
+        @Override
+        public int size() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'size'");
+        }
+
+        @Override
+        public boolean isEmpty() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'isEmpty'");
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'contains'");
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            Set<T> allVals = new HashSet<>();
+
+            for (Set<T> set : sets) {
+                allVals.addAll(set);
+            }
+
+            return allVals.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'toArray'");
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'toArray'");
+        }
+
+        @Override
+        public boolean add(T e) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'add'");
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'remove'");
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'containsAll'");
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends T> c) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'addAll'");
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'retainAll'");
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'removeAll'");
+        }
+
+        @Override
+        public void clear() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'clear'");
         }
     }
 
