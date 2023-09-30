@@ -7,41 +7,37 @@ import helperObjects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-public class SLR1Parser extends LR0Parser {
+public class CLR1Parser extends SLR1Parser {
 
-    protected HashMap<NonTerminal, Set<Token>> firstSets;  //A map containing the first sets for all non-terminals
-    protected HashMap<NonTerminal, Set<Token>> followSets;   //A map containing the follow sets for all non-terminals
+    // protected HashMap<NonTerminal, Set<Token>> firstSets;  //A map containing the first sets for all non-terminals
 
     private int currentParseToken = -1;
 
-    public SLR1Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
+    protected static Token emptyToken = new EmptyToken();
+
+    public CLR1Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
     }
 
-    public SLR1Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
+    public CLR1Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
     }
 
-    public SLR1Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
+    public CLR1Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
     }
 
-    public SLR1Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
+    public CLR1Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
     }
 
     @Override
     protected void initialise() {
         generateFirstSets();
-        generateFollowSets();
     }
 
     private void generateFirstSets() {
         firstSets = FirstSetGenerator.generate(productionRules, nonTerminals);
-    }
-
-    private void generateFollowSets() {
-        followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
     }
 
     @Override
@@ -82,11 +78,12 @@ public class SLR1Parser extends LR0Parser {
         LexicalElement[] startProductionSequence = new LexicalElement[] { sentinel };
         acceptRule = new ProductionRule(start, startProductionSequence);
 
-        GrammarPosition startPosition = new GrammarPosition(acceptRule, 0);
+        CLR1Position startPosition = new CLR1Position(acceptRule, 0, Set.of(EOF));
 
-        rootState = createState(null, List.of(new GrammarPosition[] {startPosition}), null);
+        rootState = createState(null, List.of(new CLR1Position[] {startPosition}), null);
     }
 
+    @Override
     protected State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
         List<GrammarPosition> currentPositions = startPositions;
 
@@ -139,14 +136,20 @@ public class SLR1Parser extends LR0Parser {
                 nextPositions.add(currentPosition.getNextPosition());
             }
         }
+
         return nextPositions;
     }
 
-    protected List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
+    protected List<GrammarPosition> createParentGraphBranches(
+        State parentState, 
+        LexicalElement elementTraversed, 
+        List<GrammarPosition> currentPositions
+    ) {
         State foundLink = null;
 
-        GrammarPosition position = currentPositions.get(0);
-        State stateFound = getStateContainingPosition(position);
+        GrammarPosition firstPosition = currentPositions.get(0);
+
+        State stateFound = getStateContainingPosition(firstPosition);
 
         if(stateFound != null) {
             Route newRoute = new Route(stateFound, elementTraversed);
@@ -159,6 +162,8 @@ public class SLR1Parser extends LR0Parser {
 
         foundLink = stateFound;
 
+        GrammarPosition position;
+        
         for(int i = 0; i < currentPositions.size(); i++) {
             position = currentPositions.get(i);
 
@@ -188,39 +193,117 @@ public class SLR1Parser extends LR0Parser {
     }
 
     /**
-     * Expands the existing positions given based on the production rules.
+     * Expands the existing positions given based on the production rules, taking CLR the follow sets into account.
      * All espansions will be positioned at the start of the production sequences.
      * @param startPositions The positions to be expanded
      */
     private List<GrammarPosition> expandPositions(List<GrammarPosition> startPositions) {
-        Set<NonTerminal> seenNonTerminals = new HashSet<>();
+        LinkedListHashMap<GrammarPosition, CombinedSet<Token>> positionMap = new LinkedListHashMap<>(); //TODO: Consider a different method than using composite sets
+        initialiseLookaheadSets(startPositions, positionMap);
+        
+        LinkedMapIterator<GrammarPosition, CombinedSet<Token>> positionIterator = new LinkedMapIterator<>(positionMap);
 
-        List<GrammarPosition> positionsList = new ArrayList<>(startPositions);
-
-        int i = 0;
-        while(i < positionsList.size()) {
-            GrammarPosition position = positionsList.get(i);
-            if(position.isClosed()) { i++; continue; }
+        while(positionIterator.hasNext()) {
+            GrammarPosition position = positionIterator.next();
+            if(position.isClosed()) { continue; }
 
             LexicalElement nextElement = position.getNextElement();
-            if(!(nextElement instanceof NonTerminal)) { i++; continue; }
+            if(!(nextElement instanceof NonTerminal)) { continue; }
 
             NonTerminal nextNonTerminal = (NonTerminal)nextElement;
-            if(seenNonTerminals.contains(nextNonTerminal)) { i++; continue; }
 
-            for (ProductionRule rule : productionMap.get(nextNonTerminal)) {
+            CLR1Position posCLR1 = new CLR1Position(
+                position.getRule(),
+                position.getPosition(),
+                positionMap.get(position).getValue()
+            );
+
+            CombinedSet<Token> lookahead = computeLookahead(posCLR1, positionMap.get(position));
+
+            for(ProductionRule rule : productionMap.get(nextNonTerminal)) {
                 GrammarPosition newPosition = new GrammarPosition(rule, 0);
-                positionsList.add(newPosition);
+                CombinedSet<Token> existingTokens = positionMap.get(newPosition);
+                
+                if(existingTokens == null) {
+                    positionMap.put(newPosition, lookahead);
+                }
+                else {
+                    existingTokens.addSet(lookahead);
+                }
             }
-
-            seenNonTerminals.add(nextNonTerminal);
-
-            i++;
         }
 
-        return positionsList;
+        return combinePosAndLookahead(positionMap);
+    }
+
+    private List<GrammarPosition> combinePosAndLookahead(LinkedListHashMap<GrammarPosition, CombinedSet<Token>> positionMap) {
+        List<GrammarPosition> positionsWithLookahead = new ArrayList<>(positionMap.size());
+        GrammarPosition[] finalPositions = positionMap.toArray(new GrammarPosition[positionMap.size()]);
+
+        for(GrammarPosition positionKey : finalPositions) {
+            Set<Token> lookahead = positionMap.get(positionKey).getValue();
+            positionsWithLookahead.add(new CLR1Position(
+                positionKey.getRule(),
+                positionKey.getPosition(),
+                lookahead
+            ));
+        }
+        
+        return positionsWithLookahead;
+    }
+
+    private void initialiseLookaheadSets(
+        List<GrammarPosition> startPositions,
+        LinkedListHashMap<GrammarPosition, CombinedSet<Token>> positions
+    ) {
+        for(int i = 0; i < startPositions.size(); i++) {
+            CLR1Position clr1Position = (CLR1Position)startPositions.get(i);
+            Set<Token> lookahead = clr1Position.getFollowSet();
+
+            positions.put(clr1Position, new CombinedSet<>(lookahead));
+        }
     }
     
+    private CombinedSet<Token> computeLookahead(GrammarPosition position, CombinedSet<Token> positionLookahead) {
+        CLR1Position clrPosition = (CLR1Position)position;
+        LexicalElement[] productionSequence = clrPosition.getRule().productionSequence();
+
+        CombinedSet<Token> lookahead = new CombinedSet<>();
+        int seqPosition = clrPosition.getPosition() + 1;
+
+        if(seqPosition >= productionSequence.length) {
+            lookahead.addSet(positionLookahead);
+            return lookahead;
+        }
+
+        boolean keepLooking = true;
+        do {
+            LexicalElement nextElement = productionSequence[seqPosition];
+
+            if(nextElement instanceof Token) { 
+                lookahead.addValue((Token)nextElement); 
+                return lookahead;
+            }
+
+            Set<Token> firstSet = firstSets.get((NonTerminal)nextElement);
+
+            lookahead.addSet(firstSet);
+
+            if(!firstSet.contains(emptyToken)) {
+                return lookahead;
+            }
+
+            if(seqPosition >= productionSequence.length) { 
+                lookahead.addSet(positionLookahead);
+                return lookahead; 
+            }
+
+            seqPosition++;
+        } while(keepLooking);
+
+        return lookahead;
+    }
+
     public Set<State> getStates() {
         return states;
     }
@@ -234,7 +317,7 @@ public class SLR1Parser extends LR0Parser {
         allTokens.addAll(tokens);
         allTokens.add(EOF);
 
-        for (State state : states) {
+        for(State state : states) {
             actionTable.put(state, new HashMap<>());
             gotoTable.put(state, new HashMap<>());
         }
@@ -244,10 +327,9 @@ public class SLR1Parser extends LR0Parser {
             for(GrammarPosition position : state.getPositions()) {
                 if(!position.isClosed()) { continue; }
 
-                NonTerminal nonTerminal = position.getRule().nonTerminal();
-                Set<Token> followingTokens = followSets.get(nonTerminal);
+                Set<Token> followingTokens = ((CLR1Position)position).getFollowSet();
                 
-                if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
+                if(position.equals(new CLR1Position(acceptRule, 1, Set.of(EOF)))) { //Full accept Position
                     actionTable.get(state).put(EOF, new Accept());
                     continue;
                 }
@@ -315,6 +397,7 @@ public class SLR1Parser extends LR0Parser {
 
         try {
             while(!accepted) {
+                System.out.println(states.size());
                 Action action = actionTable.get(parseStates.peek().state()).get(currentToken);
 
                 if(action instanceof Shift) {
@@ -349,7 +432,7 @@ public class SLR1Parser extends LR0Parser {
                     if(currentToken.equals(EOF)) {
                         throw new IncompleteParseException();
                     }
-
+                    
                     throw new SyntaxError(currentToken, parseStates.peek().state());
                 }   
             }
@@ -391,4 +474,5 @@ public class SLR1Parser extends LR0Parser {
             return currentState;
         }
     }
+
 }

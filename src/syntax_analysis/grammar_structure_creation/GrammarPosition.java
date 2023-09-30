@@ -1,9 +1,23 @@
 package syntax_analysis.grammar_structure_creation;
 
-import grammar_objects.LexicalElement;
-import grammar_objects.ProductionRule;
+import grammar_objects.*;
 
-public record GrammarPosition(ProductionRule rule, int position) {
+public class GrammarPosition {
+    protected ProductionRule rule;
+    protected int position;
+    
+    public GrammarPosition(ProductionRule rule, int position) {
+        this.rule = rule;
+        this.position = position;
+    }
+
+    public ProductionRule getRule() {
+        return rule;
+    }
+
+    public int getPosition() {
+        return position;
+    }
     
     public boolean isClosed() {
         return position == rule.productionSequence().length;
@@ -36,6 +50,21 @@ public record GrammarPosition(ProductionRule rule, int position) {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+
+        if(!(obj instanceof GrammarPosition)) {
+            return false;
+        }
+        
+        GrammarPosition otherPos = (GrammarPosition)obj;
+
+        return this.rule.equals(otherPos.rule) && this.position == otherPos.position;
+    }
+
+    @Override
     public String toString() {
         String string = "";
 
@@ -57,11 +86,12 @@ public record GrammarPosition(ProductionRule rule, int position) {
             string += production[i].toString() + " ";
         }
 
+        string = string.substring(0, string.length() - 1);
+
         if(position == production.length) {
             string += "•";
         }
 
-        string.stripTrailing();
         return string;
     }
 }

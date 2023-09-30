@@ -400,9 +400,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return new BookendDetails(startRegexMatched, indexOfStart, lengthOfStart, startPosition);
     }
 
-    private String[] splitAround(String string, String regex) {
-        return string.split("(?<=" + regex + ")" + "|(?=" + regex + ")", 2);
-    }
+    // private String[] splitAround(String string, String regex) {
+    //     return string.split("(?<=" + regex + ")" + "|(?=" + regex + ")", 2);
+    // }
 
     private BookendDetails findMatchingEndBookend(String startBookendRegex, String string) {
         Set<String> potentialEnds = dynamicRegexBookends.getEndRegex(startBookendRegex);
@@ -719,9 +719,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             return startToEnd.get(startBookend);
         }
 
-        public Set<String> getStartRegex(String endBookend) {
-            return endToStart.get(endBookend);
-        }
+        // public Set<String> getStartRegex(String endBookend) {
+        //     return endToStart.get(endBookend);
+        // }
 
         public Tuple<String,String> getTokenDetails(String startBookend, String endBookend) {
             return bookendsToDetails.get(new NotEmptyTuple<String,String>(startBookend, endBookend));

@@ -13,7 +13,8 @@ import syntax_analysis.parsing.ParseState;
  * L → l L //Self-referential
  * L → o
  */
-public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGrammar {
+public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGrammar, CLR1TestGrammar {
+    List<State> clr1States;
 
     @Override
     protected void setUpTokens(List<Token> tokens) {
@@ -164,6 +165,9 @@ public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGr
         getState(6)
             .addBranch(new Route(getState(6), new Token("l")));
 
+
+        clr1States = new ArrayList<>();
+        setUpCLR1States(clr1States, extraRootRule);
     }
 
     @Override
@@ -290,6 +294,119 @@ public class SelfReferentialGrammar extends LR0TestGrammar implements SLR1TestGr
         stateActions.put(new EOF(), new Reduction(getRule(3)));
 
         return actionTable;
+    }
+
+
+    @Override
+    public Map<State, Map<Token, Action>> getCLR1ActionTable() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCLR1ActionTable'");
+    }
+
+    //TODO: Make CLR1 setup more consistent with others
+    @Override
+    public Set<State> getCLR1States() {
+        return new HashSet<State>(clr1States);
+    }
+
+    public State getCLR1State(int index) {
+        return clr1States.get(index);
+    }
+
+    @Override
+    public void setUpCLR1States(List<State> states, ProductionRule extraRootRule) {
+        states.add(new State( //0
+            Set.of(new CLR1Position[] {
+                new CLR1Position(extraRootRule, 0, Set.of(new EOF())),
+                new CLR1Position(getRule(0), 0, Set.of(new EOF()))
+            }),
+            null
+        ));
+
+        states.add(new State( //1
+            Set.of(new CLR1Position[] {
+                new CLR1Position(extraRootRule, 1, Set.of(new EOF())),
+            }),
+            getCLR1State(0)
+        ));
+
+        states.add(new State( //2
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(0), 1, Set.of(new EOF())),
+                new CLR1Position(getRule(1), 0, Set.of(new EOF()))
+            }),
+            getCLR1State(0)
+        ));
+
+        states.add(new State( //3
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(0), 2, Set.of(new EOF())),
+            }),
+            getCLR1State(2)
+        ));
+
+        states.add(new State( //4
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(1), 1, Set.of(new EOF())),
+                new CLR1Position(getRule(2), 0, Set.of(new EOF())),
+                new CLR1Position(getRule(3), 0, Set.of(new EOF()))
+            }),
+            getCLR1State(2)
+        ));
+
+        states.add(new State( //5
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(1), 2, Set.of(new EOF()))
+            }),
+            getCLR1State(4)
+        ));
+
+        states.add(new State( //6
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(2), 1, Set.of(new EOF())),
+                new CLR1Position(getRule(2), 0, Set.of(new EOF())),
+                new CLR1Position(getRule(3), 0, Set.of(new EOF()))
+            }),
+            getCLR1State(4)
+        ));
+
+        states.add(new State( //7
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(2), 2, Set.of(new EOF()))
+            }),
+            getCLR1State(6)
+        ));
+
+        states.add(new State( //8
+            Set.of(new CLR1Position[] {
+                new CLR1Position(getRule(3), 1, Set.of(new EOF()))
+            }),
+            getCLR1State(6)
+        ));
+
+        //Tree branches
+        getCLR1State(0)
+            .addBranch(new Route(getCLR1State(1), new NonTerminal("H")))
+            .addBranch(new Route(getCLR1State(2), new Token("h")));
+        
+        getCLR1State(2)
+            .addBranch(new Route(getCLR1State(3), new NonTerminal("A")))
+            .addBranch(new Route(getCLR1State(4), new Token("a")));
+        
+        getCLR1State(4)
+            .addBranch(new Route(getCLR1State(5), new NonTerminal("L")))
+            .addBranch(new Route(getCLR1State(6), new Token("l")));
+        
+        getCLR1State(6)
+            .addBranch(new Route(getCLR1State(7), new NonTerminal("L")))
+            .addBranch(new Route(getCLR1State(8), new Token("o")));
+        
+        //Graph branches, links to existing states
+        getCLR1State(4)
+            .addBranch(new Route(getCLR1State(8), new Token("o")));
+        
+        getCLR1State(6)
+            .addBranch(new Route(getCLR1State(6), new Token("l")));
     }
     
 }

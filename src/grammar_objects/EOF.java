@@ -6,4 +6,8 @@ public class EOF extends Token {
         super(null);
     }
     
+    @Override
+    public String toString() {
+        return "$";
+    }
 }

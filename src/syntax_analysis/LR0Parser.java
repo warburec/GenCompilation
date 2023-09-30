@@ -21,32 +21,37 @@ public class LR0Parser extends SyntaxAnalyser {
 
     public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
     public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
     public LR0Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
     public LR0Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
-        initialise();
+        setUp();
     }
 
-    private void initialise() {
+    private void setUp() {
         checkForInvalidNonTerminals();
         generateProductionMap();
+
+        initialise();
+
         generateStates();
         generateActionAndGotoTables();
     }
 
-    private void checkForInvalidNonTerminals() {
+    protected void initialise() {}
+
+    protected void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
             if(nonTerminal.getName().equals(null)) {
                 throw new RuntimeException("Grammar cannot include a null non-terminal");
@@ -54,7 +59,7 @@ public class LR0Parser extends SyntaxAnalyser {
         }
     }
 
-    private void generateProductionMap() {
+    protected void generateProductionMap() {
         productionMap = new HashMap<>();
 
         for (NonTerminal nonTerminal : nonTerminals) {
@@ -75,7 +80,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generateStates() {
+    protected void generateStates() {
         states = new HashSet<>();
 
         NonTerminal start = null;
@@ -209,7 +214,7 @@ public class LR0Parser extends SyntaxAnalyser {
     }
 
 
-    private void generateActionAndGotoTables() {
+    protected void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
 
@@ -232,7 +237,7 @@ public class LR0Parser extends SyntaxAnalyser {
                     continue;
                 }
 
-                Reduction reductionAction = new Reduction(position.rule());
+                Reduction reductionAction = new Reduction(position.getRule());
 
                 if(!actionTable.get(state).isEmpty()) {
                     List<ProductionRule> conflicts = new ArrayList<ProductionRule>();

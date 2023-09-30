@@ -7,13 +7,13 @@ import grammar_objects.ProductionRule;
 import syntax_analysis.grammar_structure_creation.*;
 
 public class NonDeterminismException extends RuntimeException {
-    private List<GrammarPosition> conflictingPositions;
+    private List<? extends GrammarPosition> conflictingPositions;
     private List<ProductionRule> conflictingRules;
     private DisplayType displayType;
 
     private State failingState;
 
-    public NonDeterminismException(LexicalElement elementTraversed, List<GrammarPosition> conflictingPositions, State failingState) {
+    public NonDeterminismException(LexicalElement elementTraversed, List<? extends GrammarPosition> conflictingPositions, State failingState) {
         super("Non-Determinism found whilst traversing \"" + elementTraversed + "\" ");
 
         this.conflictingPositions = conflictingPositions;
