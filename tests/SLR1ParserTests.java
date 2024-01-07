@@ -11,6 +11,7 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import tests.test_aids.*;
 import tests.test_aids.test_grammars.*;
+import tests.test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
 import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
 import syntax_analysis.*;
 
@@ -302,8 +303,8 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarStates() {
-        Grammar grammar = new BasicSLR1Grammar();
-        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -317,8 +318,8 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarAction() {
-        SLR1TestGrammar grammar = new BasicSLR1Grammar();
-        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -326,14 +327,14 @@ public class SLR1ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
     @Test
     public void basicSLR1GrammarGoto() {
-        SLR1TestGrammar grammar = new BasicSLR1Grammar();
-        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -347,8 +348,8 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarCompleteSentence() throws ParseFailedException {
-        SLR1TestGrammar grammar = new BasicSLR1Grammar();
-        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
                                                 grammarParts.productionRules(),

@@ -12,6 +12,8 @@ import syntax_analysis.parsing.*;
 import tests.test_aids.*;
 import tests.test_aids.test_grammars.*;
 import tests.test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
+import tests.test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
+import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
 import syntax_analysis.*;
 
 public class CLR1ParserTests {
@@ -188,7 +190,7 @@ public class CLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarStates() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -304,8 +306,8 @@ public class CLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarStates() {
-        Grammar grammar = new BasicSLR1Grammar();
-        GrammarParts grammarParts = ((Grammar)grammar).getParts();
+        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),

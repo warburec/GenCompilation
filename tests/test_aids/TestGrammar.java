@@ -9,7 +9,7 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 import tests.test_aids.test_grammars.UnsupportedSentenceException;
 
-public abstract class TestGrammar {
+public abstract class TestGrammar { //TODO allow implementation of grammar interface for propper testing
     
     protected Grammar grammar;
 
