@@ -12,6 +12,7 @@ import syntax_analysis.parsing.*;
 import tests.test_aids.*;
 import tests.test_aids.test_grammars.*;
 import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
+import tests.test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
 import syntax_analysis.*;
 
 public class LR0ParserTests {
@@ -142,7 +143,7 @@ public class LR0ParserTests {
 
     @Test
     public void selfReferentialGrammarStates() {
-        LR0TestGrammar grammar = new SelfReferentialGrammar();
+        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -157,7 +158,7 @@ public class LR0ParserTests {
 
     @Test
     public void selfReferentialGrammarAction() {
-        LR0TestGrammar grammar = new SelfReferentialGrammar();
+        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -172,7 +173,7 @@ public class LR0ParserTests {
 
     @Test
     public void selfReferentialGrammarGoto() {
-        LR0TestGrammar grammar = new SelfReferentialGrammar();
+        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),

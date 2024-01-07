@@ -7,6 +7,7 @@ import java.util.*;
 import org.junit.Test;
 
 import grammar_objects.*;
+import grammars.self_referential.SelfReferentialGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import tests.test_aids.*;
@@ -14,6 +15,7 @@ import tests.test_aids.test_grammars.*;
 import tests.test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
 import tests.test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
 import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
+import tests.test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
 import syntax_analysis.*;
 
 public class CLR1ParserTests {
@@ -145,7 +147,7 @@ public class CLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarStates() {
-        SelfReferentialGrammar grammar = new SelfReferentialGrammar();
+        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.CLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -154,7 +156,7 @@ public class CLR1ParserTests {
                                                 grammarParts.sentinal());
         Set<State> generatedStates = syntaxAnalyser.getStates();
 
-        Set<State> expectedStateSet = grammar.getCLR1States();
+        Set<State> expectedStateSet = grammar.getStates();
         assertEquals(expectedStateSet, generatedStates);
     }
 
