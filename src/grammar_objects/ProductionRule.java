@@ -59,4 +59,15 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
         string.stripTrailing();
         return string;
     }
+
+    @Override
+    public int hashCode() {
+        int hashCode = nonTerminal.hashCode() * 31;
+
+        for (LexicalElement lexicalElement : productionSequence) {
+            hashCode *= lexicalElement.hashCode();
+        }
+
+        return hashCode;
+    }
 }
