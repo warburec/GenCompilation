@@ -7,10 +7,11 @@ import java.util.*;
 import org.junit.Test;
 
 import grammar_objects.*;
-import grammars.basic_identifier.BasicIdentifierGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import tests.test_aids.*;
 import tests.test_aids.test_grammars.*;
+import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
 import syntax_analysis.*;
 
 public class LR0ParserTests {
@@ -186,7 +187,7 @@ public class LR0ParserTests {
 
     @Test
     public void basicIdentifierGrammarStates() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -201,7 +202,7 @@ public class LR0ParserTests {
 
     @Test
     public void basicIdentifierGrammarAction() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -216,7 +217,7 @@ public class LR0ParserTests {
 
     @Test
     public void basicIdentifierGrammarGoto() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
@@ -231,7 +232,7 @@ public class LR0ParserTests {
 
     @Test
     public void XToYToXGrammarCompleteSentence() throws ParseFailedException {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         LR0Parser syntaxAnalyser = new LR0Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),

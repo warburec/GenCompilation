@@ -7,10 +7,11 @@ import java.util.*;
 import org.junit.Test;
 
 import grammar_objects.*;
-import grammars.basic_identifier.BasicIdentifierGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import tests.test_aids.*;
 import tests.test_aids.test_grammars.*;
+import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
 import syntax_analysis.*;
 
 public class SLR1ParserTests {
@@ -186,7 +187,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarStates() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -201,8 +202,8 @@ public class SLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarAction() {
-        SLR1TestGrammar grammar = new BasicIdentifierGrammar();
-        GrammarParts grammarParts = ((LR0TestGrammar)grammar).getParts();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.SLR1);
+        GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -210,13 +211,13 @@ public class SLR1ParserTests {
                                                 grammarParts.sentinal());
         Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-        Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
+        Map<State, Map<Token, Action>> expectedActionTable = grammar.getActionTable();
         assertEquals(expectedActionTable, generatedActionTable);
     }
 
     @Test
     public void basicIdentifierGrammarGoto() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -231,7 +232,7 @@ public class SLR1ParserTests {
 
     @Test
     public void XToYToXGrammarCompleteSentence() throws ParseFailedException {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),

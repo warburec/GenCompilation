@@ -21,14 +21,12 @@ public class BasicCLR1TestGrammar extends TestGrammar {
 
     @Override
     protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpActionTable'");
+        // Unimplemented
     }
 
     @Override
     protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpGotoTable'");
+        // Unimplemented
     }
 
     @Override
@@ -158,16 +156,16 @@ public class BasicCLR1TestGrammar extends TestGrammar {
 
     @Override
     protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUpRuleConvertors'");
+        // Unimplemented
     }
     
     @Override
-    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {}
+    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
+        // Unimplemented
+    }
 
     @Override
     public ParseState getParseRoot(String sentence) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
     }
 

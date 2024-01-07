@@ -7,10 +7,9 @@ import java.util.*;
 import org.junit.Test;
 
 import grammar_objects.*;
-import grammars.basic_CLR1.BasicCLR1Grammar;
-import grammars.basic_identifier.BasicIdentifierGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import tests.test_aids.*;
 import tests.test_aids.test_grammars.*;
 import tests.test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
 import syntax_analysis.*;
@@ -373,7 +372,7 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1Grammar() {
-        BasicCLR1TestGrammar grammar = new BasicCLR1TestGrammar();
+        TestGrammar grammar = new BasicCLR1TestGrammar(GrammarType.CLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -388,7 +387,7 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1BasicParsing() throws ParseFailedException {
-        BasicCLR1TestGrammar grammar = new BasicCLR1TestGrammar();
+        TestGrammar grammar = new BasicCLR1TestGrammar(GrammarType.CLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -410,5 +409,6 @@ public class CLR1ParserTests {
         assertNotNull(syntaxAnalyser.analyse(sentence));
         //TODO: Ensure tables/parse states are correct (not that they just don't throw errors and aren't null)
     }
+    
     //TODO: Make tests to parse sentences that would cause SLR1 issues
 }

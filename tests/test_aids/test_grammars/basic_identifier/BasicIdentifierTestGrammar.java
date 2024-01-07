@@ -8,8 +8,7 @@ import grammars.basic_identifier.convertors.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import tests.test_aids.*;
-import tests.test_aids.test_grammars.UnsupportedGrammarException;
-import tests.test_aids.test_grammars.UnsupportedSentenceException;
+import tests.test_aids.test_grammars.*;
 
 /**
  * <statement list> := <statement> |

@@ -3,23 +3,33 @@ package code_generation;
 import java.util.*;
 
 import grammar_objects.*;
+import helperObjects.NullableTuple;
 import syntax_analysis.parsing.*;
 
-public class BasicCodeGenerator implements CodeGenerator {
+public class BasicCodeGenerator implements CodeGenerator { //TODO: Rework to use RuleConvertor
     public static ProductionRule ROOT_RULE = null;
 
     protected Map<ProductionRule, Generator> ruleConvertor;
     protected String preGeneration;
     protected String postGeneration;
 
+    public BasicCodeGenerator(RuleConvertor ruleConvertor) {
+        this.ruleConvertor = ruleConvertor.getConversions();
+
+        NullableTuple<String, String> bookends = ruleConvertor.getBookends();
+
+        this.preGeneration = bookends.value1();
+        this.postGeneration = bookends.value2();
+    }
+
     /**
      * 
-     * @param ruleConvertor A map of production rules and generation functions to produce strings for them, map ROOT_RULE to a Generator function to alter the entire generated code
+     * @param ruleConvertorMap A map of production rules and generation functions to produce strings for them, map ROOT_RULE to a Generator function to alter the entire generated code
      * @param preGeneration A string that will precede the generated code
      * @param postGeneration A string that will follow the generated code
      */
-    public BasicCodeGenerator(Map<ProductionRule, Generator> ruleConvertor, String preGeneration, String postGeneration) {
-        this.ruleConvertor = ruleConvertor;
+    public BasicCodeGenerator(Map<ProductionRule, Generator> ruleConvertorMap, String preGeneration, String postGeneration) {
+        this.ruleConvertor = ruleConvertorMap;
         this.preGeneration = preGeneration;
         this.postGeneration = postGeneration;
     }
