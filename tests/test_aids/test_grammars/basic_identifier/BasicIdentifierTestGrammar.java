@@ -28,6 +28,131 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
     }
 
     @Override
+    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
+        states.add(new State( //0
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(extraRootRule, 0),
+                new GrammarPosition(getRule(1), 0),
+                new GrammarPosition(getRule(0), 0),
+                new GrammarPosition(getRule(2), 0)
+            }),
+            null
+        ));
+
+        states.add(new State( //1
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(extraRootRule, 1),
+                new GrammarPosition(getRule(1), 1),
+                new GrammarPosition(getRule(2), 0)
+            }),
+            getState(0)
+        ));
+
+        states.add(new State( //2
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(1), 2),
+            }),
+            getState(1)
+        ));
+
+        states.add(new State( //3
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 1),
+            }),
+            getState(1)
+        ));
+
+        states.add(new State( //4
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 2),
+                new GrammarPosition(getRule(3), 0),
+                new GrammarPosition(getRule(4), 0)
+            }),
+            getState(3)
+        ));
+
+        states.add(new State( //5
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 3)
+            }),
+            getState(4)
+        ));
+
+        states.add(new State( //6
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 4),
+                new GrammarPosition(getRule(3), 0),
+                new GrammarPosition(getRule(4), 0)
+            }),
+            getState(5)
+        ));
+
+        states.add(new State( //7
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 5)
+            }),
+            getState(6)
+        ));
+
+        states.add(new State( //8
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(3), 1)
+            }),
+            getState(6)
+        ));
+
+        states.add(new State( //9
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(4), 1)
+            }),
+            getState(6)
+        ));
+
+        states.add(new State( //10
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(0), 1)
+            }),
+            getState(0)
+        ));
+
+        states.add(new State( //11
+            Set.of(new GrammarPosition[] {
+                new GrammarPosition(getRule(2), 6)
+            }),
+            getState(7)
+        ));
+
+        //Branches
+        getState(0)
+            .addBranch(new Route(getState(1), new NonTerminal("statement list")))
+            .addBranch(new Route(getState(10), new NonTerminal("statement")))
+            .addBranch(new Route(getState(3), new Identifier("identifier")));
+        
+        getState(1)
+            .addBranch(new Route(getState(2), new NonTerminal("statement")))
+            .addBranch(new Route(getState(3), new Identifier("identifier")));
+        
+        getState(3)
+            .addBranch(new Route(getState(4), new Token("=")));
+        
+        getState(4)
+            .addBranch(new Route(getState(5), new NonTerminal("element")))
+            .addBranch(new Route(getState(8), new Identifier("identifier")))
+            .addBranch(new Route(getState(9), new Literal("number")));
+        
+        getState(5)
+            .addBranch(new Route(getState(6), new Token("+")));
+        
+        getState(6)
+            .addBranch(new Route(getState(7), new NonTerminal("element")))
+            .addBranch(new Route(getState(8), new Identifier("identifier")))
+            .addBranch(new Route(getState(9), new Literal("number")));
+        
+        getState(7)
+            .addBranch(new Route(getState(11), new Token(";")));
+    }
+    
+    @Override
     protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
         switch (type) {
             case LR0 -> lr0ActionTable(type, actionTable, endOfFile);
@@ -158,131 +283,6 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         currentGotoActions.put(new NonTerminal("element"), getState(7));
         gotoTable.put(getState(6), new HashMap<>(currentGotoActions));
         currentGotoActions.clear();
-    }
-
-    @Override
-    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
-        states.add(new State( //0
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(extraRootRule, 0),
-                new GrammarPosition(getRule(1), 0),
-                new GrammarPosition(getRule(0), 0),
-                new GrammarPosition(getRule(2), 0)
-            }),
-            null
-        ));
-
-        states.add(new State( //1
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(extraRootRule, 1),
-                new GrammarPosition(getRule(1), 1),
-                new GrammarPosition(getRule(2), 0)
-            }),
-            getState(0)
-        ));
-
-        states.add(new State( //2
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(1), 2),
-            }),
-            getState(1)
-        ));
-
-        states.add(new State( //3
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(2), 1),
-            }),
-            getState(1)
-        ));
-
-        states.add(new State( //4
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(2), 2),
-                new GrammarPosition(getRule(3), 0),
-                new GrammarPosition(getRule(4), 0)
-            }),
-            getState(3)
-        ));
-
-        states.add(new State( //5
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(2), 3)
-            }),
-            getState(4)
-        ));
-
-        states.add(new State( //6
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(2), 4),
-                new GrammarPosition(getRule(3), 0),
-                new GrammarPosition(getRule(4), 0)
-            }),
-            getState(5)
-        ));
-
-        states.add(new State( //7
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(2), 5)
-            }),
-            getState(6)
-        ));
-
-        states.add(new State( //8
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(3), 1)
-            }),
-            getState(6)
-        ));
-
-        states.add(new State( //9
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(4), 1)
-            }),
-            getState(6)
-        ));
-
-        states.add(new State( //10
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(0), 1)
-            }),
-            getState(0)
-        ));
-
-        states.add(new State( //11
-            Set.of(new GrammarPosition[] {
-                new GrammarPosition(getRule(2), 6)
-            }),
-            getState(7)
-        ));
-
-        //Branches
-        getState(0)
-            .addBranch(new Route(getState(1), new NonTerminal("statement list")))
-            .addBranch(new Route(getState(10), new NonTerminal("statement")))
-            .addBranch(new Route(getState(3), new Identifier("identifier")));
-        
-        getState(1)
-            .addBranch(new Route(getState(2), new NonTerminal("statement")))
-            .addBranch(new Route(getState(3), new Identifier("identifier")));
-        
-        getState(3)
-            .addBranch(new Route(getState(4), new Token("=")));
-        
-        getState(4)
-            .addBranch(new Route(getState(5), new NonTerminal("element")))
-            .addBranch(new Route(getState(8), new Identifier("identifier")))
-            .addBranch(new Route(getState(9), new Literal("number")));
-        
-        getState(5)
-            .addBranch(new Route(getState(6), new Token("+")));
-        
-        getState(6)
-            .addBranch(new Route(getState(7), new NonTerminal("element")))
-            .addBranch(new Route(getState(8), new Identifier("identifier")))
-            .addBranch(new Route(getState(9), new Literal("number")));
-        
-        getState(7)
-            .addBranch(new Route(getState(11), new Token(";")));
     }
 
     @Override

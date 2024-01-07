@@ -20,16 +20,6 @@ public class BasicCLR1TestGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
-        // Unimplemented
-    }
-
-    @Override
-    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
-        // Unimplemented
-    }
-
-    @Override
     protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
         states.add(new State( //0
             Set.of(new GrammarPosition[] {
@@ -152,6 +142,16 @@ public class BasicCLR1TestGrammar extends TestGrammar {
             .addBranch(new Route(getState(8), new NonTerminal("X")))
             .addBranch(new Route(getState(7), new Token("a")))
             .addBranch(new Route(getState(9), new Token("b")));
+    }
+
+    @Override
+    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        // Unimplemented
+    }
+
+    @Override
+    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
+        // Unimplemented
     }
 
     @Override

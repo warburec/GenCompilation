@@ -26,51 +26,6 @@ public class BasicSLR1TestGrammar extends TestGrammar {
     }
 
     @Override
-    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
-        Map<Token, Action> stateActions = actionTable.get(getState(0));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
-        stateActions.put(new Token("b"), new Shift(getState(6)));
-
-        //Accept EOF at state 1
-        stateActions = actionTable.get(getState(1));
-        stateActions.put(new EOF(), new Accept());
-
-        stateActions = actionTable.get(getState(2));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
-        stateActions.put(new Token("b"), new Shift(getState(6)));
-
-        stateActions = actionTable.get(getState(3));
-        stateActions.put(new EOF(), new Reduction(getRule(0)));
-
-        stateActions = actionTable.get(getState(4));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
-        stateActions.put(new Token("b"), new Shift(getState(6)));
-
-        stateActions = actionTable.get(getState(5));
-        stateActions.put(new Token("a"), new Reduction(getRule(1)));
-        stateActions.put(new Token("b"), new Reduction(getRule(1)));
-        stateActions.put(new EOF(), new Reduction(getRule(1)));
-
-        stateActions = actionTable.get(getState(6));
-        stateActions.put(new Token("a"), new Reduction(getRule(2)));
-        stateActions.put(new Token("b"), new Reduction(getRule(2)));
-        stateActions.put(new EOF(), new Reduction(getRule(2)));
-    }
-
-    @Override
-    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
-        Map<NonTerminal, State> currentGotoActions = gotoTable.get(getState(0));
-        currentGotoActions.put(new NonTerminal("S"), getState(1));
-        currentGotoActions.put(new NonTerminal("A"), getState(2));
-
-        currentGotoActions = gotoTable.get(getState(2));
-        currentGotoActions.put(new NonTerminal("A"), getState(3));
-
-        currentGotoActions = gotoTable.get(getState(4));
-        currentGotoActions.put(new NonTerminal("A"), getState(5));
-    }
-
-    @Override
     protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
         states.add(new State(
             Set.of(
@@ -134,6 +89,51 @@ public class BasicSLR1TestGrammar extends TestGrammar {
         getState(4).addBranch(new Route(getState(5), new NonTerminal("A")));
         getState(4).addBranch(new Route(getState(4), new Token("a")));
         getState(4).addBranch(new Route(getState(6), new Token("b")));
+    }
+    
+    @Override
+    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("a"), new Shift(getState(4)));
+        stateActions.put(new Token("b"), new Shift(getState(6)));
+
+        //Accept EOF at state 1
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new EOF(), new Accept());
+
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("a"), new Shift(getState(4)));
+        stateActions.put(new Token("b"), new Shift(getState(6)));
+
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new EOF(), new Reduction(getRule(0)));
+
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("a"), new Shift(getState(4)));
+        stateActions.put(new Token("b"), new Shift(getState(6)));
+
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new Token("a"), new Reduction(getRule(1)));
+        stateActions.put(new Token("b"), new Reduction(getRule(1)));
+        stateActions.put(new EOF(), new Reduction(getRule(1)));
+
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Token("a"), new Reduction(getRule(2)));
+        stateActions.put(new Token("b"), new Reduction(getRule(2)));
+        stateActions.put(new EOF(), new Reduction(getRule(2)));
+    }
+
+    @Override
+    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
+        Map<NonTerminal, State> currentGotoActions = gotoTable.get(getState(0));
+        currentGotoActions.put(new NonTerminal("S"), getState(1));
+        currentGotoActions.put(new NonTerminal("A"), getState(2));
+
+        currentGotoActions = gotoTable.get(getState(2));
+        currentGotoActions.put(new NonTerminal("A"), getState(3));
+
+        currentGotoActions = gotoTable.get(getState(4));
+        currentGotoActions.put(new NonTerminal("A"), getState(5));
     }
 
     //TODO: Make functions into observers (move this method to outside the implementations)
