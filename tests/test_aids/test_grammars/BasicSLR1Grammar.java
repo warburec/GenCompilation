@@ -1,13 +1,11 @@
-package tests.test_aids.grammar_generators;
+package tests.test_aids.test_grammars;
 
 import java.util.*;
 
 import code_generation.Generator;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
-import syntax_analysis.parsing.ParseState;
-import syntax_analysis.parsing.ReducedState;
-import syntax_analysis.parsing.ShiftedState;
+import syntax_analysis.parsing.*;
 
 /**
  * S –> AA    

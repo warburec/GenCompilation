@@ -1,4 +1,4 @@
-package tests.test_aids.grammar_generators;
+package tests.test_aids.test_grammars;
 
 import java.util.*;
 

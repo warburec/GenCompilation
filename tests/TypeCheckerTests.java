@@ -8,9 +8,10 @@ import org.junit.Test;
 
 import code_generation.*;
 import grammar_objects.ProductionRule;
+import grammars.basic_identifier.BasicIdentifierGrammar;
 import semantic_analysis.*;
 import syntax_analysis.parsing.ParseState;
-import tests.test_aids.grammar_generators.*;
+import tests.test_aids.test_grammars.*;
 
 public class TypeCheckerTests {
     

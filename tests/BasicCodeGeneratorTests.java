@@ -9,8 +9,11 @@ import org.junit.Test;
 import code_generation.*;
 import code_generation.BasicCodeGenerator.IncompleteReductionException;
 import grammar_objects.ProductionRule;
+import helperObjects.NullableTuple;
 import syntax_analysis.parsing.ParseState;
-import tests.test_aids.grammar_generators.*;
+import tests.test_aids.*;
+import tests.test_aids.test_grammars.*;
+import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
 
 public class BasicCodeGeneratorTests {
     
@@ -90,15 +93,15 @@ public class BasicCodeGeneratorTests {
 
     @Test
     public void XToYToXGeneration() {
-        LR0TestGrammar grammar = new BasicIdentifierGrammar();
+        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
         String sentence = "XToYToX";
         String language = "Java";
         Map<ProductionRule, Generator> ruleConvertor = grammar.getRuleConvertor(sentence, language);
-        String[] bookends = grammar.getGenerationBookends(sentence, language);
-        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor, bookends[0], bookends[1]);
+        NullableTuple<String, String> bookends = grammar.getGenerationBookends(sentence, language);
+        CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor, bookends.value1(), bookends.value2());
         ParseState rootParseState = grammar.getParseRoot(sentence);
 
-        String resultingCode = codeGenerator.generate(rootParseState);
+        String resultingCode = codeGenerator.generate(rootParseState); //TODO: FIx null being put in map instead of Generator
 
         String expectedCode = grammar.getGeneratedCode(sentence, language);
         assertEquals(expectedCode, resultingCode);

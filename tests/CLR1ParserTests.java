@@ -7,10 +7,12 @@ import java.util.*;
 import org.junit.Test;
 
 import grammar_objects.*;
+import grammars.basic_CLR1.BasicCLR1Grammar;
+import grammars.basic_identifier.BasicIdentifierGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
-import tests.test_aids.GrammarParts;
-import tests.test_aids.grammar_generators.*;
+import tests.test_aids.test_grammars.*;
+import tests.test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
 import syntax_analysis.*;
 
 public class CLR1ParserTests {
@@ -371,7 +373,7 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1Grammar() {
-        BasicCLR1Grammar grammar = new BasicCLR1Grammar();
+        BasicCLR1TestGrammar grammar = new BasicCLR1TestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -386,7 +388,7 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1BasicParsing() throws ParseFailedException {
-        BasicCLR1Grammar grammar = new BasicCLR1Grammar();
+        BasicCLR1TestGrammar grammar = new BasicCLR1TestGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),

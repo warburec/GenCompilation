@@ -1,5 +1,7 @@
 package tests.test_aids;
 
+import grammar_objects.GrammarParts;
+
 public class GrammarGenerator {
     
     public static GrammarParts generateParts(Grammar grammar) {

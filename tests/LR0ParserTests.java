@@ -7,10 +7,10 @@ import java.util.*;
 import org.junit.Test;
 
 import grammar_objects.*;
+import grammars.basic_identifier.BasicIdentifierGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
-import tests.test_aids.GrammarParts;
-import tests.test_aids.grammar_generators.*;
+import tests.test_aids.test_grammars.*;
 import syntax_analysis.*;
 
 public class LR0ParserTests {
