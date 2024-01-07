@@ -1,11 +1,14 @@
-package tests.test_aids.test_grammars;
+package tests.test_aids.test_grammars.small_grammar;
 
 import java.util.*;
 
-import code_generation.Generator;
 import grammar_objects.*;
+import grammars.small_grammar.SmallGrammar;
+import grammars.small_grammar.convertors.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import tests.test_aids.*;
+import tests.test_aids.test_grammars.*;
 
 /**
  * E->E+B
@@ -14,66 +17,19 @@ import syntax_analysis.parsing.*;
  * B->0
  * B->1
  */
-public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar {
+public class SmallTestGrammar extends TestGrammar {
 
-    @Override
-    protected  void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("0"));
-        tokens.add(new Token("1"));
-        tokens.add(new Token("*"));
-        tokens.add(new Token("+"));
+    public SmallTestGrammar(GrammarType type) {
+        super(type);
     }
 
     @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("E");
+    protected Grammar setUpGrammar(GrammarType type) {
+        return new SmallGrammar();
     }
 
     @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("E"));
-        nonTerminals.add(new NonTerminal("B"));
-    }
-
-    @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(new ProductionRule(
-            new NonTerminal("E"),
-            new LexicalElement[] {
-                new NonTerminal("E"),
-                new Token("+"),
-                new NonTerminal("B")
-            }));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("E"),
-            new LexicalElement[] {
-                new NonTerminal("E"),
-                new Token("*"),
-                new NonTerminal("B")
-            }));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("E"),
-            new LexicalElement[] {
-                new NonTerminal("B")
-            }));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("B"),
-            new LexicalElement[] {
-                new Token("0")
-            }));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("B"),
-            new LexicalElement[] {
-                new Token("1")
-            }));
-    }
-
-    @Override
-    protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
+    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
         states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
@@ -176,9 +132,19 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
     }
 
     @Override
-    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        switch (type) {
+            case LR0 -> lr0ActionTable(type, actionTable, endOfFile);
+            case SLR1 -> slr1ActionTable(type, actionTable, endOfFile);
+            case CLR1 -> { /* Unimplemented */ }
+            
+            default -> throw new UnsupportedGrammarException(type);
+        }
+    }
+
+    private void lr0ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
         List<Token> allTokens = new ArrayList<>();
-        allTokens.addAll(tokens);
+        allTokens.addAll(grammar.getParts().tokens());
         allTokens.add(endOfFile);
 
         Map<Token, Action> stateActions = actionTable.get(getState(0));
@@ -224,8 +190,52 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
         }
     }
 
+    private void slr1ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Token("*"), new Shift(getState(2)));
+        stateActions.put(new Token("+"), new Shift(getState(4)));
+        stateActions.put(new EOF(), new Accept());
+        
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+        
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new Token("+"), new Reduction(getRule(1)));
+        stateActions.put(new Token("*"), new Reduction(getRule(1)));
+        stateActions.put(new EOF(), new Reduction(getRule(1)));
+        
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Token("0"), new Shift(getState(7)));
+        stateActions.put(new Token("1"), new Shift(getState(8)));
+        
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new Token("+"), new Reduction(getRule(0)));
+        stateActions.put(new Token("*"), new Reduction(getRule(0)));
+        stateActions.put(new EOF(), new Reduction(getRule(0)));
+        
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Token("+"), new Reduction(getRule(2)));
+        stateActions.put(new Token("*"), new Reduction(getRule(2)));
+        stateActions.put(new EOF(), new Reduction(getRule(2)));
+
+        stateActions = actionTable.get(getState(7));
+        stateActions.put(new Token("+"), new Reduction(getRule(3)));
+        stateActions.put(new Token("*"), new Reduction(getRule(3)));
+        stateActions.put(new EOF(), new Reduction(getRule(3)));
+
+        stateActions = actionTable.get(getState(8));
+        stateActions.put(new Token("+"), new Reduction(getRule(4)));
+        stateActions.put(new Token("*"), new Reduction(getRule(4)));
+        stateActions.put(new EOF(), new Reduction(getRule(4)));
+    }
+
     @Override
-    protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
+    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
         Map<NonTerminal, State> currentGotoActions = new HashMap<>();
 
         currentGotoActions.put(new NonTerminal("E"), getState(1));
@@ -242,24 +252,16 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
         currentGotoActions.clear();
     }
 
-
+    @Override
     public ParseState getParseRoot(String sentence) {
-        switch(sentence) {
-            case "1+0*1":
-                return parseTree0();
+        return switch(sentence) {
+            case "1+0*1" -> parseTree0();
+            case "1" -> parseTree1();
+            case "emptyReduce" -> parseTree2();
+            case "1+0*1MissingReduction" -> parseTree3();
             
-            case "1":
-                return parseTree1();
-            
-            case "emptyReduce":
-                return parseTree2();
-
-            case "1+0*1MissingReduction":
-                return parseTree3();
-            
-            default:
-                throw new UnsupportedSentenceException("parse tree", sentence);
-        }
+            default -> throw new UnsupportedSentenceException("parse tree", sentence);
+        };
     }
 
     /**
@@ -383,105 +385,23 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
     }
 
     @Override
-    protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
-        generationBookendMap.put("Java", new HashMap<>());
-        generationBookendMap.get("Java").put("1+0*1", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-        generationBookendMap.get("Java").put("1", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-        generationBookendMap.get("Java").put("emptyReduce", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-        generationBookendMap.get("Java").put("1+0*1MissingReduction", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n" +
-            "\t\tSystem.out.println(",
-
-            ");\n" +
-            "\t}\n" +
-            "}"
-        });
-
-        generationBookendMap.put("C", new HashMap<>());
-        generationBookendMap.get("C").put("1+0*1", new String[] {
-            "#include <stdio.h>\n" +
-            "\n" +  
-            "main()\n" +
-            "\tprintf(",
-
-            ");\n" +
-            "}"
-        });
-    }
-
-    @Override
-    protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
+    protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
         ruleConvertorMap.put("Java", new HashMap<>());
 
-        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
-        ruleConvertorMap.get("Java").put("1+0*1", ruleConvertor);
-
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
-        ruleConvertorMap.get("Java").put("1", ruleConvertor);
-
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
-        ruleConvertorMap.get("Java").put("emptyReduce", ruleConvertor);
-
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
-        ruleConvertorMap.get("Java").put("1+0*1MissingReduction", ruleConvertor);
-
+        ruleConvertorMap.get("Java").put("1+0*1", new OpZtO());
+        ruleConvertorMap.get("Java").put("1", new One());
+        ruleConvertorMap.get("Java").put("emptyReduce", new EmptyReduce());
+        ruleConvertorMap.get("Java").put("1+0*1MissingReduction", new OpZtOMissingReduction());
 
         ruleConvertorMap.put("C", new HashMap<>());
 
-        ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConvertor.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConvertor.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConvertor.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
-        ruleConvertorMap.get("C").put("1+0*1", ruleConvertor);
+        ruleConvertorMap.get("C").put("1+0*1", new COpZtO());
     }
 
     @Override
-    protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
+    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
         codeGenerations.put("Java", new HashMap<>());
+
         codeGenerations.get("Java").put("1+0*1",
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
@@ -512,6 +432,7 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
         );
 
         codeGenerations.put("C", new HashMap<>());
+
         codeGenerations.get("C").put("1+0*1",
             "#include <stdio.h>\n" +
             "\n" +  
@@ -519,58 +440,6 @@ public class SmallTestGrammar extends LR0TestGrammar implements SLR1TestGrammar 
             "\tprintf(1 + 0 * 1);\n" +
             "}"
         );
-    }
-
-    @Override
-    public Map<State, Map<Token, Action>> getSLR1ActionTable() {
-        Map<State, Map<Token, Action>> actionTable = new HashMap<>();
-        for (State state : getStates()) {
-            actionTable.put(state, new HashMap<>());
-        }
-
-        Map<Token, Action> stateActions = actionTable.get(getState(0));
-        stateActions.put(new Token("0"), new Shift(getState(7)));
-        stateActions.put(new Token("1"), new Shift(getState(8)));
-
-        stateActions = actionTable.get(getState(1));
-        stateActions.put(new Token("*"), new Shift(getState(2)));
-        stateActions.put(new Token("+"), new Shift(getState(4)));
-        stateActions.put(new EOF(), new Accept());
-        
-        stateActions = actionTable.get(getState(2));
-        stateActions.put(new Token("0"), new Shift(getState(7)));
-        stateActions.put(new Token("1"), new Shift(getState(8)));
-        
-        stateActions = actionTable.get(getState(3));
-        stateActions.put(new Token("+"), new Reduction(getRule(1)));
-        stateActions.put(new Token("*"), new Reduction(getRule(1)));
-        stateActions.put(new EOF(), new Reduction(getRule(1)));
-        
-        stateActions = actionTable.get(getState(4));
-        stateActions.put(new Token("0"), new Shift(getState(7)));
-        stateActions.put(new Token("1"), new Shift(getState(8)));
-        
-        stateActions = actionTable.get(getState(5));
-        stateActions.put(new Token("+"), new Reduction(getRule(0)));
-        stateActions.put(new Token("*"), new Reduction(getRule(0)));
-        stateActions.put(new EOF(), new Reduction(getRule(0)));
-        
-        stateActions = actionTable.get(getState(6));
-        stateActions.put(new Token("+"), new Reduction(getRule(2)));
-        stateActions.put(new Token("*"), new Reduction(getRule(2)));
-        stateActions.put(new EOF(), new Reduction(getRule(2)));
-
-        stateActions = actionTable.get(getState(7));
-        stateActions.put(new Token("+"), new Reduction(getRule(3)));
-        stateActions.put(new Token("*"), new Reduction(getRule(3)));
-        stateActions.put(new EOF(), new Reduction(getRule(3)));
-
-        stateActions = actionTable.get(getState(8));
-        stateActions.put(new Token("+"), new Reduction(getRule(4)));
-        stateActions.put(new Token("*"), new Reduction(getRule(4)));
-        stateActions.put(new EOF(), new Reduction(getRule(4)));
-
-        return actionTable;
     }
 
 }

@@ -27,7 +27,7 @@ public class XToYToX extends RuleConvertor {
     }
 
     @Override
-    protected void setUpRuleConvertors(Grammar grammar, Map<ProductionRule, Generator> ruleConversions) { //TODO: Null being added instead of lambdas?
+    protected void setUpRuleConvertors(Grammar grammar, Map<ProductionRule, Generator> ruleConversions) {
         ruleConversions.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
         ruleConversions.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
         ruleConversions.put(getRule(2), (elements) -> {
