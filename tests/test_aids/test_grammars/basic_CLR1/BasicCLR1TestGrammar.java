@@ -1,88 +1,26 @@
-package tests.test_aids.grammar_generators;
+package tests.test_aids.test_grammars.basic_CLR1;
 
 import java.util.*;
 
-import code_generation.Generator;
 import grammar_objects.*;
+import grammars.basic_CLR1.BasicCLR1Grammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
+import tests.test_aids.*;
 
-public class BasicCLR1Grammar extends Grammar implements CLR1TestGrammar {
+public class BasicCLR1TestGrammar extends TestGrammar {
 
-    @Override
-    protected void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("a"));
-        tokens.add(new Token("b"));
+    public BasicCLR1TestGrammar(GrammarType type) {
+        super(type);
     }
 
     @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("S");
+    protected Grammar setUpGrammar(GrammarType type) {
+        return new BasicCLR1Grammar();
     }
 
     @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("S"));
-        nonTerminals.add(new NonTerminal("X"));
-    }
-
-    @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(new ProductionRule(
-            new NonTerminal("S"), 
-            new LexicalElement[] {
-                new NonTerminal("X"),
-                new NonTerminal("X")
-            }
-        ));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("X"),
-            new LexicalElement[] {
-                new Token("a"),
-                new NonTerminal("X")
-            }
-        ));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("X"),
-            new LexicalElement[] {
-                new Token("b")
-            }
-        ));
-    }
-
-    @Override
-    protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
-        setUpCLR1States(states, extraRootRule);
-    }
-
-
-    @Override
-    public Map<State, Map<Token, Action>> getCLR1ActionTable() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCLR1ActionTable'");
-    }
-
-    @Override
-    public Map<State, Map<NonTerminal, State>> getGotoTable() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getGotoTable'");
-    }
-
-    @Override
-    public ParseState getParseRoot(String sentence) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
-    }
-
-    @Override
-    public Set<State> getCLR1States() {
-        return new HashSet<>(getStates());
-    }
-
-    @Override
-    public void setUpCLR1States(List<State> states, ProductionRule extraRootRule) {
+    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
         states.add(new State( //0
             Set.of(new GrammarPosition[] {
                 new CLR1Position(extraRootRule, 0, Set.of(new EOF())),
@@ -205,15 +143,30 @@ public class BasicCLR1Grammar extends Grammar implements CLR1TestGrammar {
             .addBranch(new Route(getState(7), new Token("a")))
             .addBranch(new Route(getState(9), new Token("b")));
     }
+
+    @Override
+    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        // Unimplemented
+    }
+
+    @Override
+    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
+        // Unimplemented
+    }
+
+    @Override
+    protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
+        // Unimplemented
+    }
     
+    @Override
+    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
+        // Unimplemented
+    }
 
     @Override
-    protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {}
-
-    @Override
-    protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {}
-
-    @Override
-    protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {}
+    public ParseState getParseRoot(String sentence) {
+        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
+    }
 
 }

@@ -1,12 +1,14 @@
-package tests.test_aids.grammar_generators;
+package tests.test_aids.test_grammars.basic_identifier;
 
 import java.util.*;
 
-import code_generation.*;
 import grammar_objects.*;
-import semantic_analysis.*;
+import grammars.basic_identifier.BasicIdentifierGrammar;
+import grammars.basic_identifier.convertors.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import tests.test_aids.*;
+import tests.test_aids.test_grammars.*;
 
 /**
  * <statement list> := <statement> |
@@ -14,82 +16,19 @@ import syntax_analysis.parsing.*;
  * <statement> := identifier = <element> + <element>;
  * <element> := identifier | number
  */
-public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGrammar{
+public class BasicIdentifierTestGrammar extends TestGrammar {
 
-    Map<String, Map<String, Map<ProductionRule, Generator>>> semanticRuleConvertorMap = new HashMap<>();
-
-    public BasicIdentifierGrammar() {
-        super();
-    }
-
-    public BasicIdentifierGrammar(SemanticAnalyser semanticAnalyser) {
-        super();
-
-        setUpSemanticRuleConvertors(semanticRuleConvertorMap, semanticAnalyser);
+    public BasicIdentifierTestGrammar(GrammarType type) {
+        super(type);
     }
 
     @Override
-    protected void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("="));
-        tokens.add(new Token("+"));
-        tokens.add(new Token(";"));
-        tokens.add(new Identifier("identifier"));
-        tokens.add(new Literal("number"));
+    protected Grammar setUpGrammar(GrammarType type) {
+        return new BasicIdentifierGrammar();
     }
 
     @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("statement list");
-    }
-
-    @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("statement list"));
-        nonTerminals.add(new NonTerminal("statement"));
-        nonTerminals.add(new NonTerminal("element"));
-    }
-
-    @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(new ProductionRule(
-            new NonTerminal("statement list"),
-            new LexicalElement[] {
-                new NonTerminal("statement")
-            }));
-        
-        productionRules.add(new ProductionRule(
-            new NonTerminal("statement list"),
-            new LexicalElement[] {
-                new NonTerminal("statement list"),
-                new NonTerminal("statement")
-            }));
-        
-        productionRules.add(new ProductionRule(
-            new NonTerminal("statement"),
-            new LexicalElement[] {
-                new Identifier("identifier"),
-                new Token("="),
-                new NonTerminal("element"),
-                new Token("+"),
-                new NonTerminal("element"),
-                new Token(";")
-            }));
-
-        productionRules.add(new ProductionRule(
-            new NonTerminal("element"),
-            new LexicalElement[] {
-                new Identifier("identifier")
-            }));
-        
-        productionRules.add(new ProductionRule(
-            new NonTerminal("element"),
-            new LexicalElement[] {
-                new Literal("number")
-            }));
-    }
-
-    @Override
-    protected void setUpStates(List<State> states, ProductionRule extraRootRule) {
+    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
         states.add(new State( //0
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
@@ -212,11 +151,20 @@ public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGr
         getState(7)
             .addBranch(new Route(getState(11), new Token(";")));
     }
-
+    
     @Override
-    protected void setUpActionTable(Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        switch (type) {
+            case LR0 -> lr0ActionTable(type, actionTable, endOfFile);
+            case SLR1 -> slr1ActionTable(type, actionTable, endOfFile);
+            
+            default -> throw new UnsupportedGrammarException(type);
+        }
+    }
+    
+    private void lr0ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
         List<Token> allTokens = new ArrayList<>();
-        allTokens.addAll(tokens);
+        allTokens.addAll(grammar.getParts().tokens());
         allTokens.add(endOfFile);
 
         Map<Token, Action> stateActions = actionTable.get(getState(0));
@@ -269,10 +217,56 @@ public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGr
         }
     }
 
-    @Override
-    protected void setUpGotoTable(Map<State, Map<NonTerminal, State>> gotoTable) {
-        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+    private void slr1ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+        Map<Token, Action> stateActions = actionTable.get(getState(0));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
 
+        stateActions = actionTable.get(getState(1));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
+        stateActions.put(endOfFile, new Accept());
+
+        stateActions = actionTable.get(getState(2));
+        stateActions.put(new Identifier("identifier"), new Reduction(getRule(1)));
+        stateActions.put(endOfFile, new Reduction(getRule(1)));
+
+        stateActions = actionTable.get(getState(3));
+        stateActions.put(new Token("="), new Shift(getState(4)));
+
+        stateActions = actionTable.get(getState(4));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
+        stateActions.put(new Literal("number"), new Shift(getState(9)));
+
+        stateActions = actionTable.get(getState(5));
+        stateActions.put(new Token("+"), new Shift(getState(6)));
+
+        stateActions = actionTable.get(getState(6));
+        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
+        stateActions.put(new Literal("number"), new Shift(getState(9)));
+
+        stateActions = actionTable.get(getState(7));
+        stateActions.put(new Token(";"),new Shift( getState(11)));
+
+        stateActions = actionTable.get(getState(8));
+        stateActions.put(new Token("+"), new Reduction(getRule(3)));
+        stateActions.put(new Token(";"), new Reduction(getRule(3)));
+
+        stateActions = actionTable.get(getState(9));
+        stateActions.put(new Token("+"), new Reduction(getRule(4)));
+        stateActions.put(new Token(";"), new Reduction(getRule(4)));
+
+        stateActions = actionTable.get(getState(10));
+        stateActions.put(new Identifier("identifier"), new Reduction(getRule(0)));
+        stateActions.put(endOfFile, new Reduction(getRule(0)));
+
+        stateActions = actionTable.get(getState(11));
+        stateActions.put(new Identifier("identifier"), new Reduction(getRule(2)));
+        stateActions.put(endOfFile, new Reduction(getRule(2)));
+    }
+
+    @Override
+    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
+        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+        
         currentGotoActions.put(new NonTerminal("statement list"), getState(1));
         currentGotoActions.put(new NonTerminal("statement"), getState(10));
         gotoTable.put(getState(0), new HashMap<>(currentGotoActions));
@@ -291,9 +285,8 @@ public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGr
         currentGotoActions.clear();
     }
 
-
     @Override
-    public ParseState getParseRoot(String sentence) {
+    public ParseState getParseRoot(String sentence) { //TODO: Where to put?
         switch(sentence) {
             case "XToYToX":
                 return parseTree0();
@@ -492,92 +485,18 @@ public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGr
         return parseStates.get(parseStates.size() - 1);
     }
 
-
     @Override
-    protected void setUpGenerationBookends(Map<String, Map<String, String[]>> generationBookendMap) {
-        generationBookendMap.put("Java", new HashMap<>());
-        generationBookendMap.get("Java").put("XToYToX", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n",
-
-            "\t\tSystem.out.println(x);\n" +
-            "\t}\n" +
-            "}"
-        });
-
-        generationBookendMap.get("Java").put("XToYToXSemantic", new String[] {
-            "public class TestGrammar {\n" +
-            "\tpublic static void main(String[] args) {\n",
-
-            "\t\tSystem.out.println(x);\n" +
-            "\t}\n" +
-            "}"
-        });
-    }
-
-    @Override
-    protected void setUpRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap) {
+    protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
         ruleConvertorMap.put("Java", new HashMap<>());
 
-        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
-        ruleConvertor.put(getRule(2), (elements) -> {
-            return "\t\t" + elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration() + " " + 
-            elements[3].getGeneration() + " " + elements[4].getGeneration() + elements[5].getGeneration() + "\n"; 
-        });  //<statement> := identifier = <element> + <element>;
-        ruleConvertor.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
-        ruleConvertor.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
-        ruleConvertorMap.get("Java").put("XToYToX", ruleConvertor);
-    }
-
-
-    protected void setUpSemanticRuleConvertors(Map<String, Map<String, Map<ProductionRule, Generator>>> ruleConvertorMap, SemanticAnalyser semanticAnalyser) {
-        ruleConvertorMap.put("Java", new HashMap<>());
-
-        TypeChecker typeChecker = (TypeChecker)semanticAnalyser;
-        HashMap<ProductionRule, Generator> ruleConvertor = new HashMap<>();
-        ruleConvertor.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
-        ruleConvertor.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
-        ruleConvertor.put(getRule(2), (elements) -> {
-            String identifierType = "";
-            IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
-            if(!typeChecker.isDeclared(identifier)) {
-                identifierType = identifier.getType() + " ";
-                typeChecker.declare(identifier);
-            }
-
-            return "\t\t" + identifierType + elements[0].getGeneration() + " " + 
-            elements[1].getGeneration() + " " + elements[2].getGeneration() + " " + 
-            elements[3].getGeneration() + " " + elements[4].getGeneration() + 
-            elements[5].getGeneration() + "\n"; 
-        });  //<statement> := identifier = <element> + <element>;
-        ruleConvertor.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
-        ruleConvertor.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
-        ruleConvertorMap.get("Java").put("XToYToXSemantic", ruleConvertor);
+        ruleConvertorMap.get("Java").put("XToYToX", new XToYToX());
+        ruleConvertorMap.get("Java").put("XToYToXSemantic", new XToXToYSemantic());
     }
     
-    public Map<ProductionRule, Generator> getSemanticRuleConvertor(String sentence, String language) {
-        Map<ProductionRule, Generator> ruleConvertor = null;
-
-        try {
-            ruleConvertor = semanticRuleConvertorMap.get(language).get(sentence);
-        }
-        catch (NullPointerException e) {
-            throw new UnsupportedSentenceException("langage and rule convertor", sentence);
-        }
-
-        if(ruleConvertor == null) {
-            throw new UnsupportedSentenceException("rule convertor", sentence);
-        }
-
-        return ruleConvertor;
-    }
-
-
     @Override
-    protected void setUpCodeGenerations(Map<String, Map<String, String>> codeGenerations) {
+    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
         codeGenerations.put("Java", new HashMap<>());
+
         codeGenerations.get("Java").put("XToYToX",
             "public class TestGrammar {\n" +
             "\tpublic static void main(String[] args) {\n" +
@@ -599,60 +518,6 @@ public class BasicIdentifierGrammar extends LR0TestGrammar implements SLR1TestGr
             "\t}\n" +
             "}"
         );
-    }
-
-    @Override
-    public Map<State, Map<Token, Action>> getSLR1ActionTable() {
-        Map<State, Map<Token, Action>> actionTable = new HashMap<>();
-        for (State state : getStates()) {
-            actionTable.put(state, new HashMap<>());
-        }
-
-        Map<Token, Action> stateActions = actionTable.get(getState(0));
-        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
-
-        stateActions = actionTable.get(getState(1));
-        stateActions.put(new Identifier("identifier"), new Shift(getState(3)));
-        stateActions.put(new EOF(), new Accept());
-
-        stateActions = actionTable.get(getState(2));
-        stateActions.put(new Identifier("identifier"), new Reduction(getRule(1)));
-        stateActions.put(new EOF(), new Reduction(getRule(1)));
-
-        stateActions = actionTable.get(getState(3));
-        stateActions.put(new Token("="), new Shift(getState(4)));
-
-        stateActions = actionTable.get(getState(4));
-        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
-        stateActions.put(new Literal("number"), new Shift(getState(9)));
-
-        stateActions = actionTable.get(getState(5));
-        stateActions.put(new Token("+"), new Shift(getState(6)));
-
-        stateActions = actionTable.get(getState(6));
-        stateActions.put(new Identifier("identifier"), new Shift(getState(8)));
-        stateActions.put(new Literal("number"), new Shift(getState(9)));
-
-        stateActions = actionTable.get(getState(7));
-        stateActions.put(new Token(";"),new Shift( getState(11)));
-
-        stateActions = actionTable.get(getState(8));
-        stateActions.put(new Token("+"), new Reduction(getRule(3)));
-        stateActions.put(new Token(";"), new Reduction(getRule(3)));
-
-        stateActions = actionTable.get(getState(9));
-        stateActions.put(new Token("+"), new Reduction(getRule(4)));
-        stateActions.put(new Token(";"), new Reduction(getRule(4)));
-
-        stateActions = actionTable.get(getState(10));
-        stateActions.put(new Identifier("identifier"), new Reduction(getRule(0)));
-        stateActions.put(new EOF(), new Reduction(getRule(0)));
-
-        stateActions = actionTable.get(getState(11));
-        stateActions.put(new Identifier("identifier"), new Reduction(getRule(2)));
-        stateActions.put(new EOF(), new Reduction(getRule(2)));
-
-        return actionTable;
     }
 
 }
