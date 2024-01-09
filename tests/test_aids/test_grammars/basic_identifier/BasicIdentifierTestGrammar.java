@@ -298,6 +298,12 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         }
     }
 
+    @Override
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        parseRootMap.put("XToYToX", () -> parseTree0());
+        parseRootMap.put("XToYToXSemantic", () -> parseTree0());
+    }
+
     /**
      * Parse tree for the sentence "XToYToX"
      * @return The root ParseState of the tree

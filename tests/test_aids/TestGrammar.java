@@ -19,7 +19,12 @@ public abstract class TestGrammar { //TODO allow implementation of grammar inter
     private Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
     private Map<String, Map<String, RuleConvertor>> ruleConvertorMap = new HashMap<>(); //Language, <Sentence, RuleConvertor>
     private Map<String, Map<String, String>> codeGenerations = new HashMap<>();         //Language, <Sentence, Code>
+    private Map<String, ParseTreeBuilder> parseRootMap = new HashMap<>();
     
+    protected interface ParseTreeBuilder {
+        public ParseState buildTree();
+    }
+
     public TestGrammar(GrammarType type) {
         grammar = setUpGrammar(type);
 
@@ -37,6 +42,8 @@ public abstract class TestGrammar { //TODO allow implementation of grammar inter
 
         setUpActionTable(type, actionTable, new EOF());
         setUpGotoTable(type, gotoTable);
+
+        setUpParseTrees(parseRootMap);
 
         setUpRuleConvertors(type, ruleConvertorMap);
         setUpCodeGenerations(type, codeGenerations);
@@ -58,6 +65,11 @@ public abstract class TestGrammar { //TODO allow implementation of grammar inter
      * @param gotoTable The goto table to be populated
      */
     protected abstract void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable);
+    /**
+     * Sets up the parse trees for sentences supported by this TestGrammar
+     * @param parseRootMap A map of sentence name and the builder function for its parse tree
+     */
+    protected abstract void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap);
     protected abstract void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap);
     protected abstract void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations);
 
@@ -82,19 +94,27 @@ public abstract class TestGrammar { //TODO allow implementation of grammar inter
         return states.get(index);
     }
 
-    /**
-     * Gets the root parse state (and contained parse tree) for a given sentence
-     * @param sentence The sentence to be parsed
-     * @return The root ParseState of the parse tree
-     */
-    public abstract ParseState getParseRoot(String sentence); //TODO: Consider reworking
-
     public Map<State, Map<Token, Action>> getActionTable() {
         return actionTable;
     }
 
     public Map<State, Map<NonTerminal, State>> getGotoTable() {
         return gotoTable;
+    }
+
+    /**
+     * Gets the root parse state (and contained parse tree) for a given sentence
+     * @param sentence The sentence to be parsed
+     * @return The root ParseState of the parse tree
+     */
+    public ParseState getParseRoot(String sentence) { //TODO: Make dependent on grammar type
+        ParseState root = parseRootMap.get(sentence).buildTree();
+
+        if(root == null) {
+            throw new UnsupportedSentenceException("parse root", sentence);
+        }
+
+        return root;
     }
 
     public NullableTuple<String, String> getGenerationBookends(String sentence, String language) {

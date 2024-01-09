@@ -7,7 +7,6 @@ import grammars.basic_SLR1.BasicSLR1Grammar;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import tests.test_aids.*;
-import tests.test_aids.test_grammars.UnsupportedSentenceException;
 
 /**
  * S –> AA    
@@ -136,18 +135,11 @@ public class BasicSLR1TestGrammar extends TestGrammar {
         currentGotoActions.put(new NonTerminal("A"), getState(5));
     }
 
-    //TODO: Make functions into observers (move this method to outside the implementations)
     @Override
-    public ParseState getParseRoot(String sentence) {
-        switch(sentence) {
-            case "CompleteSentence":
-                return completeSentenceParse();
-            
-            default:
-                throw new UnsupportedSentenceException("parse tree", sentence);
-        }
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        parseRootMap.put("CompleteSentence", () -> completeSentenceParse());
     }
-
+    
      /**
      * Parse tree for the sentence "CompleteSentence"
      * @return The root ParseState of the tree

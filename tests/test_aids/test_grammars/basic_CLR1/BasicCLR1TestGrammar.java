@@ -155,6 +155,11 @@ public class BasicCLR1TestGrammar extends TestGrammar {
     }
 
     @Override
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        // Unimplemented
+    }
+
+    @Override
     protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
         // Unimplemented
     }
@@ -162,11 +167,6 @@ public class BasicCLR1TestGrammar extends TestGrammar {
     @Override
     protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
         // Unimplemented
-    }
-
-    @Override
-    public ParseState getParseRoot(String sentence) {
-        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
     }
 
 }

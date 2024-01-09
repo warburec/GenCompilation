@@ -336,8 +336,8 @@ public class SelfReferentialTestGrammar extends TestGrammar {
     }
 
     @Override
-    public ParseState getParseRoot(String sentence) {
-        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        // Unimplemented
     }
 
     @Override

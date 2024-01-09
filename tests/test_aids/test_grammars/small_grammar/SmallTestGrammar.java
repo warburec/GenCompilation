@@ -253,15 +253,11 @@ public class SmallTestGrammar extends TestGrammar {
     }
 
     @Override
-    public ParseState getParseRoot(String sentence) {
-        return switch(sentence) {
-            case "1+0*1" -> parseTree0();
-            case "1" -> parseTree1();
-            case "emptyReduce" -> parseTree2();
-            case "1+0*1MissingReduction" -> parseTree3();
-            
-            default -> throw new UnsupportedSentenceException("parse tree", sentence);
-        };
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        parseRootMap.put("1+0*1", () -> parseTree0());
+        parseRootMap.put("1", () -> parseTree1());
+        parseRootMap.put("emptyReduce", () -> parseTree2());
+        parseRootMap.put("1+0*1MissingReduction", () -> parseTree3());
     }
 
     /**
