@@ -5,7 +5,6 @@ import java.util.*;
 import grammar_objects.*;
 import grammars.self_referential.SelfReferentialGrammar;
 import syntax_analysis.grammar_structure_creation.*;
-import syntax_analysis.parsing.ParseState;
 import tests.test_aids.*;
 import tests.test_aids.test_grammars.UnsupportedGrammarException;
 
@@ -336,8 +335,8 @@ public class SelfReferentialTestGrammar extends TestGrammar {
     }
 
     @Override
-    public ParseState getParseRoot(String sentence) {
-        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        // Unimplemented
     }
 
     @Override

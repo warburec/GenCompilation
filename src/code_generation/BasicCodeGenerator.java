@@ -6,7 +6,7 @@ import grammar_objects.*;
 import helperObjects.NullableTuple;
 import syntax_analysis.parsing.*;
 
-public class BasicCodeGenerator implements CodeGenerator { //TODO: Rework to use RuleConvertor
+public class BasicCodeGenerator implements CodeGenerator {
     public static ProductionRule ROOT_RULE = null;
 
     protected Map<ProductionRule, Generator> ruleConvertor;

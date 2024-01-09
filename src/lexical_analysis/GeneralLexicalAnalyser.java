@@ -18,7 +18,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     private String[] whitespaceDelimiters;
     private String[] stronglyReservedWords;
     private String[] weaklyReservedWords;
-    private Map<Pattern, NotEmptyTuple<String, String>> dynamicTokenRegex;
+    private Map<Pattern, NotEmptyTuple<Class<? extends Token>, String>> dynamicTokenRegex;
 
     private Map<String, List<Integer>> whitespaceNewlinePositions;
     private Map<String, List<Integer>> stronglyReservedWordNewlinePositions;
@@ -36,13 +36,13 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
      *  @param whitespaceDelimiters All string to be considered as whitespace (Will not be tokenised)
      *  @param stronglyReservedWords Words that cannot be part of any user-definable token bookends (start and end). Examples: operators, punctuation, etc. (Not including whitespace)
      *  @param weaklyReservedWords Words that will be tokenised if they do not appear as part of a user-definable token
-     *  @param dynamicTokenRegex The regex for dynamic tokens (including identifiers and literals) along with a tuple of the class name and grammatical name of each token. Note: All potential token sets from the regex must be mutually exclusive
+     *  @param dynamicTokenRegex The regex objects for dynamic tokens (including identifiers and literals). Note: All potential token sets from the regex must be mutually exclusive
     */
     public GeneralLexicalAnalyser(
         String[] whitespaceDelimiters,
         String[] stronglyReservedWords,
         String[] weaklyReservedWords,
-        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex //TODO: Try passing in classes directly or use enum
+        DynamicTokenRegex[] dynamicTokenRegex
         ) {
         initialise(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords, dynamicTokenRegex);
     }
@@ -64,13 +64,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] stronglyReservedWords,
         String[] weaklyReservedWords
         ) {
-        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex = new HashMap<>();
-        dynamicTokenRegex.put("[a-zA-Z].*", new NotEmptyTuple<String, String>("Identifier", "identifier"));
-        dynamicTokenRegex.put("\".*\"", new NotEmptyTuple<String, String>("Literal", "string"));
-        dynamicTokenRegex.put("[0-9]+", new NotEmptyTuple<String, String>("Literal", "integer"));
-        dynamicTokenRegex.put("[0-9]\\.[0-9]+", new NotEmptyTuple<String, String>("Literal", "real"));
-        dynamicTokenRegex.put("[true|false]", new NotEmptyTuple<String, String>("Literal", "boolean"));
-        dynamicTokenRegex.put("\'.\'", new NotEmptyTuple<String, String>("Literal", "character"));
+        DynamicTokenRegex[] dynamicTokenRegex = {
+            new DynamicTokenRegex("[a-zA-Z].*", Identifier.class, "identifier"),
+            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
+            new DynamicTokenRegex("[0-9]+", Literal.class, "integer"),
+            new DynamicTokenRegex("[0-9]\\.[0-9]+", Literal.class, "real"),
+            new DynamicTokenRegex("[true|false]", Literal.class, "boolean"),
+            new DynamicTokenRegex("\'.\'", Literal.class, "character")
+        };
 
         initialise(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords, dynamicTokenRegex);
     }
@@ -79,7 +80,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] whitespaceDelimiters,
         String[] stronglyReservedWords,
         String[] weaklyReservedWords,
-        Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex
+        DynamicTokenRegex[] dynamicTokenRegex
         ) {
         this.whitespaceDelimiters = whitespaceDelimiters;
 
@@ -116,32 +117,31 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
     }
 
-    private void preprocessDynamicTokenRegex(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegex) {
+    private void preprocessDynamicTokenRegex(DynamicTokenRegex[] dynamicTokenRegex) {
         //TODO: User-definables/dynamic tokens must have mutually exclusive regex
 
         RegexFeatureChecker featureChecker = new RegexFeatureChecker();
         dynamicRegexBookends = new DynamicRegexBookends();
 
-        for (String regex : dynamicTokenRegex.keySet()) {
-            Tuple<String, String> bookends = featureChecker.produceBookends(regex);
+        for (DynamicTokenRegex regex : dynamicTokenRegex) {
+            Tuple<String, String> bookends = featureChecker.produceBookends(regex.regex());
             if(bookends == null) { continue; }
 
-            Tuple<String, String> tokenDetails = dynamicTokenRegex.get(regex);
             dynamicRegexBookends.addBookends(
                 bookends.value1(), 
                 bookends.value2(),
-                tokenDetails.value1(),
-                tokenDetails.value2()
+                regex.classType(),
+                regex.grammaticalName()
             );
         }
     }
 
-    private void generateDynamicRegexPatterns(Map<String, NotEmptyTuple<String, String>> dynamicTokenRegexStringBased) {
-        dynamicTokenRegex = new HashMap<>();
+    private void generateDynamicRegexPatterns(DynamicTokenRegex[] dynamicTokenRegex) {
+        this.dynamicTokenRegex = new HashMap<>();
 
-        for (String regexString : dynamicTokenRegexStringBased.keySet()) {
-            Pattern regexPattern = Pattern.compile(regexString, Pattern.DOTALL);
-            dynamicTokenRegex.put(regexPattern, dynamicTokenRegexStringBased.get(regexString));
+        for (DynamicTokenRegex regex : dynamicTokenRegex) {
+            Pattern regexPattern = Pattern.compile(regex.regex(), Pattern.DOTALL);
+            this.dynamicTokenRegex.put(regexPattern, new NotEmptyTuple<Class<? extends Token>, String>(regex.classType(), regex.grammaticalName()));
         }
     }
 
@@ -540,7 +540,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
     private Token tokenise(String string, String startBookend, String endBookend, TokenisationHolder tokenHolder) {
         //Get type and grammar name of token
-        Tuple <String, String> tokenDetails = dynamicRegexBookends.getTokenDetails(startBookend, endBookend);
+        Tuple<Class<? extends Token>, String> tokenDetails = dynamicRegexBookends.getTokenDetails(startBookend, endBookend);
 
         //Don't forget reserved words
         return DynamicTokenFactory.create(
@@ -555,7 +555,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     private Token tokenise(String string, TokenisationHolder tokenHolder) {
         for(Pattern regex : dynamicTokenRegex.keySet()) {
             if(regex.matcher(string).matches()) {
-                Tuple<String, String> tokenDetails = dynamicTokenRegex.get(regex);
+                Tuple<Class<? extends Token>, String> tokenDetails = dynamicTokenRegex.get(regex);
 
                 return DynamicTokenFactory.create(
                     tokenDetails.value1(),
@@ -673,7 +673,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     private class DynamicRegexBookends {
         private Map<String, Set<String>> startToEnd;
         private Map<String, Set<String>> endToStart;
-        private Map<NotEmptyTuple<String,String>, NotEmptyTuple<String,String>> bookendsToDetails; //Bookends -> <Type, GrammaticalName>
+        private Map<NotEmptyTuple<String,String>, NotEmptyTuple<Class<? extends Token>,String>> bookendsToDetails; //Bookends -> <Type, GrammaticalName> #TODO: Make better
         private Map<String, Pattern> regexForEndingMatches;
 
         public DynamicRegexBookends() {
@@ -683,9 +683,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             regexForEndingMatches = new HashMap<>();
         }
 
-        public void addBookends(String start, String end, String tokenType, String grammaticalName) {
+        public void addBookends(String start, String end, Class<? extends Token> tokenType, String grammaticalName) {
             NotEmptyTuple<String,String> bookendTuple = new NotEmptyTuple<String,String>(start, end);
-            NotEmptyTuple<String,String> existingDetails = bookendsToDetails.get(bookendTuple);
+            NotEmptyTuple<Class<? extends Token>,String> existingDetails = bookendsToDetails.get(bookendTuple);
 
             if(existingDetails != null) {
                 throw new BookendConflict(existingDetails.value2(), grammaticalName, bookendTuple);
@@ -712,7 +712,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             regexForEndingMatches.put(end, Pattern.compile(".*" + end + "\\Z", Pattern.DOTALL));
 
-            bookendsToDetails.put(bookendTuple, new NotEmptyTuple<String,String>(tokenType, grammaticalName));
+            bookendsToDetails.put(bookendTuple, new NotEmptyTuple<Class<? extends Token>,String>(tokenType, grammaticalName));
         }
         
         public Set<String> getEndRegex(String startBookend) {
@@ -723,7 +723,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         //     return endToStart.get(endBookend);
         // }
 
-        public Tuple<String,String> getTokenDetails(String startBookend, String endBookend) {
+        public Tuple<Class<? extends Token>,String> getTokenDetails(String startBookend, String endBookend) {
             return bookendsToDetails.get(new NotEmptyTuple<String,String>(startBookend, endBookend));
         }
 

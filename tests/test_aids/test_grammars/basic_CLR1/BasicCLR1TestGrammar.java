@@ -5,7 +5,6 @@ import java.util.*;
 import grammar_objects.*;
 import grammars.basic_CLR1.BasicCLR1Grammar;
 import syntax_analysis.grammar_structure_creation.*;
-import syntax_analysis.parsing.ParseState;
 import tests.test_aids.*;
 
 public class BasicCLR1TestGrammar extends TestGrammar {
@@ -155,6 +154,11 @@ public class BasicCLR1TestGrammar extends TestGrammar {
     }
 
     @Override
+    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
+        // Unimplemented
+    }
+
+    @Override
     protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
         // Unimplemented
     }
@@ -162,11 +166,6 @@ public class BasicCLR1TestGrammar extends TestGrammar {
     @Override
     protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
         // Unimplemented
-    }
-
-    @Override
-    public ParseState getParseRoot(String sentence) {
-        throw new UnsupportedOperationException("Unimplemented method 'getParseRoot'");
     }
 
 }
