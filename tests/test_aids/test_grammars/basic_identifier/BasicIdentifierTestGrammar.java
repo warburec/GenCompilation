@@ -286,19 +286,6 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
     }
 
     @Override
-    public ParseState getParseRoot(String sentence) { //TODO: Where to put?
-        switch(sentence) {
-            case "XToYToX":
-                return parseTree0();
-            case "XToYToXSemantic":
-                return parseTree0();
-            
-            default:
-                throw new UnsupportedSentenceException("parse tree", sentence);
-        }
-    }
-
-    @Override
     protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
         parseRootMap.put("XToYToX", () -> parseTree0());
         parseRootMap.put("XToYToXSemantic", () -> parseTree0());

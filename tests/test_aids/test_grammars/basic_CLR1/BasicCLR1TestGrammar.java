@@ -5,7 +5,6 @@ import java.util.*;
 import grammar_objects.*;
 import grammars.basic_CLR1.BasicCLR1Grammar;
 import syntax_analysis.grammar_structure_creation.*;
-import syntax_analysis.parsing.ParseState;
 import tests.test_aids.*;
 
 public class BasicCLR1TestGrammar extends TestGrammar {

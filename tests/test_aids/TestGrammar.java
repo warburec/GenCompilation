@@ -2,9 +2,7 @@ package tests.test_aids;
 
 import java.util.*;
 
-import code_generation.Generator;
 import grammar_objects.*;
-import helperObjects.NullableTuple;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
 import tests.test_aids.test_grammars.UnsupportedSentenceException;
@@ -117,28 +115,11 @@ public abstract class TestGrammar { //TODO allow implementation of grammar inter
         return root;
     }
 
-    public NullableTuple<String, String> getGenerationBookends(String sentence, String language) {
-        NullableTuple<String, String> bookends = null;
+    public RuleConvertor getRuleConvertor(String sentence, String language) {
+        RuleConvertor ruleConvertor = null;
 
         try {
-            bookends = ruleConvertorMap.get(language).get(sentence).getBookends();
-        }
-        catch (NullPointerException e) {
-            throw new UnsupportedSentenceException("langage and generation bookends", sentence);
-        }
-
-        if(bookends == null) {
-            throw new UnsupportedSentenceException("generation bookends", sentence);
-        }
-
-        return bookends;
-    }
-
-    public Map<ProductionRule, Generator> getRuleConvertor(String sentence, String language) {
-        Map<ProductionRule, Generator> ruleConvertor = null;
-
-        try {
-            ruleConvertor = ruleConvertorMap.get(language).get(sentence).getConversions();
+            ruleConvertor = ruleConvertorMap.get(language).get(sentence);
         }
         catch (NullPointerException e) {
             throw new UnsupportedSentenceException("langage and rule convertor", sentence);
