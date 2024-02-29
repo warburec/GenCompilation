@@ -14,6 +14,11 @@ public abstract class RuleConvertor {
     public RuleConvertor() {
         grammar = setUpGrammar();
         bookends = setUpBookends();
+
+        if(bookends == null) {
+            bookends = new NullableTuple<String,String>("", "");
+        }
+
         setUpRuleConvertors(grammar, conversions);
     }
 
@@ -25,7 +30,7 @@ public abstract class RuleConvertor {
 
     /**
      * Set up the constant starting and ending strings for conversions
-     * @return A NullableTuple of the starting string and ending string
+     * @return A NullableTuple of the starting string and ending string, may be null in which case the bookends will be taken as ("","")
      */
     protected abstract NullableTuple<String, String> setUpBookends();
 
