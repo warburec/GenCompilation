@@ -2,7 +2,6 @@ package code_generation;
 
 import grammar_objects.Identifier;
 
-//TODO: Allow any dynamic token, Consider changes to LiteralGenerations too
 public class IdentifierGeneration implements CodeElement {
 
     private Identifier identifier;

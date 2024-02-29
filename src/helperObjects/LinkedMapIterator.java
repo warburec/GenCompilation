@@ -2,7 +2,9 @@ package helperObjects;
 
 import java.util.*;
 
-//TODO: Exceptions
+/**
+ * An Iterator for the key set of a LinkedListHashMap
+ */
 public class LinkedMapIterator <T, E> implements Iterator<T> {
     LinkedListHashMap<T, E> linkedMap;
     int position;

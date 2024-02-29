@@ -2,6 +2,9 @@ package helperObjects;
 
 import java.util.*;
 
+/**
+ * A HashMap that allows access to its keys in the form of a LinkedList
+ */
 public class LinkedListHashMap <T, E> implements Map<T, E>, Iterable<T> {
     LinkedList<T> list;
     HashMap<T, E> hashMap;

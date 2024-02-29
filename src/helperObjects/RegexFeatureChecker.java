@@ -26,8 +26,6 @@ public class RegexFeatureChecker {
         String fullEndRegex = "";
 
         for(String regexPart : splitAtOrs) {
-            //TODO: Try putting limits on start splits
-
             //Split at (?:\\)?[^()\]\\]\?|(?:\\)[()\]]\? ".?" (not a lookahead or brackets)
             String[] splitString = regexPart.split("(?:\\\\)?[^()\\]\\\\]\\?|(?:\\\\)[()\\]]\\?");
             startRegex = splitString[0];
