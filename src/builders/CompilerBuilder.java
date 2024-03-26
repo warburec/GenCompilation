@@ -98,6 +98,11 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
     public Compiler createCompiler() {
         checkForCompleteBuild();
 
+        if(whitespaceDelimiters == null) whitespaceDelimiters = new String[]{};
+        if(stronglyReservedWords == null) stronglyReservedWords = new String[]{};
+        if(weaklyReservedWords == null) weaklyReservedWords = new String[]{};
+        if(dynamicTokenRegex == null) dynamicTokenRegex = new DynamicTokenRegex[]{};
+
         GrammarParts parts = grammar.getParts();
 
         LexicalAnalyser lexicalAnalyser = lexicalAnalyserFactory.produceAnalyser(
@@ -124,10 +129,7 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
         if(codeGeneratorFactory == null) msgParts.add("code generator factory");
         if(grammar == null) msgParts.add("grammar");
         if(ruleConvertor == null) msgParts.add("rule convertor");
-        // if(whitespaceDelimiters == null) msgParts.add("whitespace delimiters"); //Allow null
-        // if(stronglyReservedWords == null) msgParts.add("strongly reserved words");
-        // if(weaklyReservedWords == null) msgParts.add("weakly reserved words");
-        // if(dynamicTokenRegex == null) msgParts.add("dynamic token regex");
+        //Note: Allowing null lexical components
         
         if(msgParts.size() == 0) return; //No error
 

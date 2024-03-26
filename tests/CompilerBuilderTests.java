@@ -124,4 +124,23 @@ public class CompilerBuilderTests {
         assertThrows(ParameterError.class, () -> builder4.createCompiler());
         assertThrows(ParameterError.class, () -> builder5.createCompiler());
     }
+
+    @Test
+    public void nullLexicalInputs() {
+        CompilerBuilder builder = new CompilerBuilder();
+        builder.setComponents(
+            new GeneralLexicalAnalyserFactory(),
+            new CLR1ParserFactory(), 
+            new BasicCodeGenFactory(), 
+            new BasicIdentifierGrammar(), 
+            new XToXToYSemantic(), 
+            null, 
+            null,
+            null, 
+            null
+        );
+
+
+        builder.createCompiler();
+    }
 }
