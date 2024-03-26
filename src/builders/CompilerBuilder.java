@@ -3,8 +3,7 @@ package builders;
 import java.util.*;
 
 import grammar_objects.*;
-import lexical_analysis.DynamicTokenRegex;
-import lexical_analysis.LexicalAnalyser;
+import lexical_analysis.*;
 import syntax_analysis.SyntaxAnalyser;
 import code_generation.CodeGenerator;
 
@@ -20,7 +19,43 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
     protected String[] stronglyReservedWords;
     protected String[] weaklyReservedWords;
     protected DynamicTokenRegex[] dynamicTokenRegex;
+
+
+    /**
+     * A shortcut setter method for all components necessary for building a compiler
+     * @param lexicalAnalyserFactory
+     * @param syntaxAnalyserFactory
+     * @param codeGeneratorFactory
+     * @param grammar
+     * @param ruleConvertor
+     * @param whitespaceDelimiters May be null
+     * @param stronglyReservedWords May be null
+     * @param weaklyReservedWords May be null
+     * @param dynamicTokenRegex May be null
+     */
+    public void setComponents(
+        LexicalAnalyserFactory lexicalAnalyserFactory,
+        SyntaxAnalyserFactory syntaxAnalyserFactory,
+        CodeGeneratorFactory codeGeneratorFactory,
+        Grammar grammar,
+        RuleConvertor ruleConvertor,
+        String[] whitespaceDelimiters,
+        String[] stronglyReservedWords,
+        String[] weaklyReservedWords,
+        DynamicTokenRegex[] dynamicTokenRegex
+    ) {
+        setLexicalAnalyser(lexicalAnalyserFactory);
+        setSyntaxAnalyser(syntaxAnalyserFactory);
+        setCodeGenerator(codeGeneratorFactory);
+        setGrammar(grammar);
+        setRuleConvertor(ruleConvertor);
+        setWhitespaceDelimiters(whitespaceDelimiters);
+        setStronglyReservedWords(stronglyReservedWords);
+        setWeaklyReservedWords(weaklyReservedWords);
+        setDynamicTokenRegex(dynamicTokenRegex);
+    }
     
+
     public void setLexicalAnalyser(LexicalAnalyserFactory factory) {
         this.lexicalAnalyserFactory = factory;
     }
@@ -64,7 +99,7 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
         checkForCompleteBuild();
 
         GrammarParts parts = grammar.getParts();
-        
+
         LexicalAnalyser lexicalAnalyser = lexicalAnalyserFactory.produceAnalyser(
             whitespaceDelimiters,
             stronglyReservedWords,
@@ -89,10 +124,10 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
         if(codeGeneratorFactory == null) msgParts.add("code generator factory");
         if(grammar == null) msgParts.add("grammar");
         if(ruleConvertor == null) msgParts.add("rule convertor");
-        if(whitespaceDelimiters == null) msgParts.add("whitespace delimiters");
-        if(stronglyReservedWords == null) msgParts.add("strongly reserved words");
-        if(weaklyReservedWords == null) msgParts.add("weakly reserved words");
-        if(dynamicTokenRegex == null) msgParts.add("dynamic token regex");
+        // if(whitespaceDelimiters == null) msgParts.add("whitespace delimiters"); //Allow null
+        // if(stronglyReservedWords == null) msgParts.add("strongly reserved words");
+        // if(weaklyReservedWords == null) msgParts.add("weakly reserved words");
+        // if(dynamicTokenRegex == null) msgParts.add("dynamic token regex");
         
         if(msgParts.size() == 0) return; //No error
 

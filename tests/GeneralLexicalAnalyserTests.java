@@ -9,6 +9,8 @@ import lexical_analysis.*;
 
 public class GeneralLexicalAnalyserTests {
 
+    //TODO: Test null inputs in constructor
+    
     @Test
     public void normalUseTest() {
         String sentence =
