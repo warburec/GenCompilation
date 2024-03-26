@@ -131,7 +131,7 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
         
         if(msgParts.size() == 0) return; //No error
 
-        if(msgParts.size() == 1) throw new BuilderError(msgParts.get(0) + " not provided");
+        if(msgParts.size() == 1) throw new ParameterError(msgParts.get(0) + " not provided");
 
         String msg = msgParts.get(0);
 
@@ -141,12 +141,6 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
 
         msg += " and " + msgParts.get(msgParts.size() - 1) + " not provided";
 
-        throw new BuilderError(msg);
-    }
-
-    private class BuilderError extends RuntimeException {
-        public BuilderError(String message) {
-            super(message);
-        }
+        throw new ParameterError(msg);
     }
 }
