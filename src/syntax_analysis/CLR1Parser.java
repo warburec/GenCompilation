@@ -397,7 +397,6 @@ public class CLR1Parser extends SLR1Parser {
 
         try {
             while(!accepted) {
-                System.out.println(states.size());
                 Action action = actionTable.get(parseStates.peek().state()).get(currentToken);
 
                 if(action instanceof Shift) {

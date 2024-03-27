@@ -254,7 +254,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 Token newToken = tokenise(regex, tokenHolder);
 
                 if(newToken == null) {
-                    throw new LexicalError("No start bookend found"); 
+                    throw new LexicalError("No start bookend found");  //TODO: Make Error more descriptive (follow Google error design structure). "Check all Regex special characters are escaped correctly"
                 }
 
                 tokenHolder.tokenList.add(newToken);

@@ -12,7 +12,6 @@ import grammar_objects.Literal;
 import grammars.basic_identifier.BasicIdentifierGrammar;
 import grammars.basic_identifier.convertors.XToXToYSemantic;
 import lexical_analysis.DynamicTokenRegex;
-import builders.Compiler;
 
 public class CompilerBuilderTests {
     
@@ -26,11 +25,11 @@ public class CompilerBuilderTests {
             new BasicIdentifierGrammar(), 
             new XToXToYSemantic(), 
             new String[] {" "}, 
-            new String[] {"+", "="}, 
+            new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[1-9]+(.[0-9]+)?", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number") //TODO: Using [0-9]+(\\.[0-9]+)? for ll tests woud be better
             }
         );
 
@@ -53,11 +52,11 @@ public class CompilerBuilderTests {
             new BasicIdentifierGrammar(), 
             new XToXToYSemantic(), 
             new String[] {" "}, 
-            new String[] {"+", "="}, 
+            new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[1-9]+(.[0-9]+)?", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
             }
         );
         builder2.setComponents(
@@ -67,11 +66,11 @@ public class CompilerBuilderTests {
             new BasicIdentifierGrammar(), 
             new XToXToYSemantic(), 
             new String[] {" "}, 
-            new String[] {"+", "="}, 
+            new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[1-9]+(.[0-9]+)?", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
             }
         );
         builder3.setComponents(
@@ -81,11 +80,11 @@ public class CompilerBuilderTests {
             new BasicIdentifierGrammar(), 
             new XToXToYSemantic(), 
             new String[] {" "}, 
-            new String[] {"+", "="}, 
+            new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[1-9]+(.[0-9]+)?", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
             }
         );
         builder4.setComponents(
@@ -95,11 +94,11 @@ public class CompilerBuilderTests {
             null, 
             new XToXToYSemantic(), 
             new String[] {" "}, 
-            new String[] {"+", "="}, 
+            new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[1-9]+(.[0-9]+)?", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
             }
         );
         builder5.setComponents(
@@ -109,11 +108,11 @@ public class CompilerBuilderTests {
             new BasicIdentifierGrammar(), 
             null, 
             new String[] {" "}, 
-            new String[] {"+", "="}, 
+            new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[1-9]+(.[0-9]+)?", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
             }
         );
 

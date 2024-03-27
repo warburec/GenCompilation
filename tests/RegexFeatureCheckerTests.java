@@ -290,11 +290,29 @@ public class RegexFeatureCheckerTests {
     @Test
     public void numberTest() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
-        String regex = "[0-9]+[\\\\.[0.9]+]?";
+        String regex = "[0-9]+(\\.[0.9]+)?";
 
         NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
 
-        NotEmptyTuple<String, String> expectedBookends = null;
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String,String>(
+            "[0-9]", 
+            "[0-9]"
+        );
+
+        assertEquals(expectedBookends, actualBookends);
+    }
+
+    @Test
+    public void numberORTest() {
+        RegexFeatureChecker checker = new RegexFeatureChecker();
+        String regex = "[0-9]+|[0-9]+.[0-9]+";
+
+        NotEmptyTuple<String, String> actualBookends = checker.produceBookends(regex);
+
+        NotEmptyTuple<String, String> expectedBookends = new NotEmptyTuple<String,String>(
+            "[0-9]", 
+            "[0-9]"
+        );
 
         assertEquals(expectedBookends, actualBookends);
     }
