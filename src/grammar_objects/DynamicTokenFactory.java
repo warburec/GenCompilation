@@ -7,7 +7,7 @@ public class DynamicTokenFactory {
 
     private static Map<Class<? extends Token>, FactoryFunction> functionMap = Map.ofEntries(
         entry(Token.class, (type, grammaticalName, instanceName, lineNum, columnNum) -> new Token(grammaticalName, lineNum, columnNum)),
-        entry(Identifier.class, (type, grammaticalName, instanceName, lineNum, columnNum) -> new Identifier(grammaticalName, instanceName, instanceName, lineNum, columnNum)),
+        entry(Identifier.class, (type, grammaticalName, instanceName, lineNum, columnNum) -> new Identifier(grammaticalName, instanceName, instanceName, lineNum, columnNum)), //TODO: Add type
         entry(Literal.class, (type, grammaticalName, instanceName, lineNum, columnNum) -> new Literal(grammaticalName, instanceName, lineNum, columnNum))
     );
 
