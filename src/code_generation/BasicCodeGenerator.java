@@ -93,11 +93,8 @@ public class BasicCodeGenerator implements CodeGenerator {
     private CodeElement produceShiftedString(ShiftedState shift) {
         Token token = shift.tokenUsed();
 
-        if(token instanceof Identifier) {
-            return new IdentifierGeneration((Identifier)token);
-        }
-        if(token instanceof Literal) {
-            return new LiteralGeneration((Literal)token);
+        if(token instanceof DynamicToken) {
+            return new DynamicTokenGeneration((DynamicToken)token);
         }
         else {
             return new TokenGeneration(token);
