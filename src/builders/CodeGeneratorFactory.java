@@ -3,8 +3,8 @@ package builders;
 import code_generation.CodeGenerator;
 import grammar_objects.RuleConvertor;
 
-public abstract class CodeGeneratorFactory {
+public interface CodeGeneratorFactory {
 
-    public abstract CodeGenerator produceGenerator(RuleConvertor ruleConvertor);
+    public CodeGenerator produceGenerator(RuleConvertor ruleConvertor);
 
 }

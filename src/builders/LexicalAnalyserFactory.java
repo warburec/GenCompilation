@@ -2,7 +2,7 @@ package builders;
 
 import lexical_analysis.*;
 
-public abstract class LexicalAnalyserFactory {
+public interface LexicalAnalyserFactory {
 
     public abstract LexicalAnalyser produceAnalyser(
         String[] whitespaceDelimiters,
