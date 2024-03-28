@@ -7,10 +7,8 @@ import org.junit.Test;
 import builders.CompilerBuilder;
 import builders.ParameterError;
 import builders.concrete_factories.*;
-import grammar_objects.Identifier;
-import grammar_objects.Literal;
 import grammars.basic_identifier.BasicIdentifierGrammar;
-import grammars.basic_identifier.convertors.XToXToYSemantic;
+import grammars.basic_identifier.convertors.XToYToXSemantic;
 import lexical_analysis.DynamicTokenRegex;
 
 public class CompilerBuilderTests {
@@ -23,13 +21,13 @@ public class CompilerBuilderTests {
             new CLR1ParserFactory(), 
             new BasicCodeGenFactory(), 
             new BasicIdentifierGrammar(), 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             new String[] {" "}, 
             new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number") //TODO: Using [0-9]+(\\.[0-9]+)? for ll tests woud be better
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number") //TODO: Using [0-9]+(\\.[0-9]+)? for ll tests woud be better
             }
         );
 
@@ -50,13 +48,13 @@ public class CompilerBuilderTests {
             new CLR1ParserFactory(), 
             new BasicCodeGenFactory(), 
             new BasicIdentifierGrammar(), 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             new String[] {" "}, 
             new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
             }
         );
         builder2.setComponents(
@@ -64,13 +62,13 @@ public class CompilerBuilderTests {
             null, 
             new BasicCodeGenFactory(), 
             new BasicIdentifierGrammar(), 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             new String[] {" "}, 
             new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
             }
         );
         builder3.setComponents(
@@ -78,13 +76,13 @@ public class CompilerBuilderTests {
             new CLR1ParserFactory(), 
             null, 
             new BasicIdentifierGrammar(), 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             new String[] {" "}, 
             new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
             }
         );
         builder4.setComponents(
@@ -92,13 +90,13 @@ public class CompilerBuilderTests {
             new CLR1ParserFactory(), 
             new BasicCodeGenFactory(), 
             null, 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             new String[] {" "}, 
             new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
             }
         );
         builder5.setComponents(
@@ -111,8 +109,8 @@ public class CompilerBuilderTests {
             new String[] {"+", "=", ";"}, 
             new String[] {}, 
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number")
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
             }
         );
 
@@ -132,7 +130,7 @@ public class CompilerBuilderTests {
             new CLR1ParserFactory(), 
             new BasicCodeGenFactory(), 
             new BasicIdentifierGrammar(), 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             null, 
             null,
             null, 

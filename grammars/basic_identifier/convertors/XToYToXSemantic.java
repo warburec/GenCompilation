@@ -8,7 +8,7 @@ import grammars.basic_identifier.BasicIdentifierGrammar;
 import helperObjects.NullableTuple;
 import semantic_analysis.TypeChecker;
 
-public class XToXToYSemantic extends RuleConvertor {
+public class XToYToXSemantic extends RuleConvertor {
 
     @Override
     protected Grammar setUpGrammar() {
@@ -35,9 +35,10 @@ public class XToXToYSemantic extends RuleConvertor {
         ruleConversions.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
         ruleConversions.put(getRule(2), (elements) -> {
             String identifierType = "";
-            IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
+
+            DynamicTokenGeneration identifier = (DynamicTokenGeneration)elements[0];
             if(!typeChecker.isDeclared(identifier)) {
-                identifierType = identifier.getType() + " ";
+                identifierType = "int "; //Note: Only works for "int" in this grammar
                 typeChecker.declare(identifier);
             }
 
@@ -46,8 +47,8 @@ public class XToXToYSemantic extends RuleConvertor {
             elements[3].getGeneration() + " " + elements[4].getGeneration() + 
             elements[5].getGeneration() + "\n"; 
         });  //<statement> := identifier = <element> + <element>;
-        ruleConversions.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
-        ruleConversions.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
+        ruleConversions.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //<element> := identifier
+        ruleConversions.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //<element> := number
     }
     
 }

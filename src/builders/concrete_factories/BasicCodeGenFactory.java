@@ -4,7 +4,7 @@ import builders.CodeGeneratorFactory;
 import code_generation.*;
 import grammar_objects.RuleConvertor;
 
-public class BasicCodeGenFactory extends CodeGeneratorFactory {
+public class BasicCodeGenFactory implements CodeGeneratorFactory {
 
     @Override
     public CodeGenerator produceGenerator(RuleConvertor ruleConvertor) {

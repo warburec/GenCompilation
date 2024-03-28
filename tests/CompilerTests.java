@@ -6,11 +6,9 @@ import org.junit.Test;
 
 import builders.CompilerBuilder;
 import builders.Compiler;
-import grammar_objects.Identifier;
 import grammars.basic_identifier.BasicIdentifierGrammar;
-import grammars.basic_identifier.convertors.XToXToYSemantic;
+import grammars.basic_identifier.convertors.XToYToXSemantic;
 import builders.concrete_factories.*;
-import grammar_objects.Literal;
 import lexical_analysis.DynamicTokenRegex;
 import syntax_analysis.parsing.ParseFailedException;
 import tests.test_aids.GrammarType;
@@ -27,13 +25,13 @@ public class CompilerTests {
             new CLR1ParserFactory(), 
             new BasicCodeGenFactory(), 
             new BasicIdentifierGrammar(), 
-            new XToXToYSemantic(), 
+            new XToYToXSemantic(), 
             new String[] {" ", "\n", "\r", "\t"}, 
             new String[] {"+", "=", ";"},
             new String[] {}, //TODO: Place reasonable troubleshooting description for failing parsing to check that weakly and strongly reserved words are defined correctly
             new DynamicTokenRegex[] {
-                new DynamicTokenRegex("[A-Za-z]+", Identifier.class, "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", Literal.class, "number") //TODO: Using [0-9]+(\\.[0-9]+)? would be better
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number") //TODO: Using [0-9]+(\\.[0-9]+)? would be better
             }
         );
 

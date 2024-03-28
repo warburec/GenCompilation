@@ -56,10 +56,10 @@ public class JavaConversion extends RuleConvertor {
         ruleConversions.put(getRule(13), (elements) -> { 
             String generation = "";
 
-            IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
+            DynamicTokenGeneration identifier = (DynamicTokenGeneration)elements[0];
             if(!typeChecker.isDeclared(identifier)) {
                 typeChecker.declare(identifier);
-                generation += identifier.getType() + " ";
+                generation += "int "; //TODO: Handle types other than just fixed "int"
             }
             
             generation += elements[0].getGeneration();

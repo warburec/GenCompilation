@@ -3,7 +3,7 @@ package builders.concrete_factories;
 import builders.LexicalAnalyserFactory;
 import lexical_analysis.*;
 
-public class GeneralLexicalAnalyserFactory extends LexicalAnalyserFactory {
+public class GeneralLexicalAnalyserFactory implements LexicalAnalyserFactory {
 
     @Override
     public LexicalAnalyser produceAnalyser(

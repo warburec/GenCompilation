@@ -2,22 +2,22 @@ package semantic_analysis;
 
 import java.util.*;
 
-import code_generation.IdentifierGeneration;
+import code_generation.CodeElement;
 
 public class TypeChecker implements SemanticAnalyser {
     
-    protected Set<IdentifierGeneration> declaredIdentifiers;
+    protected Set<CodeElement> declaredElements;
 
     public TypeChecker() {
-        declaredIdentifiers = new HashSet<>();
+        declaredElements = new HashSet<>();
     }
 
-    public boolean isDeclared(IdentifierGeneration identifier) {
-        return declaredIdentifiers.contains(identifier);
+    public boolean isDeclared(CodeElement identifier) {
+        return declaredElements.contains(identifier);
     }
 
-    public void declare(IdentifierGeneration identfier) {
-        declaredIdentifiers.add(identfier);
+    public void declare(CodeElement identfier) {
+        declaredElements.add(identfier);
     }
     
 }

@@ -1,42 +1,25 @@
 package grammar_objects;
 
-public class Literal extends Token {
-    private String type;
-    private String value;
+public class Literal extends DynamicToken {
+
+    /**
+     * A constructor for grammar description, not for use within sentences/inputs to syntax analysis.
+     * @param grammarName The name of this Literal used within the grammar.
+     */
+    public Literal(String name) {
+        super(name);
+    }
+
+    public Literal(String grammarName, String value) {
+        super(grammarName, value);
+    }
+
+    public Literal(String name, String value, int symbolNumber) {
+        super(name, value, symbolNumber);
+    }
 
     public Literal(String grammaticalName, String value, int lineNum, int columnNum) {
-        super(grammaticalName, lineNum, columnNum);
-
-        this.type = null;
-        this.value = value;
+        super(grammaticalName, value, lineNum, columnNum);
     }
 
-    public Literal(String grammaticalName, String type, String value) {
-        super(grammaticalName);
-
-        this.type = type;
-        this.value = value;
-    }
-    
-    public Literal(String grammaticalName, String value) {
-        super(grammaticalName);
-
-        this.type = null;
-        this.value = value;
-    }
-
-    public Literal(String grammaticalName) {
-        super(grammaticalName);
-
-        this.type = null;
-        this.value = null;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getValue() {
-        return value;
-    }
 }

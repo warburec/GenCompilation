@@ -4,7 +4,7 @@ import builders.SyntaxAnalyserFactory;
 import grammar_objects.GrammarParts;
 import syntax_analysis.*;
 
-public class CLR1ParserFactory extends SyntaxAnalyserFactory {
+public class CLR1ParserFactory implements SyntaxAnalyserFactory {
 
     @Override
     public SyntaxAnalyser produceAnalyser(GrammarParts parts) {
