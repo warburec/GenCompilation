@@ -15,7 +15,4 @@ public class LiteralGeneration implements CodeElement {
         return literal.getValue();
     }
 
-    public String getType() {
-        return literal.getType();
-    }
 }

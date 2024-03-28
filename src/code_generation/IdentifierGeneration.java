@@ -14,14 +14,6 @@ public class IdentifierGeneration implements CodeElement {
     public String getGeneration() {
         return identifier.getIdentifierName();
     }
-    
-    public String getType() {
-        if(identifier.getType() == null) {
-            return "";
-        }
-        
-        return identifier.getType();
-    }
 
     @Override
     public boolean equals(Object obj) {

@@ -300,7 +300,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
 
         parseStates.add(new ShiftedState(
             getState(3), 
-            new Identifier("identifier", "int", "x")));
+            new Identifier("identifier", "x")));
 
         parseStates.add(new ShiftedState(
             getState(4), 
@@ -324,7 +324,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         
         parseStates.add(new ShiftedState(
             getState(3), 
-            new Identifier("identifier", "int", "y")));
+            new Identifier("identifier", "y")));
         
         parseStates.add(new ShiftedState(
             getState(4), 
@@ -332,7 +332,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         
         parseStates.add(new ShiftedState(
             getState(8), 
-            new Identifier("identifier", "int", "x")));
+            new Identifier("identifier", "x")));
         
         parseStates.add(new ShiftedState(
             getState(6), 
@@ -348,7 +348,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         
         parseStates.add(new ShiftedState(
             getState(3), 
-            new Identifier("identifier", "int", "x")));
+            new Identifier("identifier", "x")));
         
         parseStates.add(new ShiftedState(
             getState(4), 
@@ -356,7 +356,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         
         parseStates.add(new ShiftedState(
             getState(8), 
-            new Identifier("identifier", "int", "y")));
+            new Identifier("identifier", "y")));
         
         parseStates.add(new ShiftedState(
             getState(6), 
@@ -483,7 +483,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
         ruleConvertorMap.put("Java", new HashMap<>());
 
         ruleConvertorMap.get("Java").put("XToYToX", new XToYToX());
-        ruleConvertorMap.get("Java").put("XToYToXSemantic", new XToXToYSemantic());
+        ruleConvertorMap.get("Java").put("XToYToXSemantic", new XToYToXSemantic());
     }
     
     @Override

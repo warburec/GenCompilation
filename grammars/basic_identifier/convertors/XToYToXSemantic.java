@@ -8,7 +8,7 @@ import grammars.basic_identifier.BasicIdentifierGrammar;
 import helperObjects.NullableTuple;
 import semantic_analysis.TypeChecker;
 
-public class XToXToYSemantic extends RuleConvertor {
+public class XToYToXSemantic extends RuleConvertor {
 
     @Override
     protected Grammar setUpGrammar() {
@@ -37,7 +37,7 @@ public class XToXToYSemantic extends RuleConvertor {
             String identifierType = "";
             IdentifierGeneration identifier = (IdentifierGeneration)elements[0];
             if(!typeChecker.isDeclared(identifier)) {
-                identifierType = identifier.getType() + " ";
+                identifierType = "int "; //Note: Only works for "int" in this grammar
                 typeChecker.declare(identifier);
             }
 
