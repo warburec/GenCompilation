@@ -2,12 +2,13 @@ package builders;
 
 import java.util.*;
 
+import builders.bundles.GrammarBundle;
 import grammar_objects.*;
 import lexical_analysis.*;
 import syntax_analysis.SyntaxAnalyser;
 import code_generation.CodeGenerator;
 
-public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used (also create builder for bundles), bundles should have everything needed for conversion
+public class CompilerBuilder {
     protected LexicalAnalyserFactory lexicalAnalyserFactory;
     protected SyntaxAnalyserFactory syntaxAnalyserFactory;
     protected CodeGeneratorFactory codeGeneratorFactory;
@@ -20,7 +21,32 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
     protected String[] weaklyReservedWords;
     protected DynamicTokenRegex[] dynamicTokenRegex;
 
-
+    /**
+     * A shortcut setter method for all components necessary for building a compiler
+     * @param lexicalAnalyserFactory
+     * @param syntaxAnalyserFactory
+     * @param codeGeneratorFactory
+     * @param grammarBundle
+     */
+    public CompilerBuilder setComponents(
+        LexicalAnalyserFactory lexicalAnalyserFactory,
+        SyntaxAnalyserFactory syntaxAnalyserFactory,
+        CodeGeneratorFactory codeGeneratorFactory,
+        GrammarBundle grammarBundle
+    ) {
+        return setComponents(
+            lexicalAnalyserFactory, 
+            syntaxAnalyserFactory, 
+            codeGeneratorFactory, 
+            grammarBundle.getGrammar(),
+            grammarBundle.getRuleConvertor(),
+            grammarBundle.getWhitespaceDelimiters(),
+            grammarBundle.getStronglyReservedWords(),
+            grammarBundle.getWeaklyReservedWords(),
+            grammarBundle.getDynamicTokenRegex()
+        );
+    }
+    
     /**
      * A shortcut setter method for all components necessary for building a compiler
      * @param lexicalAnalyserFactory
@@ -33,7 +59,7 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
      * @param weaklyReservedWords May be null
      * @param dynamicTokenRegex May be null
      */
-    public void setComponents(
+    public CompilerBuilder setComponents(
         LexicalAnalyserFactory lexicalAnalyserFactory,
         SyntaxAnalyserFactory syntaxAnalyserFactory,
         CodeGeneratorFactory codeGeneratorFactory,
@@ -53,45 +79,56 @@ public class CompilerBuilder { //TODO: Extend to allow GrammarBundles to be used
         setStronglyReservedWords(stronglyReservedWords);
         setWeaklyReservedWords(weaklyReservedWords);
         setDynamicTokenRegex(dynamicTokenRegex);
+
+        return this;
     }
     
 
-    public void setLexicalAnalyser(LexicalAnalyserFactory factory) {
+    public CompilerBuilder setLexicalAnalyser(LexicalAnalyserFactory factory) {
         this.lexicalAnalyserFactory = factory;
+        return this;
     }
 
-    public void setSyntaxAnalyser(SyntaxAnalyserFactory factory) {
+    public CompilerBuilder setSyntaxAnalyser(SyntaxAnalyserFactory factory) {
         this.syntaxAnalyserFactory = factory;
+        return this;
     }
 
-    public void setCodeGenerator(CodeGeneratorFactory factory) {
+    public CompilerBuilder setCodeGenerator(CodeGeneratorFactory factory) {
         this.codeGeneratorFactory = factory;
+        return this;
     }
 
 
-    public void setGrammar(Grammar grammar) {
+    public CompilerBuilder setGrammar(Grammar grammar) {
         this.grammar = grammar;
+        return this;
     }
 
-    public void setRuleConvertor(RuleConvertor ruleConvertor) {
+    public CompilerBuilder setRuleConvertor(RuleConvertor ruleConvertor) {
         this.ruleConvertor = ruleConvertor;
+        return this;
     }
 
     
-    public void setWhitespaceDelimiters(String[] whitespaceDelimiters) {
+    public CompilerBuilder setWhitespaceDelimiters(String[] whitespaceDelimiters) {
         this.whitespaceDelimiters = whitespaceDelimiters;
+        return this;
     }
 
-    public void setStronglyReservedWords(String[] stronglyReservedWords) {
+    public CompilerBuilder setStronglyReservedWords(String[] stronglyReservedWords) {
         this.stronglyReservedWords = stronglyReservedWords;
+        return this;
     }
 
-    public void setWeaklyReservedWords(String[] weaklyReservedWords) {
+    public CompilerBuilder setWeaklyReservedWords(String[] weaklyReservedWords) {
         this.weaklyReservedWords = weaklyReservedWords;
+        return this;
     }
 
-    public void setDynamicTokenRegex(DynamicTokenRegex[] dynamicTokenRegex) {
+    public CompilerBuilder setDynamicTokenRegex(DynamicTokenRegex[] dynamicTokenRegex) {
         this.dynamicTokenRegex = dynamicTokenRegex;
+        return this;
     }
 
 

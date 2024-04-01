@@ -1,3 +1,20 @@
+import org.junit.Test;
+
+import builders.CompilerBuilder;
+import builders.LexicalAnalyserFactory;
+import builders.SyntaxAnalyserFactory;
+import builders.bundles.GrammarBundle;
+import builders.concrete_factories.BasicCodeGenFactory;
+import builders.concrete_factories.CLR1ParserFactory;
+import builders.concrete_factories.GeneralLexicalAnalyserFactory;
+import grammar_objects.Grammar;
+import grammar_objects.RuleConvertor;
+import grammars.basic_identifier.BasicIdentifierGrammar;
+import grammars.basic_identifier.convertors.XToYToXSemantic;
+import grammars.integer_comparison.IntegerCompGrammar;
+import grammars.integer_comparison.convertors.JavaConversion;
+import lexical_analysis.DynamicTokenRegex;
+import syntax_analysis.parsing.ParseFailedException;
 
 public class GrammarSandbox {
     
@@ -326,5 +343,64 @@ public class GrammarSandbox {
     //     String output = codeGenerator.generate(analysedSyntaxStates);
 
     //     System.out.println(output);
+    // }
+
+    // private class BasicIdentBundle implements GrammarBundle {
+
+    //     @Override
+    //     public Grammar getGrammar() { return new BasicIdentifierGrammar(); }
+
+    //     @Override
+    //     public RuleConvertor getRuleConvertor() { return new XToYToXSemantic(); }
+
+    //     @Override
+    //     public String[] getWhitespaceDelimiters() { 
+    //         return new String[] {"\n", "\r", " ", "\t"};
+    //     }
+            
+    //     @Override
+    //     public String[] getStronglyReservedWords() {
+    //         return new String[] {"+", "=", ";"};
+    //     }
+
+    //     @Override
+    //     public String[] getWeaklyReservedWords() {
+    //         return new String[] {};
+    //     }
+
+    //     @Override
+    //     public DynamicTokenRegex[] getDynamicTokenRegex() {
+    //         return new DynamicTokenRegex[] {
+    //             new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+    //             new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
+    //         };
+    //     }
+
+    // }
+
+    // private class DefaultCompilerBuilder extends CompilerBuilder {
+    //     public DefaultCompilerBuilder() {
+    //         setComponents(
+    //             new GeneralLexicalAnalyserFactory(),
+    //             new CLR1ParserFactory(),
+    //             new BasicCodeGenFactory(),
+    //             new BasicIdentBundle()
+    //         );
+    //     }
+    // }
+
+    // @Test
+    // public void compilerBuilder() throws ParseFailedException {
+    //     String input = """
+    //     x = 1 + 2;
+    //     y = x + 3;
+    //     x = y + 0;
+    //     """;
+
+    //     System.out.println(
+    //         new DefaultCompilerBuilder()
+    //         .createCompiler()
+    //         .compile(input)
+    //     );
     // }
 }
