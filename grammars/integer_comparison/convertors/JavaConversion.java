@@ -1,7 +1,5 @@
 package grammars.integer_comparison.convertors;
 
-import java.util.Map;
-
 import code_generation.*;
 import grammar_objects.*;
 import grammars.integer_comparison.IntegerCompGrammar;
@@ -28,32 +26,33 @@ public class JavaConversion extends RuleConvertor {
     }
 
     @Override
-    protected void setUpRuleConvertors(Grammar grammar, Map<ProductionRule, Generator> ruleConversions) {
+    protected void setUpRuleConvertors(RuleOrganiser ruleOrganiser) {
         TypeChecker typeChecker = new TypeChecker();
 
-        ruleConversions.put(BasicCodeGenerator.ROOT_RULE, (elements) -> { return "        " + elements[0].getGeneration().stripTrailing().replaceAll("\n", "\n        ") + "\n"; });
-        ruleConversions.put(getRule(0), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + "\n"; }); //<statement list> := <statement list> <statement>
-        ruleConversions.put(getRule(1), (elements) -> { return elements[0].getGeneration() + "\n"; }); //<statement list> := <statement>
-        ruleConversions.put(getRule(2), (elements) -> { return elements[0].getGeneration() + ";"; }); //<statement> := <assignment>;
-        ruleConversions.put(getRule(3), (elements) -> { return elements[0].getGeneration() + "\n"; }); //<statement> := <if statement>
-        ruleConversions.put(getRule(4), (elements) -> { 
+        ruleOrganiser
+        .setConversion(ROOT_RULE_INDEX, (elements) -> { return "        " + elements[0].getGeneration().stripTrailing().replaceAll("\n", "\n        ") + "\n"; })
+        .setConversion(0, (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration() + "\n"; }) //<statement list> := <statement list> <statement>
+        .setConversion(1, (elements) -> { return elements[0].getGeneration() + "\n"; }) //<statement list> := <statement>
+        .setConversion(2, (elements) -> { return elements[0].getGeneration() + ";"; }) //<statement> := <assignment>;
+        .setConversion(3, (elements) -> { return elements[0].getGeneration() + "\n"; }) //<statement> := <if statement>
+        .setConversion(4, (elements) -> { 
             String generation =  "\nif(" + elements[2].getGeneration() + ") {\n    ";
             generation += elements[5].getGeneration().stripTrailing().replaceAll("\n", "\n    ");
             return generation + "\n}";
-        }); //<if statement> := if(<condition>) {<statement list>}
-        ruleConversions.put(getRule(5), (elements) -> {
+        }) //<if statement> := if(<condition>) {<statement list>}
+        .setConversion(5, (elements) -> {
             String generation =  elements[0].getGeneration() + "\nelse {\n    ";
             generation += elements[3].getGeneration().stripTrailing().replaceAll("\n", "\n    ");
             return generation + "\n}";
-        }); //<if statement> := <if statement> else {<statement list>}
-        ruleConversions.put(getRule(6), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //<condition> := identifier <conditional operator> identifier
-        ruleConversions.put(getRule(7), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //<condition> := identifier <conditional operator> numConstant
-        ruleConversions.put(getRule(8), (elements) -> { return elements[0].getGeneration(); }); //<conditional operator> := >
-        ruleConversions.put(getRule(9), (elements) -> { return elements[0].getGeneration(); }); //<conditional operator> := >=
-        ruleConversions.put(getRule(10), (elements) -> { return elements[0].getGeneration(); }); //<conditional operator> := ==
-        ruleConversions.put(getRule(11), (elements) -> { return elements[0].getGeneration(); }); //<conditional operator> := !=
-        ruleConversions.put(getRule(12), (elements) -> { return elements[0].getGeneration(); }); //<conditional operator> := <=
-        ruleConversions.put(getRule(13), (elements) -> { 
+        }) //<if statement> := <if statement> else {<statement list>}
+        .setConversion(6, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) //<condition> := identifier <conditional operator> identifier
+        .setConversion(7, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) //<condition> := identifier <conditional operator> numConstant
+        .setConversion(8, (elements) -> { return elements[0].getGeneration(); }) //<conditional operator> := >
+        .setConversion(9, (elements) -> { return elements[0].getGeneration(); }) //<conditional operator> := >=
+        .setConversion(10, (elements) -> { return elements[0].getGeneration(); }) //<conditional operator> := ==
+        .setConversion(11, (elements) -> { return elements[0].getGeneration(); }) //<conditional operator> := !=
+        .setConversion(12, (elements) -> { return elements[0].getGeneration(); }) //<conditional operator> := <=
+        .setConversion(13, (elements) -> { 
             String generation = "";
 
             DynamicTokenGeneration identifier = (DynamicTokenGeneration)elements[0];
@@ -64,17 +63,17 @@ public class JavaConversion extends RuleConvertor {
             
             generation += elements[0].getGeneration();
             return generation + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); 
-        }); //<assignment> := identifier = <expression>
-        ruleConversions.put(getRule(14), (elements) -> { return elements[0].getGeneration(); }); // <expression> := val identifier
-        ruleConversions.put(getRule(15), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> + identifier
-        ruleConversions.put(getRule(16), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> - identifier
-        ruleConversions.put(getRule(17), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> * identifier
-        ruleConversions.put(getRule(18), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> / identifier
-        ruleConversions.put(getRule(19), (elements) -> { return elements[0].getGeneration(); }); // <expression> := numConstant
-        ruleConversions.put(getRule(20), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> + numConstant
-        ruleConversions.put(getRule(21), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> - numConstant
-        ruleConversions.put(getRule(22), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> * numConstant
-        ruleConversions.put(getRule(23), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> / numConstant
+        }) //<assignment> := identifier = <expression>
+        .setConversion(14, (elements) -> { return elements[0].getGeneration(); }) // <expression> := val identifier
+        .setConversion(15, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> + identifier
+        .setConversion(16, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> - identifier
+        .setConversion(17, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> * identifier
+        .setConversion(18, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> / identifier
+        .setConversion(19, (elements) -> { return elements[0].getGeneration(); }) // <expression> := numConstant
+        .setConversion(20, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> + numConstant
+        .setConversion(21, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> - numConstant
+        .setConversion(22, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) // <expression> := <expression> * numConstant
+        .setConversion(23, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); // <expression> := <expression> / numConstant
     }
     
 }

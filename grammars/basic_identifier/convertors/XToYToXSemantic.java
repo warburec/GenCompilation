@@ -1,7 +1,5 @@
 package grammars.basic_identifier.convertors;
 
-import java.util.Map;
-
 import code_generation.*;
 import grammar_objects.*;
 import grammars.basic_identifier.BasicIdentifierGrammar;
@@ -28,12 +26,13 @@ public class XToYToXSemantic extends RuleConvertor {
     }
 
     @Override
-    protected void setUpRuleConvertors(Grammar grammar, Map<ProductionRule, Generator> ruleConversions) {
+    protected void setUpRuleConvertors(RuleOrganiser ruleOrganiser) {
         TypeChecker typeChecker = new TypeChecker();
 
-        ruleConversions.put(getRule(0), (elements) -> { return elements[0].getGeneration(); }); //<statement list> := <statement>
-        ruleConversions.put(getRule(1), (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }); //<statement list> := <statement list> <statement>
-        ruleConversions.put(getRule(2), (elements) -> {
+        ruleOrganiser
+        .setConversion(0, (elements) -> { return elements[0].getGeneration(); }) //<statement list> := <statement>
+        .setConversion(1, (elements) -> { return elements[0].getGeneration() + elements[1].getGeneration(); }) //<statement list> := <statement list> <statement>
+        .setConversion(2, (elements) -> {
             String identifierType = "";
 
             DynamicTokenGeneration identifier = (DynamicTokenGeneration)elements[0];
@@ -46,9 +45,9 @@ public class XToYToXSemantic extends RuleConvertor {
             elements[1].getGeneration() + " " + elements[2].getGeneration() + " " + 
             elements[3].getGeneration() + " " + elements[4].getGeneration() + 
             elements[5].getGeneration() + "\n"; 
-        });  //<statement> := identifier = <element> + <element>;
-        ruleConversions.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //<element> := identifier
-        ruleConversions.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //<element> := number
+        })  //<statement> := identifier = <element> + <element>;
+        .setConversion(3, (elements) -> { return elements[0].getGeneration(); }) //<element> := identifier
+        .setConversion(4, (elements) -> { return elements[0].getGeneration(); }); //<element> := number
     }
     
 }
