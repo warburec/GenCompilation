@@ -1,21 +1,3 @@
-import org.junit.Test;
-
-import builders.CompilerBuilder;
-import builders.LexicalAnalyserFactory;
-import builders.SyntaxAnalyserFactory;
-import builders.bundles.GrammarBundle;
-import builders.concrete_factories.BasicCodeGenFactory;
-import builders.concrete_factories.CLR1ParserFactory;
-import builders.concrete_factories.GeneralLexicalAnalyserFactory;
-import grammar_objects.Grammar;
-import grammar_objects.RuleConvertor;
-import grammars.basic_identifier.BasicIdentifierGrammar;
-import grammars.basic_identifier.convertors.XToYToXSemantic;
-import grammars.integer_comparison.IntegerCompGrammar;
-import grammars.integer_comparison.convertors.JavaConversion;
-import lexical_analysis.DynamicTokenRegex;
-import syntax_analysis.parsing.ParseFailedException;
-
 public class GrammarSandbox {
     
     // @Test
