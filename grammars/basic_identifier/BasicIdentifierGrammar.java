@@ -1,7 +1,5 @@
 package grammars.basic_identifier;
 
-import java.util.*;
-
 import grammar_objects.*;
 
 /**
@@ -13,12 +11,13 @@ import grammar_objects.*;
 public class BasicIdentifierGrammar extends Grammar {
 
     @Override
-    protected void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("="));
-        tokens.add(new Token("+"));
-        tokens.add(new Token(";"));
-        tokens.add(new Identifier("identifier"));
-        tokens.add(new Literal("number"));
+    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+        tokenOrganiser
+        .addToken(new Token("="))
+        .addToken(new Token("+"))
+        .addToken(new Token(";"))
+        .addToken(new Identifier("identifier"))
+        .addToken(new Literal("number"));
     }
 
     @Override
@@ -27,28 +26,31 @@ public class BasicIdentifierGrammar extends Grammar {
     }
 
     @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("statement list"));
-        nonTerminals.add(new NonTerminal("statement"));
-        nonTerminals.add(new NonTerminal("element"));
+    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+        nonTerminalOrganiser
+        .addNonTerminal("statement list")
+        .addNonTerminal("statement")
+        .addNonTerminal("element");
     }
 
     @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(new ProductionRule(
+    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+        ruleOrganiser
+
+        .addRule(
             new NonTerminal("statement list"),
             new LexicalElement[] {
                 new NonTerminal("statement")
-            }));
+        })
         
-        productionRules.add(new ProductionRule(
+        .addRule(
             new NonTerminal("statement list"),
             new LexicalElement[] {
                 new NonTerminal("statement list"),
                 new NonTerminal("statement")
-            }));
+        })
         
-        productionRules.add(new ProductionRule(
+        .addRule(
             new NonTerminal("statement"),
             new LexicalElement[] {
                 new Identifier("identifier"),
@@ -57,19 +59,19 @@ public class BasicIdentifierGrammar extends Grammar {
                 new Token("+"),
                 new NonTerminal("element"),
                 new Token(";")
-            }));
+        })
 
-        productionRules.add(new ProductionRule(
+        .addRule(
             new NonTerminal("element"),
             new LexicalElement[] {
                 new Identifier("identifier")
-            }));
+        })
         
-        productionRules.add(new ProductionRule(
+        .addRule(
             new NonTerminal("element"),
             new LexicalElement[] {
                 new Literal("number")
-            }));
+        });
     }
 
 }

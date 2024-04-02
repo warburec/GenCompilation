@@ -1,7 +1,5 @@
 package grammars.self_referential;
 
-import java.util.*;
-
 import grammar_objects.*;
 
 /**
@@ -13,11 +11,12 @@ import grammar_objects.*;
 public class SelfReferentialGrammar extends Grammar {
 
     @Override
-    protected void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("h"));
-        tokens.add(new Token("a"));
-        tokens.add(new Token("l"));
-        tokens.add(new Token("o"));
+    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+        tokenOrganiser
+        .addToken("h")
+        .addToken("a")
+        .addToken("l")
+        .addToken("o");
     }
 
     @Override
@@ -26,44 +25,43 @@ public class SelfReferentialGrammar extends Grammar {
     }
 
     @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("H"));
-        nonTerminals.add(new NonTerminal("A"));
-        nonTerminals.add(new NonTerminal("L"));
+    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+        nonTerminalOrganiser
+        .addNonTerminal("H")
+        .addNonTerminal("A")
+        .addNonTerminal("L");
     }
 
     @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(
-            new ProductionRule(
-                new NonTerminal("H"),
-                new LexicalElement[] {
-                    new Token("h"),
-                    new NonTerminal("A")
-                }));
+    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+        ruleOrganiser
+
+        .addRule(
+            new NonTerminal("H"),
+            new LexicalElement[] {
+                new Token("h"),
+                new NonTerminal("A")
+        })
         
-        productionRules.add(
-            new ProductionRule(
-                new NonTerminal("A"),
-                new LexicalElement[] {
-                    new Token("a"),
-                    new NonTerminal("L")
-                }));
+        .addRule(
+            new NonTerminal("A"),
+            new LexicalElement[] {
+                new Token("a"),
+                new NonTerminal("L")
+        })
         
-        productionRules.add(
-            new ProductionRule(
-                new NonTerminal("L"),
-                new LexicalElement[] {
-                    new Token("l"),
-                    new NonTerminal("L")
-                }));
+        .addRule(
+            new NonTerminal("L"),
+            new LexicalElement[] {
+                new Token("l"),
+                new NonTerminal("L")
+        })
         
-        productionRules.add(
-            new ProductionRule(
-                new NonTerminal("L"),
-                new LexicalElement[] {
-                    new Token("o")
-                }));
+        .addRule(
+            new NonTerminal("L"),
+            new LexicalElement[] {
+                new Token("o")
+        });
     }
 
 }
