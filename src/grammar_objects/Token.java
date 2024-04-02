@@ -9,6 +9,10 @@ public class Token extends LexicalElement {
 
     private PositionType positionType;
 
+    /**
+     * A constructor for grammar description, not for use within sentences/inputs to syntax analysis.
+     * @param grammarName The name of this Token used within the grammar.
+     */
     public Token(String name) {
         super(name);
     }

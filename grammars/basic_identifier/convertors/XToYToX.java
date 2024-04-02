@@ -34,8 +34,8 @@ public class XToYToX extends RuleConvertor {
             return "\t\t" + elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration() + " " + 
             elements[3].getGeneration() + " " + elements[4].getGeneration() + elements[5].getGeneration() + "\n"; 
         });  //<statement> := identifier = <element> + <element>;
-        ruleConversions.put(getRule(3), (elements) -> { return ((IdentifierGeneration)elements[0]).getGeneration(); }); //<element> := identifier
-        ruleConversions.put(getRule(4), (elements) -> { return ((LiteralGeneration)elements[0]).getGeneration(); }); //<element> := number
+        ruleConversions.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //<element> := identifier
+        ruleConversions.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //<element> := number
     }
     
 }

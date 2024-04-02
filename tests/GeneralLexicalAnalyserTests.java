@@ -9,6 +9,8 @@ import lexical_analysis.*;
 
 public class GeneralLexicalAnalyserTests {
 
+    //TODO: Test null inputs in constructor
+    
     @Test
     public void normalUseTest() {
         String sentence =
@@ -36,9 +38,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -55,14 +57,14 @@ public class GeneralLexicalAnalyserTests {
         Token[] expected = new Token[] {
             new Token("for", 1, 1),
             new Token("(", 1, 5),
-            new Identifier("identifier", "int", 1, 6),
-            new Identifier("identifier", "n", 1, 10),
+            new DynamicToken("identifier", "int", 1, 6),
+            new DynamicToken("identifier", "n", 1, 10),
             new Token(":", 1, 12),
-            new Identifier("identifier", "numbers", 1, 14),
+            new DynamicToken("identifier", "numbers", 1, 14),
             new Token(")", 1, 21),
             new Token("{", 1, 23),
-            new Identifier("identifier", "//Do", 2, 5), //No preprocessing
-            new Identifier("identifier", "stuffs", 2, 10), // ^
+            new DynamicToken("identifier", "//Do", 2, 5), //No preprocessing
+            new DynamicToken("identifier", "stuffs", 2, 10), // ^
             new Token("}", 3, 1)
         };
 
@@ -98,9 +100,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -145,9 +147,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -191,9 +193,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -259,9 +261,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -278,12 +280,12 @@ public class GeneralLexicalAnalyserTests {
         Token[] expected = new Token[] {
             new Token("for", 1, 1),
             new Token("(int", 1, 5),
-            new Identifier("identifier", "n", 1, 10),
+            new DynamicToken("identifier", "n", 1, 10),
             new Token(":", 1, 12),
-            new Identifier("identifier", "numbers", 1, 14),
+            new DynamicToken("identifier", "numbers", 1, 14),
             new Token(")-{", 1, 21),
-            new Identifier("identifier", "//Do", 2, 5), //No preprocessing
-            new Identifier("identifier", "stuffs", 2, 10), // ^
+            new DynamicToken("identifier", "//Do", 2, 5), //No preprocessing
+            new DynamicToken("identifier", "stuffs", 2, 10), // ^
             new Token("}", 3, 1)
         };
 
@@ -322,9 +324,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -341,14 +343,14 @@ public class GeneralLexicalAnalyserTests {
         Token[] expected = new Token[] {
             new Token("for", 1, 1),
             new Token("(", 1, 5),
-            new Identifier("identifier", "int", 1, 6),
-            new Identifier("identifier", "n", 1, 10),
+            new DynamicToken("identifier", "int", 1, 6),
+            new DynamicToken("identifier", "n", 1, 10),
             new Token(":", 1, 12),
-            new Identifier("identifier", "numbers", 1, 14),
+            new DynamicToken("identifier", "numbers", 1, 14),
             new Token(")", 1, 21),
             new Token("{", 1, 23),
-            new Identifier("identifier", "//Dofor", 2, 5), //No preprocessing
-            new Identifier("identifier", "stuffs", 2, 13), // ^
+            new DynamicToken("identifier", "//Dofor", 2, 5), //No preprocessing
+            new DynamicToken("identifier", "stuffs", 2, 13), // ^
             new Token("}", 3, 1)
         };
 
@@ -378,7 +380,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex(".+", Identifier.class, "identifier")
+            new DynamicTokenRegex(".+", "identifier")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -393,8 +395,8 @@ public class GeneralLexicalAnalyserTests {
 
 
         Token[] expected = new Token[] {
-            new Identifier("identifier", "a\n", 1, 1),
-            new Identifier("identifier", "b\nc", 2, 3)
+            new DynamicToken("identifier", "a\n", 1, 1),
+            new DynamicToken("identifier", "b\nc", 2, 3)
         };
 
         assertArrayEquals(expected, actual);
@@ -426,7 +428,7 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex(".+", Identifier.class, "identifier")
+            new DynamicTokenRegex(".+", "identifier")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -441,8 +443,8 @@ public class GeneralLexicalAnalyserTests {
 
 
         Token[] expected = new Token[] {
-            new Identifier("identifier", "a\n\n", 1, 1),
-            new Identifier("identifier", "b\n\nd\nc", 3, 3)
+            new DynamicToken("identifier", "a\n\n", 1, 1),
+            new DynamicToken("identifier", "b\n\nd\nc", 3, 3)
         };
 
         assertArrayEquals(expected, actual);
@@ -473,8 +475,8 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[^\"].*[^\"]", Identifier.class, "ident")
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[^\"].*[^\"]", "ident")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -489,10 +491,10 @@ public class GeneralLexicalAnalyserTests {
 
 
         Token[] expected = new Token[] {
-            new Literal("string", "\"ab cde\"", 1, 1),
-            new Literal("string", "\"bcd\ndcb cdb\"", 2, 1),
+            new DynamicToken("string", "\"ab cde\"", 1, 1),
+            new DynamicToken("string", "\"bcd\ndcb cdb\"", 2, 1),
             new Token("+", 3, 9),
-            new Identifier("ident", "zzz", 3, 11)
+            new DynamicToken("ident", "zzz", 3, 11)
         };
 
         assertArrayEquals(expected, actual);
@@ -518,8 +520,8 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("\\{.*\\}", Identifier.class, "single set")
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("\\{.*\\}", "single set")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -534,10 +536,10 @@ public class GeneralLexicalAnalyserTests {
 
 
         Token[] expected = new Token[] {
-            new Literal("string", "\"a\"", 1, 1),
-            new Identifier("single set", "{b}", 1, 4),
-            new Identifier("single set", "{cd}", 1, 7),
-            new Literal("string", "\"e\"", 1, 11),
+            new DynamicToken("string", "\"a\"", 1, 1),
+            new DynamicToken("single set", "{b}", 1, 4),
+            new DynamicToken("single set", "{cd}", 1, 7),
+            new DynamicToken("string", "\"e\"", 1, 11),
         };
 
         assertArrayEquals(expected, actual);
@@ -569,9 +571,9 @@ public class GeneralLexicalAnalyserTests {
         };
 
         DynamicTokenRegex[] dynamicTokenRegex = {        
-            new DynamicTokenRegex("[^\"0-9].*", Identifier.class, "identifier"),
-            new DynamicTokenRegex("\".*\"", Literal.class, "string"),
-            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", Literal.class, "number")
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
         };
 
         LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
@@ -586,9 +588,9 @@ public class GeneralLexicalAnalyserTests {
 
 
         Token[] expected = new Token[] {
-            new Identifier("identifier", "forwhile", 1, 1),
+            new DynamicToken("identifier", "forwhile", 1, 1),
             new Token("=", 1, 10),
-            new Literal("number", "0", 1, 12),
+            new DynamicToken("number", "0", 1, 12),
             new Token(";", 1, 13),
         };
 

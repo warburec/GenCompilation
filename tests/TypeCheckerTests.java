@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import code_generation.*;
 import grammar_objects.*;
-import grammars.basic_identifier.convertors.XToXToYSemantic;
+import grammars.basic_identifier.convertors.XToYToXSemantic;
 import syntax_analysis.parsing.ParseState;
 import tests.test_aids.*;
 import tests.test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
@@ -18,7 +18,7 @@ public class TypeCheckerTests {
         String language = "Java";
         String sentence = "XToYToXSemantic";
         TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
-        RuleConvertor ruleConvertor = new XToXToYSemantic();
+        RuleConvertor ruleConvertor = new XToYToXSemantic();
         CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor);
         ParseState rootParseState = grammar.getParseRoot("XToYToXSemantic");
 

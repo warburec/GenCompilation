@@ -4,21 +4,20 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import grammar_objects.*;
-import grammar_objects.Identifier.ConflictingTypesException;
 
 public class IdentifierTests {
     
     @Test
     public void identifierEquality() {
-        Identifier i1 = new Identifier("Identifier", "String", "x");
-        Identifier i2 = new Identifier("Identifier", "String", "x");
+        Identifier i1 = new Identifier("Identifier", "x");
+        Identifier i2 = new Identifier("Identifier", "x");
 
         assertEquals(i1, i2);
     }
 
     @Test
     public void similarTokenEquality() {
-        Identifier ident = new Identifier("Identifier", "String", "x");
+        Identifier ident = new Identifier("Identifier", "x");
         Token token = new Token("Identifier");
 
         assertNotEquals(ident, token);
@@ -26,8 +25,8 @@ public class IdentifierTests {
 
     @Test
     public void differentIdentifierNamesGrammatically() {
-        Identifier i1 = new Identifier("Identifier", "String", "x");
-        Identifier i2 = new Identifier("Identifier", "String", "y");
+        Identifier i1 = new Identifier("Identifier", "x");
+        Identifier i2 = new Identifier("Identifier", "y");
 
         assertTrue(i1.equals(i2));
         assertTrue(i1.grammaticallyEquals(i2));
@@ -35,17 +34,9 @@ public class IdentifierTests {
 
     @Test
     public void differentIdentifierNamesExact() {
-        Identifier i1 = new Identifier("Identifier", "String", "x");
-        Identifier i2 = new Identifier("Identifier", "String", "y");
+        Identifier i1 = new Identifier("Identifier", "x");
+        Identifier i2 = new Identifier("Identifier","y");
 
         assertFalse(i1.exactlyEquals(i2));
-    }
-
-    @Test
-    public void differingTypes() {
-        Identifier i1 = new Identifier("Identifier", "String", "x");
-        Identifier i2 = new Identifier("Identifier", "Integer", "x");
-
-        assertThrows(ConflictingTypesException.class, () -> i1.exactlyEquals(i2));
     }
 }
