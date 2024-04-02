@@ -1,8 +1,5 @@
 package grammars.small_grammar.convertors;
 
-import java.util.Map;
-
-import code_generation.Generator;
 import grammar_objects.*;
 import grammars.small_grammar.SmallGrammar;
 import helperObjects.NullableTuple;
@@ -31,12 +28,13 @@ public class OpZtO extends RuleConvertor {
     }
 
     @Override
-    protected void setUpRuleConvertors(Grammar grammar, Map<ProductionRule, Generator> ruleConversions) {
-        ruleConversions.put(getRule(0), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E+B
-        ruleConversions.put(getRule(1), (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }); //E->E*B
-        ruleConversions.put(getRule(2), (elements) -> { return elements[0].getGeneration(); }); //E->B
-        ruleConversions.put(getRule(3), (elements) -> { return elements[0].getGeneration(); }); //B->0
-        ruleConversions.put(getRule(4), (elements) -> { return elements[0].getGeneration(); }); //B->1
+    protected void setUpRuleConvertors(RuleOrganiser ruleOrganiser) {
+        ruleOrganiser
+        .setConversion(0, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) //E->E+B
+        .setConversion(1, (elements) -> { return elements[0].getGeneration() + " " + elements[1].getGeneration() + " " + elements[2].getGeneration(); }) //E->E*B
+        .setConversion(2, (elements) -> { return elements[0].getGeneration(); }) //E->B
+        .setConversion(3, (elements) -> { return elements[0].getGeneration(); }) //B->0
+        .setConversion(4, (elements) -> { return elements[0].getGeneration(); }); //B->1
     }
     
 }

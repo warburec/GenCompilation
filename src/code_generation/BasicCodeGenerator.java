@@ -7,8 +7,6 @@ import helperObjects.NullableTuple;
 import syntax_analysis.parsing.*;
 
 public class BasicCodeGenerator implements CodeGenerator {
-    public static ProductionRule ROOT_RULE = null;
-
     protected Map<ProductionRule, Generator> ruleConvertor;
     protected String preGeneration;
     protected String postGeneration;
@@ -82,7 +80,7 @@ public class BasicCodeGenerator implements CodeGenerator {
             }
         }
 
-        Generator rootGenerator = ruleConvertor.get(ROOT_RULE);
+        Generator rootGenerator = ruleConvertor.get(RuleConvertor.ROOT_RULE);
         if(rootGenerator != null) {
             currentlyBuiltCode = new NonTerminalGeneration(rootGenerator.generateCode(new CodeElement[] { currentlyBuiltCode }));
         }

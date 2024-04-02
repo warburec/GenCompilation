@@ -6,6 +6,8 @@ import code_generation.Generator;
 import helperObjects.NullableTuple;
 
 public abstract class RuleConvertor {
+    public static final Integer ROOT_RULE_INDEX = null;
+    public static final ProductionRule ROOT_RULE = null;
 
     private Grammar grammar;
     private NullableTuple<String, String> bookends;
@@ -19,7 +21,7 @@ public abstract class RuleConvertor {
             bookends = new NullableTuple<String,String>("", "");
         }
 
-        setUpRuleConvertors(grammar, conversions);
+        setUpRuleConvertors(new RuleOrganiser());
     }
 
     /**
@@ -35,10 +37,10 @@ public abstract class RuleConvertor {
     protected abstract NullableTuple<String, String> setUpBookends();
 
     /**
-     * Populates the map of production rules to their conversion Generator
-     * @param ruleConversions The map to be populated
+     * Sets up code conversions for each production rule, for when the rules are sanctioned
+     * @param ruleOrganiser A helper object for conversion setup
      */
-    protected abstract void setUpRuleConvertors(Grammar grammar, Map<ProductionRule, Generator> ruleConversions);
+    protected abstract void setUpRuleConvertors(RuleOrganiser ruleOrganiser);
 
     /**
      * Gets the start and ending strings for conversions
@@ -56,12 +58,30 @@ public abstract class RuleConvertor {
         return conversions;
     }
 
-    /**
-     * Helper function to get ProductionRule from the grammar returned from setUpGrammar()
-     * @param index The index of the ProductionRule in the Gramar
-     * @return The ProductionRule
-     */
-    protected ProductionRule getRule(int index) {
-        return grammar.getRule(index);
+    protected class RuleOrganiser {
+
+        /**
+         * Sets the conversion code to run when the specified rule is sanctioned 
+         * @param ruleNumber The rule index. ROOT_RULE_INDEX, to run code after the final rule is sanctioned (useful for formatting).
+         * @param generatorFunction The function to be run when the specified rule is sanctioned.
+         * @return The original organiser object to allof method chaining.
+         */
+        public RuleOrganiser setConversion(Integer ruleNumber, Generator generatorFunction) {
+            if(ruleNumber < 0 && ruleNumber != ROOT_RULE_INDEX) { 
+                throw new RuntimeException("The given rule number must be >= 0 or ROOT_RULE_INDEX");
+            }
+
+            ProductionRule rule = null;
+
+            if(ruleNumber != ROOT_RULE_INDEX) {
+                rule = grammar.getRule(ruleNumber);
+            }
+
+            conversions.put(rule, generatorFunction);
+
+            return this;
+        }
+
     }
+
 }

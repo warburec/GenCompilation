@@ -1,15 +1,14 @@
 package grammars.basic_CLR1;
 
-import java.util.*;
-
 import grammar_objects.*;
 
 public class BasicCLR1Grammar extends Grammar {
 
     @Override
-    protected void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("a"));
-        tokens.add(new Token("b"));
+    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+        tokenOrganiser
+        .addToken("a")
+        .addToken("b");
     }
 
     @Override
@@ -18,34 +17,34 @@ public class BasicCLR1Grammar extends Grammar {
     }
 
     @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("S"));
-        nonTerminals.add(new NonTerminal("X"));
+    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+        nonTerminalOrganiser
+        .addNonTerminal("S")
+        .addNonTerminal("X");
     }
 
     @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(new ProductionRule(
+    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+        ruleOrganiser
+
+        .addRule(
             new NonTerminal("S"), 
             new LexicalElement[] {
                 new NonTerminal("X"),
                 new NonTerminal("X")
-            }
-        ));
+        })
 
-        productionRules.add(new ProductionRule(
+        .addRule(
             new NonTerminal("X"),
             new LexicalElement[] {
                 new Token("a"),
                 new NonTerminal("X")
-            }
-        ));
+        })
 
-        productionRules.add(new ProductionRule(
+        .addRule(
             new NonTerminal("X"),
             new LexicalElement[] {
                 new Token("b")
-            }
-        ));
+        });
     }
 }

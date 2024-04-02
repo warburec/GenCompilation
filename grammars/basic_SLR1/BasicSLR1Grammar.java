@@ -1,7 +1,5 @@
 package grammars.basic_SLR1;
 
-import java.util.*;
-
 import grammar_objects.*;
 
 /**
@@ -12,9 +10,10 @@ import grammar_objects.*;
 public class BasicSLR1Grammar extends Grammar {
 
     @Override
-    protected void setUpTokens(List<Token> tokens) {
-        tokens.add(new Token("a"));
-        tokens.add(new Token("b"));
+    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+        tokenOrganiser
+        .addToken("a")
+        .addToken("b");
     }
 
     @Override
@@ -23,33 +22,36 @@ public class BasicSLR1Grammar extends Grammar {
     }
 
     @Override
-    protected void setUpNonTerminals(List<NonTerminal> nonTerminals) {
-        nonTerminals.add(new NonTerminal("S"));
-        nonTerminals.add(new NonTerminal("A"));
+    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+        nonTerminalOrganiser
+        .addNonTerminal("S")
+        .addNonTerminal("A");
     }
 
     @Override
-    protected void setUpProductionRules(List<ProductionRule> productionRules) {
-        productionRules.add(new ProductionRule(
+    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+        ruleOrganiser
+
+        .addRule(
             new NonTerminal("S"),
             new LexicalElement[] {
                 new NonTerminal("A"),
                 new NonTerminal("A")
             }
-        ));
-        productionRules.add(new ProductionRule(
+        )
+        .addRule(
             new NonTerminal("A"),
             new LexicalElement[] {
                 new Token("a"),
                 new NonTerminal("A")
             }
-        ));
-        productionRules.add(new ProductionRule(
+        )
+        .addRule(
             new NonTerminal("A"),
             new LexicalElement[] {
                 new Token("b")
             }
-        ));
+        );
     }
 
 }
