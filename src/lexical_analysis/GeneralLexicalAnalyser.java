@@ -49,12 +49,12 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
     /**
      * Default dynamic tokens:
-     * Regex:"[a-zA-Z].*",     Object type:"Identifier", Grammatical name:"identifier" //TODO: Remove object types in JavaDoc
-     * Regex:"\".*\"",         Object type:"Literal",    Grammatical name:"string"
-     * Regex:"[0-9]+",         Object type:"Literal",    Grammatical name:"integer"
-     * Regex:"[0-9]\\.[0-9]+", Object type:"Literal",    Grammatical name:"real"
-     * Regex:"[true|false]",   Object type:"Literal",    Grammatical name:"boolean"
-     * Regex:"\'.\'",          Object type:"Literal",    Grammatical name:"character"
+     * Regex:"[a-zA-Z].*",     Grammatical name:"identifier"
+     * Regex:"\".*\"",         Grammatical name:"string"
+     * Regex:"[0-9]+",         Grammatical name:"integer"
+     * Regex:"[0-9]\\.[0-9]+", Grammatical name:"real"
+     * Regex:"[true|false]",   Grammatical name:"boolean"
+     * Regex:"\'.\'",          Grammatical name:"character"
      * @param whitespaceDelimiters
      * @param stronglyReservedWords
      * @param weaklyReservedWords
@@ -253,7 +253,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 Token newToken = tokenise(regex, tokenHolder);
 
                 if(newToken == null) {
-                    throw new LexicalError("No start bookend found");  //TODO: Make Error more descriptive (follow Google error design structure). "Check all Regex special characters are escaped correctly"
+                    throw new LexicalError("No start bookend found. ");  //TODO: Make Error more descriptive (follow Google error design structure). "Check all Regex special characters are escaped correctly", add line/token number
                 }
 
                 tokenHolder.tokenList.add(newToken);
@@ -268,7 +268,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             }
 
             String afterStart = regex.substring(startBookend.length);
-            BookendDetails endBookend = findMatchingEndBookend(startBookend.regex, afterStart);
+            BookendDetails endBookend = findFirstEndBookend(startBookend.regex, afterStart);
 
             if(endBookend == null) {
                 Token token = tokenise(regex, tokenHolder);
@@ -297,27 +297,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 return;
             }
             
-            //Keep trying end bookend until failure or positioned at end of regex
-            String endRegex = endBookend.regex;
-            String remainingString = afterStart.substring(endBookend.startIndex); 
-            int index = endBookend.startIndex + 1;
-            boolean edgeFound = false;
-            String[] parts;
-
-            while(index < afterStart.length() - 1) {
-                remainingString = afterStart.substring(index);
-
-                parts = java.util.regex.Pattern.compile(endRegex, Pattern.DOTALL).split(remainingString, 2);
-
-                if(!parts[0].equals("")) {
-                    edgeFound = true;
-                    break;
-                }
-
-                index++;
-            }
+            Integer edgeIndex = findTokenEdge(endBookend, afterStart);
             
-            if(!edgeFound) {
+            if(edgeIndex == null) {
                 //Tokenise all as one token
                 tokenHolder.tokenList.add(tokenise(
                     regex, 
@@ -330,16 +312,16 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 return;
             }
             
-            index--;
+            edgeIndex--;
 
             int endOfStartIndex = startBookend.startIndex + startBookend.length;
 
-            BookendDetails finalMatch = findMatchingEndBookend(
+            BookendDetails finalMatch = findFirstEndBookend(
                 startBookend.regex,
-                regex.substring(endOfStartIndex + index)
-            ); //TODO: Alter to use the same endBookend, not just any potential one , only useful for length
+                regex.substring(endOfStartIndex + edgeIndex)
+            ); //TODO: Alter to use the same endBookend, not just any potential one, only useful for length
 
-            String stringToTokenise = regex.substring(0, endOfStartIndex + index + finalMatch.length);
+            String stringToTokenise = regex.substring(0, endOfStartIndex + edgeIndex + finalMatch.length);
 
             tokenHolder.tokenList.add(tokenise(
                 stringToTokenise, 
@@ -350,8 +332,37 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             updateDisplayPosition(tokenHolder, stringToTokenise, StringType.Dynamic);
 
-            regex = regex.substring(endOfStartIndex + index + finalMatch.length);
+            regex = regex.substring(endOfStartIndex + edgeIndex + finalMatch.length);
         }
+    }
+
+    /**
+     * Finds the final valid ending bookend position for the token being read.
+     * @param endBookend The previously found end bookend instance
+     * @param afterStart The sentence commencing from after the start bookend that was found
+     * @return The index of the matched ending bookend, or null if an ending bookend cound not be found
+     */
+    private Integer findTokenEdge(BookendDetails endBookend, String afterStart) {
+        //Keeps trying to find the given end bookend until it is no longer valid, therefore positioned at end of the token.
+
+        String endRegex = endBookend.regex;
+        String remainingString = afterStart.substring(endBookend.startIndex); 
+        int index = endBookend.startIndex + 1;
+        String[] parts;
+
+        while(index < afterStart.length() - 1) {
+            remainingString = afterStart.substring(index);
+
+            parts = java.util.regex.Pattern.compile(endRegex, Pattern.DOTALL).split(remainingString, 2);
+
+            if(!parts[0].equals("")) {
+                return index;
+            }
+
+            index++;
+        }
+
+        return null;
     }
 
     private BookendDetails findStartingBookend(String string) {
@@ -361,9 +372,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         int lengthOfStart = -1;
 
         for(String start : dynamicRegexBookends.startToEnd.keySet()) {
-            String[] splitString = string.split("(?<=" + start + ")" + "|(?=" + start + ")", 2); //TODO: Use splitAround
+            String[] splitString = splitAround(string, start);
 
-            if(splitString.length == 1) { continue; }
+            if(splitString.length == 1) { continue; } //No split occured
 
             String part1 = splitString[0];
             String part2 = splitString[1];
@@ -384,9 +395,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             startRegexMatched = start;
         }
 
-        if(!matchFound) {
-            return null;
-        }
+        if(!matchFound) { return null; }
 
         BookendPosition startPosition = BookendPosition.Middle;
         if(indexOfStart == 0) {
@@ -399,11 +408,13 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return new BookendDetails(startRegexMatched, indexOfStart, lengthOfStart, startPosition);
     }
 
-    // private String[] splitAround(String string, String regex) {
-    //     return string.split("(?<=" + regex + ")" + "|(?=" + regex + ")", 2);
-    // }
-
-    private BookendDetails findMatchingEndBookend(String startBookendRegex, String string) {
+    /**
+     * Finds the first instance of the ending bookend, that corresponds with the given starting bookend, within the given string
+     * @param startBookendRegex
+     * @param string
+     * @return
+     */
+    private BookendDetails findFirstEndBookend(String startBookendRegex, String string) {
         Set<String> potentialEnds = dynamicRegexBookends.getEndRegex(startBookendRegex);
 
         boolean matchFound = false;
@@ -413,9 +424,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         int lengthOfEnding = -1;
 
         for(String ending : potentialEnds) {
-            String[] splitString = string.split(ending +"|(?<=" + ending + ")", 2); //TODO: Use splitAround
+            String[] splitString = string.split(ending + "|(?<=" + ending + ")", 2); //TODO: Convert to SplitAround
 
-            if(splitString.length == 1) { continue; }
+            if(splitString.length == 1) { continue; } //No split occured
 
             matchFound = true;
 
@@ -432,9 +443,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             }
         }
 
-        if(!matchFound) {
-            return null;
-        }
+        if(!matchFound) { return null; }
 
         BookendPosition endPosition = BookendPosition.Middle;
         if(indexOfEnding + lengthOfEnding == string.length()) {
@@ -442,6 +451,16 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
 
         return new BookendDetails(endingRegexMatched, indexOfEnding, lengthOfEnding, endPosition);
+    }
+
+    /**
+     * Splits the string around the first instance of the specified item
+     * @param string The full string
+     * @param regex The string item to be split around
+     * @return The string split into sections. index: 0 - before item, 1 - item, 2 - after item
+     */
+    private String[] splitAround(String string, String item) {
+        return string.split("(?<=" + item + ")" + "|(?=" + item + ")", 3);
     }
 
     private String findEndingRegex(Set<String> endBookends, String string) {
