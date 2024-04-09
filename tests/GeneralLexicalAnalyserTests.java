@@ -455,7 +455,6 @@ public class GeneralLexicalAnalyserTests {
         }
     }
 
-    //TODO: Fix .equals for identifiers (should use exactly equals)
     @Test
     public void standardStringMatches() {
         String sentence =
@@ -603,4 +602,5 @@ public class GeneralLexicalAnalyserTests {
     }
 
     //TODO: Make tests for: same start bookend but different ends, and different start bookends but same ends
+    //^^^^ Add assertions for lexical errors and bookend errors.
 }

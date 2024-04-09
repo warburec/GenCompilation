@@ -190,7 +190,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 catch(ArrayIndexOutOfBoundsException e) {
                     if(matchFound) { break; }
                     
-                    throw new LexicalError("Token ended prematurely at line:" + tokenHolder.lineNum + ", column:" + tokenHolder.columnNum + " (end of file)");
+                    throw new LexicalError("Token ended prematurely", tokenHolder.lineNum, tokenHolder.columnNum, "(end of file)");
                 }
                 
                 tokenHolder.tokenList.add(tokenise(currentTokStr, tokenHolder.startBookend, firstMatch, tokenHolder));
@@ -253,7 +253,14 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 Token newToken = tokenise(regex, tokenHolder);
 
                 if(newToken == null) {
-                    throw new LexicalError("No start bookend found. ");  //TODO: Make Error more descriptive (follow Google error design structure). "Check all Regex special characters are escaped correctly", add line/token number
+                    throw new LexicalError(
+                        "No start bookend found", 
+                        tokenHolder.lineNum, 
+                        tokenHolder.columnNum, 
+                        """
+                        Ensure the sentence is correctly written. Check all Regex special characters (e.g ".", "\\") are escaped correctly, and reserved words are set up appropriately (if a reserved word can be included within a dynamic token's label, it must be weakly reserved and therefore cannot be strongly reserved).
+                        """
+                    );
                 }
 
                 tokenHolder.tokenList.add(newToken);
@@ -747,9 +754,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
     }
 
-    public class BookendConflict extends LexicalError {
+    public class BookendConflict extends RuntimeException {
         public BookendConflict(String name1, String name2, Tuple<String, String> bookends) {
-            super("The tokens \"" + name1 + "\" and \"" + name2 + "\" have the same bookends <\"" + bookends.value1() + "\", \"" + bookends.value2() + "\">");
+            super("The tokens \"" + name1 + "\" and \"" + name2 + "\" have the same bookends <\"" + bookends.value1() + "\", \"" + bookends.value2() + "\">. Alter either the start or end bookend (constant set of potential strings) enable this analyser to differentiate between the tokens.");
         }
     }
 }
