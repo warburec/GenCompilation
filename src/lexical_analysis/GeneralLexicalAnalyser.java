@@ -82,6 +82,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         String[] weaklyReservedWords,
         DynamicTokenRegex[] dynamicTokenRegex
         ) {
+        checkForNullInputs(whitespaceDelimiters, stronglyReservedWords, weaklyReservedWords, dynamicTokenRegex);
+
         this.whitespaceDelimiters = whitespaceDelimiters;
 
         List<String> reservedWords = new ArrayList<>(stronglyReservedWords.length);
@@ -148,6 +150,8 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     //It may also be useful to allow users to disallow strongly reserved words even if there are specific bookends 
     @Override
     public Token[] analyse(String sentence) {
+        if(sentence == null) { throw new NullInputException("The provided sentence cannot be null."); }
+
         char[] sentenceChars = sentence.toCharArray();
 
         StronglyResRemovalHolder strongRemovalholder = new StronglyResRemovalHolder();
@@ -623,8 +627,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
     }
 
-    private String getStringRepresentation(ArrayList<Character> list)
-    {    
+    private String getStringRepresentation(ArrayList<Character> list) {    
         StringBuilder builder = new StringBuilder(list.size());
 
         for(Character c : list) {
@@ -632,6 +635,36 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         }
 
         return builder.toString();
+    }
+
+    private void  checkForNullInputs(
+        String[] whitespaceDelimiters,
+        String[] stronglyReservedWords,
+        String[] weaklyReservedWords,
+        DynamicTokenRegex[] dynamicTokenRegex
+    ) {
+        List<String> messageParts = new ArrayList<>();
+
+        if (whitespaceDelimiters == null) { messageParts.add("whitespaceDelimiters"); }
+        if (stronglyReservedWords == null) { messageParts.add("stronglyReservedWords"); }
+        if (weaklyReservedWords == null) { messageParts.add("weaklyReservedWords"); }
+        if (dynamicTokenRegex == null) { messageParts.add("dynamicTokenRegex"); }
+
+        if(messageParts.size() == 0) { return; }
+
+        String messageEnd = " null. No input parameter may be null.";
+        if(messageParts.size() == 1) { throw new NullInputException(messageParts.get(0) + " was" + messageEnd); }
+
+        String messageStart = "";
+
+        for(int i = 0; i < messageParts.size() - 2; i++) {
+            messageStart += messageParts.get(i) + ", ";
+        }
+
+        messageStart += messageParts.get(messageParts.size() - 2) + " and";
+        messageStart += messageParts.get(messageParts.size() - 1);
+
+        throw new NullInputException(messageStart + " were" + messageEnd);
     }
     
     private class TokenisationHolder {

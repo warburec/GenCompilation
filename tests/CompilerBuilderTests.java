@@ -27,7 +27,7 @@ public class CompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number") //TODO: Using [0-9]+(\\.[0-9]+)? for ll tests woud be better
+                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number") //TODO: Using [0-9]+(\\.[0-9]+)? for all tests woud be better
             }
         );
 

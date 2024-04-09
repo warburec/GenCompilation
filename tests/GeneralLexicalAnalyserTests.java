@@ -4,12 +4,178 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import grammar_objects.*;
+import helperObjects.NullInputException;
 import lexical_analysis.*;
 
 
 public class GeneralLexicalAnalyserTests {
 
-    //TODO: Test null inputs in constructor
+    @Test
+    public void nullDelims() {
+        String[] delims = null;
+
+        String[] stronglyReserved = new String[] {
+            "(",
+            ")",
+            ":",
+            "{",
+            "}"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for"
+        };
+
+        DynamicTokenRegex[] dynamicTokenRegex = {
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
+        };
+
+
+        assertThrows(NullInputException.class, () -> new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        ));
+    }
+
+    @Test
+    public void nullStronglyReserved() {
+        String[] delims = new String[] {
+            " ",
+            "\t",
+            "\r\n",
+            "\n"
+        };
+
+        String[] stronglyReserved = null;
+
+        String[] weaklyReserved = new String[] {
+            "for"
+        };
+
+        DynamicTokenRegex[] dynamicTokenRegex = {
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
+        };
+
+
+        assertThrows(NullInputException.class, () -> new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        ));
+    }
+
+    @Test
+    public void nullWeaklyReserved() {
+        String[] delims = new String[] {
+            " ",
+            "\t",
+            "\r\n",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "(",
+            ")",
+            ":",
+            "{",
+            "}"
+        };
+
+        String[] weaklyReserved = null;
+
+        DynamicTokenRegex[] dynamicTokenRegex = {
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
+        };
+
+
+        assertThrows(NullInputException.class, () -> new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        ));
+    }
+
+    @Test
+    public void nullDynamics() {
+        String[] delims = new String[] {
+            " ",
+            "\t",
+            "\r\n",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "(",
+            ")",
+            ":",
+            "{",
+            "}"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for"
+        };
+
+        DynamicTokenRegex[] dynamicTokenRegex = null;
+
+
+        assertThrows(NullInputException.class, () -> new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        ));
+    }
+
+    @Test
+    public void nullSentence() {
+        String sentence = null;
+
+        String[] delims = new String[] {
+            " ",
+            "\t",
+            "\r\n",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "(",
+            ")",
+            ":",
+            "{",
+            "}"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for"
+        };
+
+        DynamicTokenRegex[] dynamicTokenRegex = {
+            new DynamicTokenRegex("[^\"0-9].*", "identifier"),
+            new DynamicTokenRegex("\".*\"", "string"),
+            new DynamicTokenRegex("[0-9]+[\\.[0.9]+]?", "number")
+        };
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+        
+
+        assertThrows(NullInputException.class, () -> lexAnalyser.analyse(sentence));
+    }
     
     @Test
     public void normalUseTest() {

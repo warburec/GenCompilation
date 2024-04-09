@@ -28,7 +28,7 @@ public class CompilerTests {
             new XToYToXSemantic(), 
             new String[] {" ", "\n", "\r", "\t"}, 
             new String[] {"+", "=", ";"},
-            new String[] {}, //TODO: Place reasonable troubleshooting description for failing parsing to check that weakly and strongly reserved words are defined correctly
+            new String[] {},
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
                 new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number") //TODO: Using [0-9]+(\\.[0-9]+)? would be better
