@@ -769,4 +769,102 @@ public class GeneralLexicalAnalyserTests {
 
     //TODO: Make tests for: same start bookend but different ends, and different start bookends but same ends
     //^^^^ Add assertions for lexical errors and bookend errors.
+
+    @Test
+    public void sameStartingBookend() {
+        String sentence = "0000 0aaaa 0000a";
+
+        String[] delims = new String[] {
+            " ",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "=",
+            ";"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for",
+            "while"
+        };
+
+        DynamicTokenRegex[] dynamicTokenRegex = {        
+            new DynamicTokenRegex("[0-9]+", "number"),
+            new DynamicTokenRegex("[0-9]+[a-zA-Z]+", "numStr")
+        };
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new DynamicToken("number", "0000", 1, 1),
+            new DynamicToken("numStr", "0aaaa", 1, 6),
+            new DynamicToken("numStr", "0000a", 1, 12),
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
+
+    @Test
+    public void sameEndingBookend() {
+        String sentence = "0000 aaaa0 a0000";
+        
+        String[] delims = new String[] {
+            " ",
+            "\n"
+        };
+
+        String[] stronglyReserved = new String[] {
+            "=",
+            ";"
+        };
+
+        String[] weaklyReserved = new String[] {
+            "for",
+            "while"
+        };
+
+        DynamicTokenRegex[] dynamicTokenRegex = {        
+            new DynamicTokenRegex("[0-9]+", "number"),
+            new DynamicTokenRegex("[a-zA-Z]+[0-9]+", "strNum")
+        };
+
+        LexicalAnalyser lexAnalyser = new GeneralLexicalAnalyser(
+            delims,
+            stronglyReserved,
+            weaklyReserved,
+            dynamicTokenRegex
+        );
+
+
+        Token[] actual = lexAnalyser.analyse(sentence);
+
+
+        Token[] expected = new Token[] {
+            new DynamicToken("number", "0000", 1, 1),
+            new DynamicToken("strNum", "aaaa0", 1, 6),
+            new DynamicToken("strNum", "a0000", 1, 12),
+        };
+
+        assertArrayEquals(expected, actual);
+
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i].getLineNumber(), actual[i].getLineNumber());
+            assertEquals(expected[i].getColumnNumber(), actual[i].getColumnNumber());
+        }
+    }
 }

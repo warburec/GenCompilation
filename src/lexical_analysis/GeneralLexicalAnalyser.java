@@ -597,7 +597,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
     }
 
     private Token tokeniseWithoutBookends(String substring) {
-        throw new RuntimeException("Not implemented");
+        throw new RuntimeException("\"tokeniseWithoutBookends\" Not implemented"); //TODO: tokeniseWithoutBookends
     }
 
 
