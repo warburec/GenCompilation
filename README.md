@@ -1,4 +1,4 @@
-# GenComp
+# GenCompiler
 
 ### What is the project?
 This project provides an easy-to-use and extensible framework for creating/prototyping languages and grammars.
@@ -57,29 +57,11 @@ String output = compiler.compile(input);
 ## Running the tests
 
 This project uses [JUnit](https://junit.org/junit5/).
+Tests can be found in the [tests](tests) folder.
+
 Use the VScode [Test Runner for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test) extension.
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
 ## Contributing
-
-<!-- Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us. -->
 
 Make a pull request. Make an issue for large changes. Ensure unit tests are provided for your code.
 
