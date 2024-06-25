@@ -56,10 +56,15 @@ String output = compiler.compile(input);
 
 ## Running the tests
 
-This project uses [JUnit](https://junit.org/junit5/).
-Tests can be found in the [tests](tests) folder.
+Run the tests with Gradle using the gradle wrapper:
+```shell
+./gradlew test
+```
 
-Use the VScode [Test Runner for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test) extension.
+This project uses [JUnit](https://junit.org/junit5/).
+Tests can be found in the [test](test) folder.
+
+If you're using VSCode, it is recommended to use the VSCode [Test Runner for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test) extension.
 
 ## Contributing
 
