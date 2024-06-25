@@ -63,6 +63,7 @@ jobs:
         run: ./gradlew test
 
       - name: Publish Test Report
+        if: success() || failure()
         uses: mikepenz/action-junit-report@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
