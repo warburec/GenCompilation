@@ -1,2 +1,7 @@
 .vscode
 .vs
+.idea
+
+.gradle
+
+build
