@@ -1,6 +1,7 @@
-# GenCompiler
+![GenCompilation](https://github.com/warburec/GenCompilation/assets/36624401/f2852187-d57e-46ff-8644-894d77b28b3e)
 
 ### What is the project?
+
 This project provides an easy-to-use and extensible framework for creating/prototyping languages and grammars.
 
 It also provides support for atypical languages, e.g., sample languages typically used in education.
@@ -17,7 +18,7 @@ May produce the sentence: aaaaaabb
 
 ### Aims of this project
 
-This project aims to provide a foundation for fast prototyping of languages/grammar, reference/an education tool for students, and a sandbox. 
+This project aims to provide a foundation for fast prototyping of languages/grammar, reference/an education tool for students, and a sandbox.
 
 Compilation speed is not a main concern, although, components should be produced in a way so that they can be replaced for applications that require it.
 
@@ -57,6 +58,7 @@ String output = compiler.compile(input);
 ## Running the tests
 
 Run the tests with Gradle using the gradle wrapper:
+
 ```shell
 ./gradlew test
 ```
