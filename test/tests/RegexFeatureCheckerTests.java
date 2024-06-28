@@ -1,10 +1,10 @@
 package tests;
 
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import helperObjects.*;
 
@@ -140,7 +140,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void indefiniteRangeInBrackets() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "(ab|(cd){3,7}).*end";
@@ -201,7 +201,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void indefiniteEndRepitition() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "a.*cb{1,7}";
@@ -232,7 +232,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void indefiniteRepititionNotAtEnd() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "a.*cb{1,7}d";
@@ -248,7 +248,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void zeroOrMoreRepetitions() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "aa{0,7}.*b{0,}b";
@@ -264,7 +264,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void startAndEndRepititions() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "a{4,7}.*b{4,7}";
@@ -280,7 +280,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void rangeChoices() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "(a|b{4}|c{3,5})b.*b(a|b{4}|c{3,5})";
@@ -296,7 +296,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void numberTest() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "[0-9]+(\\.[0.9]+)?";
@@ -312,7 +312,7 @@ public class RegexFeatureCheckerTests {
     }
 
     @Test
-    @Ignore("Failing - disabled for now")
+    @Disabled("Failing - disabled for now")
     public void numberORTest() {
         RegexFeatureChecker checker = new RegexFeatureChecker();
         String regex = "[0-9]+|[0-9]+.[0-9]+";

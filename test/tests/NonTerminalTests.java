@@ -1,11 +1,10 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
-
-import org.junit.Test;
-
 import grammar_objects.NonTerminal;
 
 public class NonTerminalTests {
