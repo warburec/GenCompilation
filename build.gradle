@@ -33,6 +33,7 @@ test {
     useJUnitPlatform()
 
     // some logging while the tests run
+    // https://stackoverflow.com/a/36130467
     testLogging {
         // set options for log level LIFECYCLE
         events TestLogEvent.FAILED,
