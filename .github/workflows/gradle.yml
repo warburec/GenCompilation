@@ -32,6 +32,7 @@ jobs:
             src/**
             test/**
             .github/workflows/**
+            build.gradle
 
   build-and-test:
     needs: check
