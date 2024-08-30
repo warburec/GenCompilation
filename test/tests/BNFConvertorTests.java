@@ -685,4 +685,6 @@ public class BNFConvertorTests {
 
         assertEquals(expectedGrammar, producedGrammar);
     }
+
+    //TODO: Test for empty token "\\e"
 }
