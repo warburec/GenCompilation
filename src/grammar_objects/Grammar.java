@@ -124,4 +124,26 @@ public abstract class Grammar {
 
         return true;
     }
+
+    @Override
+    public String toString() {
+        String out = "";
+
+        out += "Sentinal:\n\t" + sentinal.toString() + "\n\n";
+        out += "Tokens:\n" + tabFormat(tokens) + "\n";
+        out += "Non-terminals:\n" + tabFormat(nonTerminals) + "\n";
+        out += "Production Rules:\n" + tabFormat(productionRules) + "\n";
+
+        return out;
+    }
+
+    private <E> String tabFormat(Collection<E> collection) {
+        String out = "";
+
+        for (Object object : collection) {
+            out += "\t" + object.toString() + "\n";
+        }
+
+        return out;
+    }
 }
