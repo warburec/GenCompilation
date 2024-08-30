@@ -16,9 +16,25 @@ public abstract class Grammar {
         setUpProductionRules(new RuleOrganiser());
     }
 
+    /**
+     * Sets up the tokens for this grammar.
+     * @param tokenOrganiser An object which is passed to this method to store created tokens.
+     */
     protected abstract void setUpTokens(TokenOrganiser tokenOrganiser);
+    /**
+     * Sets up the sentinal token for this grammar.
+     * @return The sentinal token for this grammar.
+     */
     protected abstract NonTerminal setUpSentinal();
+    /**
+     * Sets up the non-terminals for this grammar.
+     * @param nonTerminalOrganiser An object which is passed to this method to store created non-terminals.
+     */
     protected abstract void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser);
+    /**
+     * Sets up the production rules for this grammar.
+     * @param ruleOrganiser An object which is passed to this method to store specified production rules.
+     */
     protected abstract void setUpProductionRules(RuleOrganiser ruleOrganiser);
 
     public ProductionRule getRule(int index) {
