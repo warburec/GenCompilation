@@ -79,10 +79,17 @@ public class BNFConvertor implements GrammarFactory {
 
         String[] splitByArrow = line.split("(?<!\\\\) +-> *", 2); //Split at first arrow preceded by a non-escaped space
 
-        if (splitByArrow.length == 1) { throw new MissingArrowException(line, lineNumber); }
-        if (splitByArrow[0].matches(".*[^\\\\] .*")) { throw new NonTerminalOveruseException(line, lineNumber); }
+        if (splitByArrow.length == 1) { throw new MissingArrowException(line, lineNumber); } //No split made
 
-        lexElements.add(new NonTerminal(splitByArrow[0]));
+        String leftHandSide = splitByArrow[0];
+
+        if (leftHandSide.matches(".*[^\\\\] .*")) //Contains space; therefore, multiple non-terminals
+            throw new NonTerminalOveruseException(line, lineNumber); 
+
+        if(leftHandSide.startsWith("n:"))
+            leftHandSide = leftHandSide.replaceFirst("n:", "");
+
+        lexElements.add(new NonTerminal(leftHandSide));
 
         String[] remainingParts = splitByArrow[1].split("(?<!\\\\) "); //Split by " " not preceded by "\"
 
