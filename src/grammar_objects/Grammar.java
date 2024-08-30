@@ -109,4 +109,19 @@ public abstract class Grammar {
             return addRule(new NonTerminal(nonTerminalName), elements);
         }
     }
+
+    @Override
+    public boolean equals(Object object){
+        if(!(object instanceof Grammar)) { return false; }
+
+        Grammar otherGrammar = (Grammar)object;
+
+        if(!Set.copyOf(tokens).containsAll(otherGrammar.tokens)) { return false; }
+        if(!sentinal.equals(otherGrammar.sentinal)) { return false; }
+        if(!Set.copyOf(nonTerminals).containsAll(otherGrammar.nonTerminals)) { return false; }
+
+        if(!Set.copyOf(productionRules).containsAll(otherGrammar.productionRules)) { return false; }
+
+        return true;
+    }
 }
