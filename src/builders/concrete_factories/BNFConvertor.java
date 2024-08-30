@@ -89,11 +89,15 @@ public class BNFConvertor implements GrammarFactory {
         if(leftHandSide.startsWith("n:"))
             leftHandSide = leftHandSide.replaceFirst("n:", "");
 
+        leftHandSide = removeEscapeChars(leftHandSide);
+
         lexElements.add(new NonTerminal(leftHandSide));
 
         String[] remainingParts = splitByArrow[1].split("(?<!\\\\) "); //Split by " " not preceded by "\"
 
         for (String part : remainingParts) {
+            part = removeEscapeChars(part);
+
             if(part.startsWith("t:")) { lexElements.add(new Token(part.replaceFirst("t:", ""))); }
             else if(part.startsWith("n:")) { lexElements.add(new NonTerminal(part.replaceFirst("n:", ""))); }
             else if(part.matches("[A-Z].*")) { lexElements.add(new NonTerminal(part)); }
@@ -101,6 +105,13 @@ public class BNFConvertor implements GrammarFactory {
         }
 
         return lexElements;
+    }
+
+    private String removeEscapeChars(String string) {
+        return string
+            .replaceAll("\\\\\\\\", "\\\\") //Turn any "\\\\"" into "\\"
+            .replaceAll("\\\\ ", " ") //Turn any "\\ " into " "
+            .replaceAll("\\\\\n", "\n"); //Turn any "\\\n" into "\n"
     }
 
     @Override
