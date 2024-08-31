@@ -4,8 +4,8 @@ import java.util.*;
 
 public abstract class Grammar {
     
-    protected List<Token> tokens = new ArrayList<>();
-    protected List<NonTerminal> nonTerminals = new ArrayList<>();
+    protected Set<Token> tokens = new HashSet<>();
+    protected Set<NonTerminal> nonTerminals = new HashSet<>();
     protected List<ProductionRule> productionRules = new ArrayList<>();
     protected NonTerminal sentinal;
     
@@ -43,8 +43,8 @@ public abstract class Grammar {
 
     public GrammarParts getParts() {
         return new GrammarParts(
-            Set.copyOf(tokens), 
-            Set.copyOf(nonTerminals), 
+            tokens, 
+            nonTerminals, 
             Set.copyOf(productionRules), 
             sentinal
         );

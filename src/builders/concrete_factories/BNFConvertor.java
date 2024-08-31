@@ -16,7 +16,7 @@ import grammar_objects.*;
 public class BNFConvertor implements GrammarFactory {
     private Grammar constructedGrammar;
     
-    public BNFConvertor(String bnf){
+    public BNFConvertor(String bnf) {
         GrammarDetailsHolder detailsHolder = gatherGrammarDetails(bnf);
 
         constructedGrammar = new Grammar() {
@@ -29,7 +29,7 @@ public class BNFConvertor implements GrammarFactory {
 
             @Override
             protected NonTerminal setUpSentinal() {
-                return detailsHolder.nonTerminalHolder.get(0); // First nonTerminal is the sentinal
+                return detailsHolder.sentinal;
             }
 
             @Override
@@ -52,11 +52,14 @@ public class BNFConvertor implements GrammarFactory {
         Set<Token> tokenHolder = new HashSet<>();
         Set<NonTerminal> nonTerminalHolder = new HashSet<>();
         ArrayList<ProductionRule> ruleHolder = new ArrayList<>();
+        NonTerminal sentinal = null;
 
         String[] lines = bnf.split("(?<!\\\\) *\\R+"); //Split at new lines (with proceding spaces as long as they are not escaped)
 
-        for (int i = 0; i < lines.length; i++) {
-            List<LexicalElement> parts = categoriseParts(lines[i], i + 1);
+        for (int lineNum = 0; lineNum < lines.length; lineNum++) {
+            List<LexicalElement> parts = categoriseParts(lines[lineNum], lineNum + 1);
+
+            if (lineNum == 0) { sentinal = (NonTerminal) parts.get(0); }
 
             ruleHolder.add(new ProductionRule(
                 (NonTerminal) parts.get(0),
@@ -69,7 +72,7 @@ public class BNFConvertor implements GrammarFactory {
             }
         }
 
-        return new GrammarDetailsHolder(tokenHolder, nonTerminalHolder, ruleHolder);
+        return new GrammarDetailsHolder(sentinal, tokenHolder, nonTerminalHolder, ruleHolder);
     }
 
     /**
@@ -102,10 +105,14 @@ public class BNFConvertor implements GrammarFactory {
         for (String part : remainingParts) {
             part = removeEscapeChars(part);
 
-            if(part.startsWith("t:")) { lexElements.add(new Token(part.replaceFirst("t:", ""))); }
-            else if(part.startsWith("n:")) { lexElements.add(new NonTerminal(part.replaceFirst("n:", ""))); }
-            else if(part.matches("[A-Z].*")) { lexElements.add(new NonTerminal(part)); }
-            else { lexElements.add(new Token(part)); }
+            if(part.startsWith("t:")) { 
+                lexElements.add(new Token(part.replaceFirst("t:", ""))); }
+            else if(part.startsWith("n:")) { 
+                lexElements.add(new NonTerminal(part.replaceFirst("n:", ""))); }
+            else if(part.matches("[A-Z](?:.|\\s)*")) { 
+                lexElements.add(new NonTerminal(part)); }
+            else { 
+                lexElements.add(new Token(part)); }
         }
 
         return lexElements;
@@ -124,15 +131,18 @@ public class BNFConvertor implements GrammarFactory {
     }
 
     protected class GrammarDetailsHolder {
+        public NonTerminal sentinal;
         public ArrayList<Token> tokenHolder;
         public ArrayList<NonTerminal> nonTerminalHolder;
         public ArrayList<ProductionRule> ruleHolder;
 
         public GrammarDetailsHolder(
+            NonTerminal sentinal,
             Collection<Token> tokens, 
             Collection<NonTerminal> nonTerminals, 
             Collection<ProductionRule> rules
         ) {
+            this.sentinal = sentinal;
             tokenHolder = new ArrayList<>(tokens);
             nonTerminalHolder = new ArrayList<>(nonTerminals);
             ruleHolder = new ArrayList<>(rules);

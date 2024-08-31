@@ -547,7 +547,7 @@ public class BNFConvertorTests {
 
             @Override
             protected NonTerminal setUpSentinal() {
-                return new NonTerminal(" A");
+                return new NonTerminal("\nA");
             }
 
             @Override
