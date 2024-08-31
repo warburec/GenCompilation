@@ -28,6 +28,7 @@ public class BNFConvertor implements GrammarFactory {
      * 
      * <p>
      * Spaces and newline characters <b>may</b> be used within token and non-terminal names but must be preceded by "\\", to signify that it should not be used as a BNF seperator.
+     * An empty token (containing no contents) may be created by using "\\e" or "t:" surrounded by space seperators.
      * </p>
      * @param bnf The grammar written in BNF form
      */
@@ -120,14 +121,22 @@ public class BNFConvertor implements GrammarFactory {
         for (String part : remainingParts) {
             part = removeEscapeChars(part);
 
-            if(part.startsWith("t:")) { 
-                lexElements.add(new Token(part.replaceFirst("t:", ""))); }
-            else if(part.startsWith("n:")) { 
-                lexElements.add(new NonTerminal(part.replaceFirst("n:", ""))); }
-            else if(part.matches("[A-Z](?:.|\\s)*")) { 
-                lexElements.add(new NonTerminal(part)); }
-            else { 
-                lexElements.add(new Token(part)); }
+            if(part.equals("\\e"))
+                lexElements.add(new EmptyToken());
+            else if(part.startsWith("t:")) {
+                part = part.replaceFirst("t:", "");
+
+                if(part.equals(""))
+                    lexElements.add(new EmptyToken());
+                else
+                    lexElements.add(new Token(part));
+            }
+            else if(part.startsWith("n:"))
+                lexElements.add(new NonTerminal(part.replaceFirst("n:", "")));
+            else if(part.matches("[A-Z](?:.|\\s)*"))
+                lexElements.add(new NonTerminal(part));
+            else
+                lexElements.add(new Token(part));
         }
 
         return lexElements;

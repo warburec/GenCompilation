@@ -686,5 +686,66 @@ public class BNFConvertorTests {
         assertEquals(expectedGrammar, producedGrammar);
     }
 
-    //TODO: Test for empty token "\\e"
+    @Test
+    public void emptyTokenUsage() {
+        String bnf  = """
+            A -> B C \\e b t:
+            B -> t:
+            C -> \\e
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new EmptyToken());
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("B"));
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("C"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new NonTerminal("B"),
+                        new NonTerminal("C"),
+                        new EmptyToken(),
+                        new Token("b"),
+                        new EmptyToken()
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("B"), 
+                    new LexicalElement[] {
+                        new EmptyToken()
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("C"), 
+                    new LexicalElement[] {
+                        new EmptyToken()
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
 }
