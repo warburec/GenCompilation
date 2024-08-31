@@ -4,8 +4,8 @@ import java.util.*;
 
 public abstract class Grammar {
     
-    protected List<Token> tokens = new ArrayList<>();
-    protected List<NonTerminal> nonTerminals = new ArrayList<>();
+    protected Set<Token> tokens = new HashSet<>();
+    protected Set<NonTerminal> nonTerminals = new HashSet<>();
     protected List<ProductionRule> productionRules = new ArrayList<>();
     protected NonTerminal sentinal;
     
@@ -16,9 +16,25 @@ public abstract class Grammar {
         setUpProductionRules(new RuleOrganiser());
     }
 
+    /**
+     * Sets up the tokens for this grammar.
+     * @param tokenOrganiser An object which is passed to this method to store created tokens.
+     */
     protected abstract void setUpTokens(TokenOrganiser tokenOrganiser);
+    /**
+     * Sets up the sentinal token for this grammar.
+     * @return The sentinal token for this grammar.
+     */
     protected abstract NonTerminal setUpSentinal();
+    /**
+     * Sets up the non-terminals for this grammar.
+     * @param nonTerminalOrganiser An object which is passed to this method to store created non-terminals.
+     */
     protected abstract void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser);
+    /**
+     * Sets up the production rules for this grammar.
+     * @param ruleOrganiser An object which is passed to this method to store specified production rules.
+     */
     protected abstract void setUpProductionRules(RuleOrganiser ruleOrganiser);
 
     public ProductionRule getRule(int index) {
@@ -27,8 +43,8 @@ public abstract class Grammar {
 
     public GrammarParts getParts() {
         return new GrammarParts(
-            Set.copyOf(tokens), 
-            Set.copyOf(nonTerminals), 
+            tokens, 
+            nonTerminals, 
             Set.copyOf(productionRules), 
             sentinal
         );
@@ -92,5 +108,42 @@ public abstract class Grammar {
         public RuleOrganiser addRule(String nonTerminalName, LexicalElement[] elements) {
             return addRule(new NonTerminal(nonTerminalName), elements);
         }
+    }
+
+    @Override
+    public boolean equals(Object object){
+        if(!(object instanceof Grammar)) { return false; }
+
+        Grammar otherGrammar = (Grammar)object;
+
+        if(!Set.copyOf(tokens).containsAll(otherGrammar.tokens)) { return false; }
+        if(!sentinal.equals(otherGrammar.sentinal)) { return false; }
+        if(!Set.copyOf(nonTerminals).containsAll(otherGrammar.nonTerminals)) { return false; }
+
+        if(!Set.copyOf(productionRules).containsAll(otherGrammar.productionRules)) { return false; }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        String out = "";
+
+        out += "Sentinal:\n\t" + sentinal.toString() + "\n\n";
+        out += "Tokens:\n" + tabFormat(tokens) + "\n";
+        out += "Non-terminals:\n" + tabFormat(nonTerminals) + "\n";
+        out += "Production Rules:\n" + tabFormat(productionRules) + "\n";
+
+        return out;
+    }
+
+    private <E> String tabFormat(Collection<E> collection) {
+        String out = "";
+
+        for (Object object : collection) {
+            out += "\t" + object.toString() + "\n";
+        }
+
+        return out;
     }
 }
