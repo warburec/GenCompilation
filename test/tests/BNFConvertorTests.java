@@ -385,7 +385,7 @@ public class BNFConvertorTests {
     @Test
     public void escapedSpaceTokens() {
         String bnf  = """
-            A -> \\  b\\  t:\\ \\ 
+            A -> \\  b\\  t:\\ \\\s
             """;
         
         Grammar expectedGrammar = new Grammar() {
@@ -593,7 +593,7 @@ public class BNFConvertorTests {
     @Test
     public void arrowInTokens() {
         String bnf  = """
-            A -> -> t:a-> \\ ->\\ 
+            A -> -> t:a-> \\ ->\\\s
             """;
         
         Grammar expectedGrammar = new Grammar() {

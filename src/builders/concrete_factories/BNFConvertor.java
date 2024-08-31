@@ -7,7 +7,11 @@ import grammar_objects.*;
 
 /**
  * A class for converting text written in BNF into Grammar objects
- * Note: Production rules must have only one non-terminal to the left of the arrow seperator "->". To use the arrow within a non-terminal, preface the non-terminal with "n:" (non-terminal tag) and follow it by a space
+ * Notes:
+ * <ul>
+ *  <li> Production rules must have only one non-terminal to the left of the arrow seperator "->". To use the arrow within a non-terminal, preface the non-terminal with "n:" (non-terminal tag) and follow it by a space.
+ *  <li> To use whitespace at the end of lines for bnf notated within a text-block (tripple quoted i.e.""") use \s to note at least the last space character.
+ * </ul>
  */
 public class BNFConvertor implements GrammarFactory {
     private Grammar constructedGrammar;
@@ -49,7 +53,7 @@ public class BNFConvertor implements GrammarFactory {
         Set<NonTerminal> nonTerminalHolder = new HashSet<>();
         ArrayList<ProductionRule> ruleHolder = new ArrayList<>();
 
-        String[] lines = bnf.split("(?<!\\\\)(?> *\\R+)"); //Split at new lines (with proceding spaces as long ans they are not escaped)
+        String[] lines = bnf.split("(?<!\\\\) *\\R+"); //Split at new lines (with proceding spaces as long as they are not escaped)
 
         for (int i = 0; i < lines.length; i++) {
             List<LexicalElement> parts = categoriseParts(lines[i], i + 1);
