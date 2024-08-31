@@ -16,6 +16,21 @@ import grammar_objects.*;
 public class BNFConvertor implements GrammarFactory {
     private Grammar constructedGrammar;
     
+    /**
+     * Allows the production of a Grammar object from the given grammar written in <a href = https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>Backus-Naur Form</a> (BNF).
+     * BNF in this convertor contains a list of grammar rules (one per line) in the form <b>"non-terminal -> list of tokens or non-terminals sperated by space characters"</b>.
+     * Note that the arrow seperator "->" must be surrounded by at least one non-escaped space character on either side.
+     * 
+     * <p>
+     * <b>Non-terminals</b> are defined by starting their name with a capital letter, or by preceding their name by the non-terminal tag <b>"n:"</b>.
+     * <b>Tokens</b> are defined by starting their name with a non-capital letter, or by preceding their name by the token tag <b>"t:"</b>.
+     * </p>
+     * 
+     * <p>
+     * Spaces and newline characters <b>may</b> be used within token and non-terminal names but must be preceded by "\\", to signify that it should not be used as a BNF seperator.
+     * </p>
+     * @param bnf The grammar written in BNF form
+     */
     public BNFConvertor(String bnf) {
         GrammarDetailsHolder detailsHolder = gatherGrammarDetails(bnf);
 
