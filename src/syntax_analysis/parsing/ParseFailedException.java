@@ -7,6 +7,11 @@ public class ParseFailedException extends Exception {
     }
 
     public ParseFailedException(Exception cause, int failedTokenIndex) {
-        super("Failed at token " + failedTokenIndex + " due to " + cause.getClass().getTypeName(), cause);
+        super(
+            cause.getMessage() == null ? 
+            "Parsing failed at token " + failedTokenIndex + " due to " + cause.getClass().getTypeName() :
+            cause.getMessage(),
+            cause
+        );
     }
 }
