@@ -15,6 +15,7 @@ sourceSets {
     test {
         java {
             srcDirs("./test")
+            srcDirs("./sandbox")
         }
     }
 }
