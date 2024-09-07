@@ -1,3 +1,8 @@
+title: GenCompilation
+description: A project providing an easy-to-use and extensible framework for creating and prototyping languages and grammars.
+
+author: warburec
+
 remote_theme: pages-themes/midnight@v0.2.0
 plugins:
 - jekyll-remote-theme
