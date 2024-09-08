@@ -262,7 +262,9 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                         tokenHolder.lineNum, 
                         tokenHolder.columnNum, 
                         """
-                        Ensure the sentence is correctly written. Check all Regex special characters (e.g ".", "\\") are escaped correctly, and reserved words are set up appropriately (if a reserved word can be included within a dynamic token's label, it must be weakly reserved and therefore cannot be strongly reserved).
+                        Ensure the sentence is correctly written.
+                        Check all Regex special characters (e.g ".", "\\") are escaped correctly, and reserved words are set up appropriately
+                        (if a reserved word can be included within a dynamic token's label, it must be weakly reserved and therefore cannot be strongly reserved).
                         """
                     );
                 }
