@@ -1,6 +1,8 @@
 package syntax_analysis.grammar_structure_creation;
 
-import grammar_objects.Token;
+import java.util.*;
+
+import grammar_objects.*;
 
 public class SyntaxError extends UnsupportedOperationException {
 
@@ -26,24 +28,40 @@ public class SyntaxError extends UnsupportedOperationException {
             message += " at " + tokenPosition.toString();
         }
 
-        message += ", expected ";
+        message += ". Expected ";
+
+        Set<LexicalElement> nextElements =  gatherUniqueNextElements(state);
+        Iterator<LexicalElement> nextElemIterator = nextElements.iterator();
+
+        message += nextElemIterator.next().toString();
+
+        if (nextElements.size() == 1) { return message; }
+
+        while (nextElemIterator.hasNext()) {
+            LexicalElement element = nextElemIterator.next();
+            
+            if (nextElemIterator.hasNext()) {
+                message += ", ";
+            }
+            else {
+                message += " or ";
+            }
+
+            message += element.toString();
+        }
+
+        return message;
+    }
+
+    private Set<LexicalElement> gatherUniqueNextElements(State state) {
+        Set<LexicalElement> nextElements = new HashSet<>();
 
         GrammarPosition[] positions = state.getPositions().toArray(new GrammarPosition[state.getPositions().size()]);
 
-        if(positions.length > 1) {
-            for(int i = 0; i < positions.length - 2; i++) {
-                message += positions[i].getNextElement().toString();
-                
-                if(i < positions.length - 3) {
-                    message += ", ";
-                }
-            }
-            
-            message += " or ";
+        for (GrammarPosition position : positions) {
+            nextElements.add(position.getNextElement());
         }
 
-        message += positions[positions.length - 1].getNextElement().toString();
-
-        return message;
+        return nextElements;
     }
 }

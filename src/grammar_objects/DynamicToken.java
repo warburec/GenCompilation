@@ -66,4 +66,9 @@ public class DynamicToken extends Token {
 
         return true;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

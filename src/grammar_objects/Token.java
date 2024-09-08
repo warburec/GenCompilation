@@ -73,4 +73,9 @@ public class Token extends LexicalElement {
         Symbol
     }
 
+    @Override
+    public String toString() {
+        return "\"" + getName() + "\"";
+    }
+
 }
