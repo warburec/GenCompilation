@@ -1,5 +1,19 @@
 package sandbox;
 
+import org.junit.jupiter.api.Test;
+
+import builders.CompilerBuilder;
+import builders.bundles.GrammarBundle;
+import builders.concrete_factories.BasicCodeGenFactory;
+import builders.concrete_factories.CLR1ParserFactory;
+import builders.concrete_factories.GeneralLexicalAnalyserFactory;
+import grammar_objects.Grammar;
+import grammar_objects.RuleConvertor;
+import grammars.basic_identifier.BasicIdentifierGrammar;
+import grammars.basic_identifier.convertors.XToYToXSemantic;
+import lexical_analysis.DynamicTokenRegex;
+import syntax_analysis.parsing.ParseFailedException;
+
 public class GrammarSandbox {
     
     // @Test
