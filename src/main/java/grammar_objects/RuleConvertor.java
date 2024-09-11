@@ -3,7 +3,7 @@ package grammar_objects;
 import java.util.*;
 
 import code_generation.Generator;
-import helperObjects.NullableTuple;
+import helper_objects.NullableTuple;
 
 public abstract class RuleConvertor {
     public static final Integer ROOT_RULE_INDEX = null;

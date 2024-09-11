@@ -3,7 +3,7 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.*;
-import helperObjects.*;
+import helper_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 

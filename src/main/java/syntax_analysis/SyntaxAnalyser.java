@@ -3,7 +3,7 @@ package syntax_analysis;
 import java.util.*;
 
 import grammar_objects.*;
-import helperObjects.LexElementFinder;
+import helper_objects.LexElementFinder;
 import syntax_analysis.parsing.*;
 
 public abstract class SyntaxAnalyser {

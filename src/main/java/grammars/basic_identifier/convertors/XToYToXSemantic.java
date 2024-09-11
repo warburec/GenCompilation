@@ -3,7 +3,7 @@ package grammars.basic_identifier.convertors;
 import code_generation.*;
 import grammar_objects.*;
 import grammars.basic_identifier.BasicIdentifierGrammar;
-import helperObjects.NullableTuple;
+import helper_objects.NullableTuple;
 import semantic_analysis.TypeChecker;
 
 public class XToYToXSemantic extends RuleConvertor {

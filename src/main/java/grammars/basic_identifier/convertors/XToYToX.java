@@ -2,7 +2,7 @@ package grammars.basic_identifier.convertors;
 
 import grammar_objects.*;
 import grammars.basic_identifier.BasicIdentifierGrammar;
-import helperObjects.NullableTuple;
+import helper_objects.NullableTuple;
 
 public class XToYToX extends RuleConvertor {
 

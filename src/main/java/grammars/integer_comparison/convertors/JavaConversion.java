@@ -3,7 +3,7 @@ package grammars.integer_comparison.convertors;
 import code_generation.*;
 import grammar_objects.*;
 import grammars.integer_comparison.IntegerCompGrammar;
-import helperObjects.NullableTuple;
+import helper_objects.NullableTuple;
 import semantic_analysis.TypeChecker;
 
 public class JavaConversion extends RuleConvertor {

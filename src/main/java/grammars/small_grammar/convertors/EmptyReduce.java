@@ -2,7 +2,7 @@ package grammars.small_grammar.convertors;
 
 import grammar_objects.*;
 import grammars.small_grammar.SmallGrammar;
-import helperObjects.NullableTuple;
+import helper_objects.NullableTuple;
 
 public class EmptyReduce extends RuleConvertor {
 

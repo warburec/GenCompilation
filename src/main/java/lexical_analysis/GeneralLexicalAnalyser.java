@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import grammar_objects.*;
-import helperObjects.*;
+import helper_objects.*;
 
 public class GeneralLexicalAnalyser implements LexicalAnalyser {
 

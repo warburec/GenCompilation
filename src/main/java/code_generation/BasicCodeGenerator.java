@@ -3,7 +3,7 @@ package code_generation;
 import java.util.*;
 
 import grammar_objects.*;
-import helperObjects.NullableTuple;
+import helper_objects.NullableTuple;
 import syntax_analysis.parsing.*;
 
 public class BasicCodeGenerator implements CodeGenerator {
