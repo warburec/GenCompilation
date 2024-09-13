@@ -18,7 +18,7 @@ May produce the sentence: aaaaaabb
 
 ### Aims of this project
 
-This project aims to provide a foundation for fast prototyping of languages/grammar, reference/an education tool for students, and a sandbox.
+This project aims to provide a foundation for fast prototyping of languages/grammar, reference/an education tool for students.
 
 Compilation speed is not a main concern, although, components should be produced in a way so that they can be replaced for applications that require it.
 
