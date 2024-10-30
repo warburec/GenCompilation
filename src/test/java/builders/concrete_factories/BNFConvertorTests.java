@@ -1,8 +1,11 @@
 package builders.concrete_factories;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import builders.concrete_factories.BNFConvertor.InvalidEscapeCharacterException;
 import grammar_objects.*;
 
 public class BNFConvertorTests {
@@ -745,5 +748,156 @@ public class BNFConvertorTests {
 
 
         assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void escapedSpaceBeforeArrow() {
+        String bnf  = """
+            A\\  -> b
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A ");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A "));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A "), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void singleNonTerminalOr() {
+        String bnf  = """
+            A -> b | c
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new Token("c"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("c")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void singleNonTerminalEscapedOr() {
+        String bnf  = """
+            A -> b \\| c
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new Token("|"));
+                tokenOrganiser.addToken(new Token("c"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b"),
+                        new Token("|"),
+                        new Token("c")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+
+    @Test
+    public void validEscapes() {
+        String bnf  = """
+            A -> \\ \\\n \\\t \\e \\|
+            """;
+        
+        assertDoesNotThrow(() -> new BNFConvertor(bnf));
+    }
+    
+    @Test
+    public void invalidEscape() {
+        String bnf  = """
+            A -> \\b
+            """;
+        
+        assertThrows(InvalidEscapeCharacterException.class, () -> new BNFConvertor(bnf));
     }
 }

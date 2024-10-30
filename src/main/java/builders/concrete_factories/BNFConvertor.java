@@ -5,6 +5,9 @@ import java.util.*;
 import builders.GrammarFactory;
 import grammar_objects.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * A class for converting text written in BNF into Grammar objects
  * Notes:
@@ -15,6 +18,14 @@ import grammar_objects.*;
  */
 public class BNFConvertor implements GrammarFactory {
     private Grammar constructedGrammar;
+
+    private Set<String> validEscapeSequences = Set.of(new String[] {
+        "\\ ",
+        "\\\n",
+        "\\\t",
+        "\\e",
+        "\\|"
+    });
     
     /**
      * Allows the production of a Grammar object from the given grammar written in <a href = https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>Backus-Naur Form</a> (BNF).
@@ -32,7 +43,7 @@ public class BNFConvertor implements GrammarFactory {
      * </p>
      * @param bnf The grammar written in BNF form
      */
-    public BNFConvertor(String bnf) {
+    public BNFConvertor(String bnf) {        
         GrammarDetailsHolder detailsHolder = gatherGrammarDetails(bnf);
 
         constructedGrammar = new Grammar() {
@@ -73,57 +84,101 @@ public class BNFConvertor implements GrammarFactory {
         String[] lines = bnf.split("(?<!\\\\) *\\R+"); //Split at new lines (with proceding spaces as long as they are not escaped)
 
         for (int lineNum = 0; lineNum < lines.length; lineNum++) {
-            List<LexicalElement> parts = categoriseParts(lines[lineNum], lineNum + 1);
+            String line = lines[lineNum];
+            
+            checkForInvalidEscaping(line, lineNum);
 
-            if (lineNum == 0) { sentinal = (NonTerminal) parts.get(0); }
+            String[] splitByArrow = splitByArrow(line, lineNum);
 
-            ruleHolder.add(new ProductionRule(
-                (NonTerminal) parts.get(0),
-                parts.subList(1, parts.size()).toArray(new LexicalElement[parts.size() - 1])
-            ));
+            String leftHandSide = splitByArrow[0];
+            String rightHandSide = splitByArrow[1];
 
-            for (LexicalElement lexicalElement : parts) {
-                if (lexicalElement instanceof Token) { tokenHolder.add((Token) lexicalElement); }
-                else { nonTerminalHolder.add((NonTerminal) lexicalElement); }
+            NonTerminal ruleNonTerminal = categoriseLeftHandSide(leftHandSide, lineNum);
+
+            String[] alternativeRHSs = findAlternatives(rightHandSide);
+
+            for (String alternative : alternativeRHSs) {
+                List<LexicalElement> parts = categoriseElements(alternative, lineNum + 1);
+
+                if (lineNum == 0) { sentinal = (NonTerminal) ruleNonTerminal; }
+
+                ruleHolder.add(new ProductionRule(
+                    (NonTerminal) ruleNonTerminal,
+                    parts.toArray(new LexicalElement[parts.size()])
+                ));
+
+                for (LexicalElement lexicalElement : parts) {
+                    if (lexicalElement instanceof Token) { tokenHolder.add((Token) lexicalElement); }
+                    else { nonTerminalHolder.add((NonTerminal) lexicalElement); }
+                }
             }
         }
 
         return new GrammarDetailsHolder(sentinal, tokenHolder, nonTerminalHolder, ruleHolder);
     }
 
+    private void checkForInvalidEscaping(String line, int lineNum) {
+        Pattern pattern = Pattern.compile("\\\\.");
+        Matcher matcher = pattern.matcher(line);
+
+        while (matcher.find()) {
+            if (validEscapeSequences.contains(matcher.group())) continue;
+
+            throw new InvalidEscapeCharacterException(
+                line,
+                lineNum,
+                matcher.start()
+            );
+        }
+    }
+
     /**
-     * Makes a list of lexical elements within a production rule, starting with the non-terminal for the rule
-     * @param line The production rule line
-     * @param lineNumber The order number of the given line
-     * @return The list of lexical elements within the rule
+     * Categorises the NonTerminal of the left hand side of a production rule
+     * @param leftHandSide The test for the left hand side of the rule
+     * @param lineNumber The number of the line of the production rule
+     * @return The generated NonTerminal
      */
-    private List<LexicalElement> categoriseParts(String line, int lineNumber) {
-        ArrayList<LexicalElement> lexElements = new ArrayList<>();
-
-        String[] splitByArrow = line.split("(?<!\\\\) +-> *", 2); //Split at first arrow preceded by a non-escaped space
-
-        if (splitByArrow.length == 1) { throw new MissingArrowException(line, lineNumber); } //No split made
-
-        String leftHandSide = splitByArrow[0];
-
+    private NonTerminal categoriseLeftHandSide(String leftHandSide, int lineNumber) {
         if (leftHandSide.matches(".*[^\\\\] .*")) //Contains space; therefore, multiple non-terminals
-            throw new NonTerminalOveruseException(line, lineNumber); 
+            throw new NonTerminalOveruseException(leftHandSide, lineNumber); 
 
         if(leftHandSide.startsWith("n:"))
             leftHandSide = leftHandSide.replaceFirst("n:", "");
 
         leftHandSide = removeEscapeChars(leftHandSide);
 
-        lexElements.add(new NonTerminal(leftHandSide));
+        return new NonTerminal(leftHandSide);
+    }
 
-        String[] remainingParts = splitByArrow[1].split("(?<!\\\\) "); //Split by " " not preceded by "\"
+    /**
+     * Finds alternative definitions from the right hand side of a rule
+     * @param rightHandSide The right hand side of the rule to be parsed
+     * @return The alternative definitions provided in the right hands side of the rule
+     */
+    private String[] findAlternatives(String rightHandSide) {
+        return rightHandSide.split("(?<!\\\\) *\\| *"); //Split at any non-escaped pipe characters (and accompanying spaces)
+    }
+
+    /**
+     * Makes a list of lexical elements within the given text
+     * @param elementText The text containing the elements to be categorised
+     * @param lineNumber The order number of the given text
+     * @return The list of lexical elements within the text
+     */
+    private List<LexicalElement> categoriseElements(String elementText, int lineNumber) {
+        ArrayList<LexicalElement> lexElements = new ArrayList<>();
+
+        String[] remainingParts = elementText.split("(?<!\\\\) "); //Split by " " not preceded by "\"
 
         for (String part : remainingParts) {
+            if(part.equals("\\e")) {
+                lexElements.add(new EmptyToken());
+                continue;
+            }
+            
             part = removeEscapeChars(part);
 
-            if(part.equals("\\e"))
-                lexElements.add(new EmptyToken());
-            else if(part.startsWith("t:")) {
+            if(part.startsWith("t:")) {
                 part = part.replaceFirst("t:", "");
 
                 if(part.equals(""))
@@ -142,11 +197,22 @@ public class BNFConvertor implements GrammarFactory {
         return lexElements;
     }
 
+    /**
+     * Split the given line at first arrow preceded by a non-escaped space
+     * @param line The line to be split
+     * @param lineNumber The line number of the given line
+     * @return An array of the two parts either side of the first arrow
+     */
+    private String[] splitByArrow(String line, int lineNumber) {
+        String[] splitByArrow = line.split("(?<!\\\\) +-> *", 2); //Split at first arrow preceded by a non-escaped space
+
+        if (splitByArrow.length == 1) { throw new MissingArrowException(line, lineNumber); } //No split made
+
+        return splitByArrow;
+    }
+
     private String removeEscapeChars(String string) {
-        return string
-            .replaceAll("\\\\\\\\", "\\\\") //Turn any "\\\\"" into "\\"
-            .replaceAll("\\\\ ", " ") //Turn any "\\ " into " "
-            .replaceAll("\\\\\n", "\n"); //Turn any "\\\n" into "\n"
+        return string.replaceAll("\\\\(?!\\\\)", ""); //Remove any \ not followed by a \ (last \ in a chain of \'s)
     }
 
     @Override
@@ -186,6 +252,15 @@ public class BNFConvertor implements GrammarFactory {
         public NonTerminalOveruseException(String line, int lineNumber) {
             super(
                 "Line " + lineNumber + " has too many non-terminals on the left of the arrow seperator (->). Please ensure exactly one non-terminal preceded the seperator\n" +
+                "Line contents: " + line
+            );
+        }
+    }
+
+    public class InvalidEscapeCharacterException extends RuntimeException {
+        public InvalidEscapeCharacterException(String line, int lineNumber, int charNumber) {
+            super(
+                "Line " + lineNumber + " contains an invalid escape character at character " + charNumber + "\n" +
                 "Line contents: " + line
             );
         }
