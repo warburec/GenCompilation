@@ -5,6 +5,9 @@ import java.util.*;
 import builders.GrammarFactory;
 import grammar_objects.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * A class for converting text written in BNF into Grammar objects
  * Notes:
@@ -15,6 +18,14 @@ import grammar_objects.*;
  */
 public class BNFConvertor implements GrammarFactory {
     private Grammar constructedGrammar;
+
+    private Set<String> validEscapeSequences = Set.of(new String[] {
+        "\\ ",
+        "\\\n",
+        "\\\t",
+        "\\e",
+        "\\|"
+    });
     
     /**
      * Allows the production of a Grammar object from the given grammar written in <a href = https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>Backus-Naur Form</a> (BNF).
@@ -32,7 +43,7 @@ public class BNFConvertor implements GrammarFactory {
      * </p>
      * @param bnf The grammar written in BNF form
      */
-    public BNFConvertor(String bnf) {
+    public BNFConvertor(String bnf) {        
         GrammarDetailsHolder detailsHolder = gatherGrammarDetails(bnf);
 
         constructedGrammar = new Grammar() {
@@ -73,17 +84,20 @@ public class BNFConvertor implements GrammarFactory {
         String[] lines = bnf.split("(?<!\\\\) *\\R+"); //Split at new lines (with proceding spaces as long as they are not escaped)
 
         for (int lineNum = 0; lineNum < lines.length; lineNum++) {
-            String[] splitByArrow = splitByArrow(lines[lineNum], lineNum);
+            String line = lines[lineNum];
+            
+            checkForInvalidEscaping(line, lineNum);
+
+            String[] splitByArrow = splitByArrow(line, lineNum);
 
             String leftHandSide = splitByArrow[0];
             String rightHandSide = splitByArrow[1];
 
-            String[] alternativeRHSs = findAlternatives(rightHandSide);
-
             NonTerminal ruleNonTerminal = categoriseLeftHandSide(leftHandSide, lineNum);
 
-            for (String alternative : alternativeRHSs) {
+            String[] alternativeRHSs = findAlternatives(rightHandSide);
 
+            for (String alternative : alternativeRHSs) {
                 List<LexicalElement> parts = categoriseElements(alternative, lineNum + 1);
 
                 if (lineNum == 0) { sentinal = (NonTerminal) ruleNonTerminal; }
@@ -101,6 +115,21 @@ public class BNFConvertor implements GrammarFactory {
         }
 
         return new GrammarDetailsHolder(sentinal, tokenHolder, nonTerminalHolder, ruleHolder);
+    }
+
+    private void checkForInvalidEscaping(String line, int lineNum) {
+        Pattern pattern = Pattern.compile("\\\\.");
+        Matcher matcher = pattern.matcher(line);
+
+        while (matcher.find()) {
+            if (validEscapeSequences.contains(matcher.group())) continue;
+
+            throw new InvalidEscapeCharacterException(
+                line,
+                lineNum,
+                matcher.start()
+            );
+        }
     }
 
     /**
@@ -127,7 +156,7 @@ public class BNFConvertor implements GrammarFactory {
      * @return The alternative definitions provided in the right hands side of the rule
      */
     private String[] findAlternatives(String rightHandSide) {
-        return rightHandSide.split("(?<!\\\\) *(?<!\\\\)\\| *"); //Split at any non-escaped pipe characters (and accompanying spaces)
+        return rightHandSide.split("(?<!\\\\) *\\| *"); //Split at any non-escaped pipe characters (and accompanying spaces)
     }
 
     /**
@@ -142,11 +171,14 @@ public class BNFConvertor implements GrammarFactory {
         String[] remainingParts = elementText.split("(?<!\\\\) "); //Split by " " not preceded by "\"
 
         for (String part : remainingParts) {
+            if(part.equals("\\e")) {
+                lexElements.add(new EmptyToken());
+                continue;
+            }
+            
             part = removeEscapeChars(part);
 
-            if(part.equals("\\e"))
-                lexElements.add(new EmptyToken());
-            else if(part.startsWith("t:")) {
+            if(part.startsWith("t:")) {
                 part = part.replaceFirst("t:", "");
 
                 if(part.equals(""))
@@ -180,10 +212,7 @@ public class BNFConvertor implements GrammarFactory {
     }
 
     private String removeEscapeChars(String string) {
-        return string
-            .replaceAll("\\\\\\\\", "\\\\") //Turn any "\\\\"" into "\\"
-            .replaceAll("\\\\ ", " ") //Turn any "\\ " into " "
-            .replaceAll("\\\\\n", "\n"); //Turn any "\\\n" into "\n"
+        return string.replaceAll("\\\\(?!\\\\)", ""); //Remove any \ not followed by a \ (last \ in a chain of \'s)
     }
 
     @Override
@@ -223,6 +252,15 @@ public class BNFConvertor implements GrammarFactory {
         public NonTerminalOveruseException(String line, int lineNumber) {
             super(
                 "Line " + lineNumber + " has too many non-terminals on the left of the arrow seperator (->). Please ensure exactly one non-terminal preceded the seperator\n" +
+                "Line contents: " + line
+            );
+        }
+    }
+
+    public class InvalidEscapeCharacterException extends RuntimeException {
+        public InvalidEscapeCharacterException(String line, int lineNumber, int charNumber) {
+            super(
+                "Line " + lineNumber + " contains an invalid escape character at character " + charNumber + "\n" +
                 "Line contents: " + line
             );
         }
