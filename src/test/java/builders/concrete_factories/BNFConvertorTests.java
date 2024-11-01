@@ -900,4 +900,283 @@ public class BNFConvertorTests {
         
         assertThrows(InvalidEscapeCharacterException.class, () -> new BNFConvertor(bnf));
     }
+
+    @Test
+    public void singleNonTerminalAlternativesWithoutOr() {
+        String bnf  = """
+            A -> b
+            A -> c
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new Token("c"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("c")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void singleNonTerminalAlternativesMultiLine() {
+        String bnf  = """
+            A -> b
+            | c
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new Token("c"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("c")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void singleNonTerminalAlternativesMultiLineVariableSpacing() {
+        String bnf  = """
+            A -> b
+             | c
+                | d
+            \t| e
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new Token("c"));
+                tokenOrganiser.addToken(new Token("d"));
+                tokenOrganiser.addToken(new Token("e"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("c")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("d")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("e")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void singleNonTerminalAlternativesEmptyLine() {
+        String bnf  = """
+            A -> b
+            |
+            | c
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new EmptyToken());
+                tokenOrganiser.addToken(new Token("c"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new EmptyToken()
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("c")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
+
+    @Test
+    public void singleNonTerminalEmptyInlineOr() {
+        String bnf  = """
+            A -> b | | c
+            """;
+        
+        Grammar expectedGrammar = new Grammar() {
+            @Override
+            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
+                tokenOrganiser.addToken(new Token("b"));
+                tokenOrganiser.addToken(new EmptyToken());
+                tokenOrganiser.addToken(new Token("c"));
+            }
+
+            @Override
+            protected NonTerminal setUpSentinal() {
+                return new NonTerminal("A");
+            }
+
+            @Override
+            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
+                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+            }
+
+            @Override
+            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("b")
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new EmptyToken()
+                    }
+                ));
+
+                ruleOrganiser.addRule(new ProductionRule(
+                    new NonTerminal("A"), 
+                    new LexicalElement[] {
+                        new Token("c")
+                    }
+                ));
+            }
+        };
+
+        
+        Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
+
+
+        assertEquals(expectedGrammar, producedGrammar);
+    }
 }

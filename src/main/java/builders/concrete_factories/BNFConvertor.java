@@ -83,17 +83,33 @@ public class BNFConvertor implements GrammarFactory {
 
         String[] lines = bnf.split("(?<!\\\\) *\\R+"); //Split at new lines (with proceding spaces as long as they are not escaped)
 
+        NonTerminal previousRuleNonTerminal = null;
+
         for (int lineNum = 0; lineNum < lines.length; lineNum++) {
             String line = lines[lineNum];
             
             checkForInvalidEscaping(line, lineNum);
 
-            String[] splitByArrow = splitByArrow(line, lineNum);
+            String rightHandSide;
+            NonTerminal ruleNonTerminal;
+            
+            boolean lineIsAlternative = line.matches("[\s\t]*\\|.*");
 
-            String leftHandSide = splitByArrow[0];
-            String rightHandSide = splitByArrow[1];
+            if (lineIsAlternative) {
+                if (previousRuleNonTerminal == null)
+                    throw new AlternativeWithoutNonTerminalException(line, lineNum);
 
-            NonTerminal ruleNonTerminal = categoriseLeftHandSide(leftHandSide, lineNum);
+                rightHandSide = line.replaceFirst("[\\s\\t]*\\|\s*", "");
+                ruleNonTerminal = previousRuleNonTerminal;
+            }
+            else {
+                String[] splitByArrow = splitByArrow(line, lineNum);
+
+                String leftHandSide = splitByArrow[0];
+                rightHandSide = splitByArrow[1];
+
+                ruleNonTerminal = categoriseLeftHandSide(leftHandSide, lineNum);
+            }
 
             String[] alternativeRHSs = findAlternatives(rightHandSide);
 
@@ -112,6 +128,9 @@ public class BNFConvertor implements GrammarFactory {
                     else { nonTerminalHolder.add((NonTerminal) lexicalElement); }
                 }
             }
+
+            if (!lineIsAlternative)
+                previousRuleNonTerminal = ruleNonTerminal;
         }
 
         return new GrammarDetailsHolder(sentinal, tokenHolder, nonTerminalHolder, ruleHolder);
@@ -167,6 +186,11 @@ public class BNFConvertor implements GrammarFactory {
      */
     private List<LexicalElement> categoriseElements(String elementText, int lineNumber) {
         ArrayList<LexicalElement> lexElements = new ArrayList<>();
+
+        if(elementText.equals("")) {
+            lexElements.add(new EmptyToken());
+            return lexElements;
+        }
 
         String[] remainingParts = elementText.split("(?<!\\\\) "); //Split by " " not preceded by "\"
 
@@ -261,6 +285,15 @@ public class BNFConvertor implements GrammarFactory {
         public InvalidEscapeCharacterException(String line, int lineNumber, int charNumber) {
             super(
                 "Line " + lineNumber + " contains an invalid escape character at character " + charNumber + "\n" +
+                "Line contents: " + line
+            );
+        }
+    }
+
+    public class AlternativeWithoutNonTerminalException extends RuntimeException {
+        public AlternativeWithoutNonTerminalException(String line, int lineNumber) {
+            super(
+                "Line " + lineNumber + " contains an alternative statement without previously stating an initial production rule\n" +
                 "Line contents: " + line
             );
         }
