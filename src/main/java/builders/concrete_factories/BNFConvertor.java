@@ -109,6 +109,8 @@ public class BNFConvertor implements GrammarFactory {
                 rightHandSide = splitByArrow[1];
 
                 ruleNonTerminal = categoriseLeftHandSide(leftHandSide, lineNum);
+
+                nonTerminalHolder.add(ruleNonTerminal);
             }
 
             String[] alternativeRHSs = findAlternatives(rightHandSide);
@@ -118,15 +120,15 @@ public class BNFConvertor implements GrammarFactory {
 
                 if (lineNum == 0) { sentinal = (NonTerminal) ruleNonTerminal; }
 
-                ruleHolder.add(new ProductionRule(
-                    (NonTerminal) ruleNonTerminal,
-                    parts.toArray(new LexicalElement[parts.size()])
-                ));
-
                 for (LexicalElement lexicalElement : parts) {
                     if (lexicalElement instanceof Token) { tokenHolder.add((Token) lexicalElement); }
                     else { nonTerminalHolder.add((NonTerminal) lexicalElement); }
                 }
+
+                ruleHolder.add(new ProductionRule(
+                    (NonTerminal) ruleNonTerminal,
+                    parts.toArray(new LexicalElement[parts.size()])
+                ));
             }
 
             if (!lineIsAlternative)
