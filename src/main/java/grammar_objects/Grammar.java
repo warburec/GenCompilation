@@ -116,11 +116,12 @@ public abstract class Grammar {
 
         Grammar otherGrammar = (Grammar)object;
 
-        if(!Set.copyOf(tokens).containsAll(otherGrammar.tokens)) { return false; }
         if(!sentinal.equals(otherGrammar.sentinal)) { return false; }
-        if(!Set.copyOf(nonTerminals).containsAll(otherGrammar.nonTerminals)) { return false; }
 
-        if(!Set.copyOf(productionRules).containsAll(otherGrammar.productionRules)) { return false; }
+        if(!tokens.equals(otherGrammar.tokens)) { return false; }
+        if(!nonTerminals.equals(otherGrammar.nonTerminals)) { return false; }
+
+        if(!productionRules.equals(otherGrammar.productionRules)) { return false; }
 
         return true;
     }
