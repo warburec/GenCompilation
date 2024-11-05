@@ -1,6 +1,0 @@
-<statement list> := <statement> |
-                    <statement list> <statement>
-
-<statement> := identifier = <element> + <element>;
-
-<element> := identifier | number
