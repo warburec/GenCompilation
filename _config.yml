@@ -1,6 +1,8 @@
+google_site_verification: cq_PwX5m3JuEUjnULJHcJ2pa1zx9uwM8o4VdXdzb42w
+
 title: GenCompilation
 description: A project providing an easy-to-use and extensible framework for creating and prototyping languages and grammars.
-
+baseurl: /GenCompilation
 author: warburec
 
 remote_theme: pages-themes/midnight@v0.2.0
