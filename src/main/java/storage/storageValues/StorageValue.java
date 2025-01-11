@@ -6,4 +6,8 @@ public abstract class StorageValue<T> {
     public StorageValue(T value) {
         this.value = value;
     }
+
+    public T getValue() {
+        return value;
+    }
 }
