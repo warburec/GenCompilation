@@ -1,15 +1,9 @@
 package storage.valueFormatters;
 
-import java.io.*;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Stream;
-
-import storage.FileOperations;
-import storage.helper_objects.DuplicateKeyException;
 import storage.storageValues.*;
 
-public class StringStorage implements ValueFormatter<String> {
+public class ValueToStringFormatter implements ValueFormatter<String> {
 
     protected static final String KEY_VALUE_SEPERATOR = " : ";
 
