@@ -1,6 +1,6 @@
-package storage.storageValueAdapters;
+package storage.storage_value_adapters;
 
-import storage.storageValues.StorageValue;
+import storage.storage_values.StorageValue;
 
 public class UnsupportedValueException extends RuntimeException {
     

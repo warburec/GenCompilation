@@ -1,6 +1,6 @@
-package storage.storageValueAdapters;
+package storage.storage_value_adapters;
 
-import storage.storageValues.StorageValue;
+import storage.storage_values.StorageValue;
 
 /**
  * An interface that defines an adapter converting StorageValues to a chosen representation for use within a StorageMethod

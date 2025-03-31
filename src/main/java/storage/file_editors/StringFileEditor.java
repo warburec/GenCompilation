@@ -1,4 +1,4 @@
-package storage.fileEditors;
+package storage.file_editors;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

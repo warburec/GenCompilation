@@ -1,4 +1,4 @@
-package storage.storageValues;
+package storage.storage_values;
 
 import java.util.Map;
 

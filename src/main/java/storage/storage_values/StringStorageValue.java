@@ -1,4 +1,4 @@
-package storage.storageValues;
+package storage.storage_values;
 
 public class StringStorageValue extends StorageValue<String> {
     

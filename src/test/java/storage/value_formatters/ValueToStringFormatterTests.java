@@ -1,12 +1,14 @@
-package storage.valueFormatters;
+package storage.value_formatters;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import storage.storageValueAdapters.UnsupportedValueException;
-import storage.storageValues.*;
+import storage.storage_value_adapters.UnsupportedValueException;
+import storage.storage_values.*;
+import storage.value_formatters.ValueFormatter;
+import storage.value_formatters.ValueToStringFormatter;
 
 public class ValueToStringFormatterTests {
     

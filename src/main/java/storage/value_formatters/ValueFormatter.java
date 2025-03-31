@@ -1,7 +1,7 @@
-package storage.valueFormatters;
+package storage.value_formatters;
 
-import storage.storageValueAdapters.UnsupportedValueException;
-import storage.storageValues.StorageValue;
+import storage.storage_value_adapters.UnsupportedValueException;
+import storage.storage_values.StorageValue;
 
 public interface ValueFormatter<F> {
     public F format(StorageValue<?> value) throws UnsupportedValueException;

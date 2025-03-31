@@ -1,7 +1,8 @@
 package storage;
 
 import java.util.HashMap;
-import storage.storageValues.StorageValue;
+
+import storage.storage_values.StorageValue;
 
 /**
  * A memento/storage object for Storable objects

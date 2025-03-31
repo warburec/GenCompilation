@@ -1,10 +1,10 @@
-package storage.valueFormatters;
+package storage.value_formatters;
 
 import java.util.*;
 import java.util.Map.Entry;
 
-import storage.storageValueAdapters.UnsupportedValueException;
-import storage.storageValues.*;
+import storage.storage_value_adapters.UnsupportedValueException;
+import storage.storage_values.*;
 import helper_objects.ValueEnum;
 
 public class ValueToStringFormatter implements ValueFormatter<String> {

@@ -1,4 +1,4 @@
-package storage.fileEditors;
+package storage.file_editors;
 
 import java.io.File;
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package storage.storageValues;
+package storage.storage_values;
 
 public abstract class StorageValue<T> {
     private T value;
