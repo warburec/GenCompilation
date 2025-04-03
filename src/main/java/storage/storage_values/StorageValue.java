@@ -1,7 +1,7 @@
 package storage.storage_values;
 
 public abstract class StorageValue<T> {
-    private T value;
+    protected T value;
 
     public StorageValue(T value) {
         this.value = value;
@@ -10,6 +10,9 @@ public abstract class StorageValue<T> {
     public T getValue() {
         return value;
     }
+
+    @Override
+    public abstract String toString();
 
     @Override
     public boolean equals(Object obj) {

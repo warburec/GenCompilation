@@ -101,7 +101,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
         if (formattedData.equals("{}") || formattedData.equals("{\n}"))
             return new MapStorageValue(Map.of());
 
-        formattedData = formattedData.replaceFirst(PREFIXES.MAP.getValue() + "{\n", "");
+        formattedData = formattedData.replaceFirst("\\{\n", "");
         formattedData = formattedData.substring(0, formattedData.length() - 2); // Remove ending "}"
 
         Map<String, StorageValue<?>> map = new HashMap<>();
@@ -111,7 +111,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
 
             map.put(
                 parts[0], 
-                this.parseMapFormat(parts[1])
+                this.parse(parts[1])
             );
         }
 

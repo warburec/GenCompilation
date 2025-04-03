@@ -3,9 +3,6 @@ package storage.storage_values;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import storage.storage_values.IntegerStorageValue;
-import storage.storage_values.StringStorageValue;
-
 public class StorageValueTests {
 
     @Test

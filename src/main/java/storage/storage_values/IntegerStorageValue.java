@@ -6,4 +6,8 @@ public class IntegerStorageValue extends StorageValue<Integer> {
         super(integer);
     }
     
+    @Override
+    public String toString() {
+        return "IntegerStorageValue(" + this.value + ")";
+    }
 }

@@ -2,13 +2,12 @@ package storage.value_formatters;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
+import helper_objects.NotEmptyTuple;
+import helper_objects.Tuple;
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.*;
-import storage.value_formatters.ValueFormatter;
-import storage.value_formatters.ValueToStringFormatter;
 
 public class ValueToStringFormatterTests {
     
@@ -64,6 +63,25 @@ public class ValueToStringFormatterTests {
         MapStorageValue expectedValue = new MapStorageValue(Map.of());
         assertEquals(expectedValue, actualValue1);
         assertEquals(expectedValue, actualValue2);
+    }
+
+    @Test
+    public void parseFormattedSimpleMap() {
+        Tuple<String, String> testString = new NotEmptyTuple<>("testStringKey", "testString");
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testintKey", 30);
+        String formattedString1 = "map:{\n" + 
+            testString.value1() + ":str:" + testString.value2() + ",\n" +
+            testInt.value1() + ":int:" + testInt.value2() + "\n"+
+        "}";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+
+        MapStorageValue expectedValue = new MapStorageValue(Map.ofEntries(
+            Map.entry(testString.value1(), new StringStorageValue(testString.value2())),
+            Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+        ));
+        assertEquals(expectedValue, actualValue1);
     }
 
     //TODO: Test MapStorageValue with various contents (including nested maps)
