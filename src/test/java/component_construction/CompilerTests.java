@@ -1,11 +1,14 @@
-package builders;
+package component_construction;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import component_construction.builders.CompilerBuilder;
+import component_construction.factories.code_generation.BasicCodeGenFactory;
+import component_construction.factories.lexical_analysis.GeneralLexicalAnalyserFactory;
+import component_construction.factories.syntax_analysis.CLR1ParserFactory;
 import grammars.basic_identifier.BasicIdentifierGrammar;
 import grammars.basic_identifier.convertors.XToYToXSemantic;
-import builders.concrete_factories.*;
 import lexical_analysis.DynamicTokenRegex;
 import syntax_analysis.parsing.ParseFailedException;
 import test_aids.GrammarType;

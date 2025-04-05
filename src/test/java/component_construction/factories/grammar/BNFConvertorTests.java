@@ -1,8 +1,8 @@
-package builders.concrete_factories;
+package component_construction.factories.grammar;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import builders.concrete_factories.BNFConvertor.InvalidEscapeCharacterException;
+import component_construction.factories.grammar.BNFConvertor.InvalidEscapeCharacterException;
 import grammar_objects.*;
 
 public class BNFConvertorTests {

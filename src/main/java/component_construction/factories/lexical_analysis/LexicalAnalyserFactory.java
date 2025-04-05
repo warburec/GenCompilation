@@ -1,4 +1,4 @@
-package builders;
+package component_construction.factories.lexical_analysis;
 
 import lexical_analysis.*;
 
