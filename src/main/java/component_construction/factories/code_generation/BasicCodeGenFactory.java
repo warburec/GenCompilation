@@ -1,6 +1,5 @@
-package builders.concrete_factories;
+package component_construction.factories.code_generation;
 
-import builders.CodeGeneratorFactory;
 import code_generation.*;
 import grammar_objects.RuleConvertor;
 

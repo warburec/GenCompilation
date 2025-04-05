@@ -1,4 +1,4 @@
-package builders.bundles;
+package component_construction.bundles;
 
 import grammar_objects.*;
 import lexical_analysis.DynamicTokenRegex;

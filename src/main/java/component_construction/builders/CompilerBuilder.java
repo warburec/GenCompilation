@@ -1,12 +1,17 @@
-package builders;
+package component_construction.builders;
 
 import java.util.*;
 
-import builders.bundles.GrammarBundle;
 import grammar_objects.*;
 import lexical_analysis.*;
 import syntax_analysis.SyntaxAnalyser;
 import code_generation.CodeGenerator;
+import component_construction.Compiler;
+import component_construction.ParameterError;
+import component_construction.bundles.GrammarBundle;
+import component_construction.factories.code_generation.CodeGeneratorFactory;
+import component_construction.factories.lexical_analysis.LexicalAnalyserFactory;
+import component_construction.factories.syntax_analysis.SyntaxAnalyserFactory;
 
 public class CompilerBuilder {
     protected LexicalAnalyserFactory lexicalAnalyserFactory;
