@@ -1,6 +1,5 @@
-package builders.concrete_factories;
+package component_construction.factories.lexical_analysis;
 
-import builders.LexicalAnalyserFactory;
 import lexical_analysis.*;
 
 public class GeneralLexicalAnalyserFactory implements LexicalAnalyserFactory {

@@ -1,4 +1,4 @@
-package builders;
+package component_construction.factories.grammar;
 
 import grammar_objects.Grammar;
 

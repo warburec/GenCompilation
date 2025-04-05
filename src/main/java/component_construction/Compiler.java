@@ -1,4 +1,4 @@
-package builders;
+package component_construction;
 
 import code_generation.CodeGenerator;
 import grammar_objects.Token;

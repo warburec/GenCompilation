@@ -1,8 +1,7 @@
-package builders.concrete_factories;
+package component_construction.factories.grammar;
 
 import java.util.*;
 
-import builders.GrammarFactory;
 import grammar_objects.*;
 
 import java.util.regex.Matcher;
