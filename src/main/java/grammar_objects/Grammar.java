@@ -2,6 +2,7 @@ package grammar_objects;
 
 import java.util.*;
 
+//TODO Make bulders instead of extending
 public abstract class Grammar {
     
     protected Set<Token> tokens = new HashSet<>();
@@ -41,6 +42,10 @@ public abstract class Grammar {
         return productionRules.get(index);
     }
 
+    public List<ProductionRule> getRules() {
+        return productionRules;
+    }
+    
     public GrammarParts getParts() {
         return new GrammarParts(
             tokens, 

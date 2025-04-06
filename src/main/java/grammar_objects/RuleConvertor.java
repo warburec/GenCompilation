@@ -5,83 +5,55 @@ import java.util.*;
 import code_generation.Generator;
 import helper_objects.NullableTuple;
 
-public abstract class RuleConvertor {
-    public static final Integer ROOT_RULE_INDEX = null;
+//TODO: Test
+/**
+ * Defines conversions for the rules within the specified grammar.
+ */
+public record RuleConvertor(
+    Grammar grammar,
+    Map<ProductionRule, Generator> conversions,
+    NullableTuple<String, String> bookends
+) {
+    
     public static final ProductionRule ROOT_RULE = null;
 
-    private Grammar grammar;
-    private NullableTuple<String, String> bookends;
-    private Map<ProductionRule, Generator> conversions = new HashMap<>();
+    /**
+     * Defines conversions for the rules within the specified grammar
+     * @param grammar The grammar for conversions
+     * @param conversions The conversions for every grammar rule
+     * @param bookends Any constant strings which will bookend produced generations. May be null
+     */
+    public RuleConvertor(
+        Grammar grammar,
+        Map<ProductionRule, Generator> conversions,
+        NullableTuple<String, String> bookends
+    ) {
+        if (grammar == null) throw new RuntimeException("A grammar must be defined");
+        if (conversions == null) throw new RuntimeException("Production rule conversions must be defined");
 
-    public RuleConvertor() {
-        grammar = setUpGrammar();
-        bookends = setUpBookends();
-
-        if(bookends == null) {
+        if(bookends == null)
             bookends = new NullableTuple<String,String>("", "");
-        }
 
-        setUpRuleConvertors(new RuleOrganiser());
+        if (!conversions.containsKey(ROOT_RULE))
+            conversions.put(ROOT_RULE, (elements) -> elements[0].getGeneration());
+
+        //TODO: Throw error if num of conversions are not the same as grammer rules including the root rule
+
+        this.grammar = grammar;
+        this.bookends = bookends;
+        this.conversions = conversions;
     }
 
     /**
-     * Set up the grammar for this convertor
-     * @return The grammar to be used
+     * Defines conversions for the rules within the specified grammar
+     * @param grammar The grammar for conversions
+     * @param conversions The conversions for every grammar rule
      */
-    protected abstract Grammar setUpGrammar();
-
-    /**
-     * Set up the constant starting and ending strings for conversions
-     * @return A NullableTuple of the starting string and ending string, may be null in which case the bookends will be taken as ("","")
-     */
-    protected abstract NullableTuple<String, String> setUpBookends();
-
-    /**
-     * Sets up code conversions for each production rule, for when the rules are sanctioned
-     * @param ruleOrganiser A helper object for conversion setup
-     */
-    protected abstract void setUpRuleConvertors(RuleOrganiser ruleOrganiser);
-
-    /**
-     * Gets the start and ending strings for conversions
-     * @return A tuple of the starting and ending strings
-     */
-    public NullableTuple<String, String> getBookends() {
-        return bookends;
-    }
-
-    /**
-     * Gets the mapping of production rules to the Generators for their conversions
-     * @return The conversion map
-     */
-    public Map<ProductionRule, Generator> getConversions() {
-        return conversions;
-    }
-
-    protected class RuleOrganiser {
-
-        /**
-         * Sets the conversion code to run when the specified rule is sanctioned 
-         * @param ruleNumber The rule index. ROOT_RULE_INDEX, to run code after the final rule is sanctioned (useful for formatting).
-         * @param generatorFunction The function to be run when the specified rule is sanctioned.
-         * @return The original organiser object to allof method chaining.
-         */
-        public RuleOrganiser setConversion(Integer ruleNumber, Generator generatorFunction) {
-            if(ruleNumber < 0 && ruleNumber != ROOT_RULE_INDEX) { 
-                throw new RuntimeException("The given rule number must be >= 0 or ROOT_RULE_INDEX");
-            }
-
-            ProductionRule rule = null;
-
-            if(ruleNumber != ROOT_RULE_INDEX) {
-                rule = grammar.getRule(ruleNumber);
-            }
-
-            conversions.put(rule, generatorFunction);
-
-            return this;
-        }
-
+    public RuleConvertor(
+        Grammar grammar,
+        Map<ProductionRule, Generator> conversions
+    ){
+        this(grammar, conversions, null);
     }
 
 }
