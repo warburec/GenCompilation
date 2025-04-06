@@ -131,7 +131,7 @@ public class RuleConvertorBuilder {
 
 
     private void populateDefaultConversions() {
-        for (ProductionRule productionRule : grammar.getRules()) {
+        for (ProductionRule productionRule : grammar.productionRules()) {
             if (conversions.containsKey(productionRule)) continue;
 
             conversions.put(productionRule, defaultConversion);

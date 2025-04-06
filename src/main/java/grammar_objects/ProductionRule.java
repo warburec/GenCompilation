@@ -8,20 +8,13 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ProductionRule)) {
-            return false;
-        }
+        if (!(obj instanceof ProductionRule)) { return false; }
          
         ProductionRule otherRule = (ProductionRule)obj;
 
-        if(nonTerminal == null) {
-            if(otherRule.nonTerminal() != null) { return false; }
-        }
-        else {
-            if(!nonTerminal.equals(otherRule.nonTerminal())) { return false; }
-        }
-
-        if(productionSequence.length != otherRule.productionSequence().length) { return false; }
+        if (nonTerminal == null && otherRule.nonTerminal() != null) { return false; }
+        if (!nonTerminal.equals(otherRule.nonTerminal())) { return false; }
+        if (productionSequence.length != otherRule.productionSequence().length) { return false; }
 
         LexicalElement[] otherProductionSequence = otherRule.productionSequence();
         for (int i = 0; i < productionSequence.length; i++) {
@@ -37,7 +30,7 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
     public String toString() {
         String string = "";
         
-        if(nonTerminal == null) {
+        if (nonTerminal == null) {
             string += "null";
         }
         else {
@@ -47,12 +40,12 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
         string += " := ";
 
         for (int i = 0; i < productionSequence.length - 1; i++) {
-            if(productionSequence[i] == null) { string += "null";  }
+            if (productionSequence[i] == null) { string += "null"; }
             
             string += productionSequence[i].toString() + " ";
         }
 
-        if(productionSequence.length > 0) {
+        if (productionSequence.length > 0) {
             string += productionSequence[productionSequence.length - 1].toString();
         }
 
