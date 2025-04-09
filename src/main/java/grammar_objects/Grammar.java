@@ -2,7 +2,6 @@ package grammar_objects;
 
 import java.util.*;
 
-//TODO: Test
 public record Grammar(
     Set<Token> tokens,
     Set<NonTerminal> nonTerminals,
