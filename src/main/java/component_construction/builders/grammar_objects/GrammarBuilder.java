@@ -65,6 +65,13 @@ public class GrammarBuilder {
         return this;
     }
 
+    /**
+     * Produces the grammar built through this builder
+     * @return The grammar that was built
+     */
+    public Grammar produceGrammar() {
+        return new Grammar(tokens, nonTerminals, productionRules, sentinal);
+    }
 
     private void addTokens(ProductionRule productionRule) {
         nonTerminals.add(productionRule.nonTerminal());

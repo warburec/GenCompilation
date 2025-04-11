@@ -5,7 +5,6 @@ import java.util.*;
 import code_generation.Generator;
 import helper_objects.NullableTuple;
 
-//TODO: Test
 /**
  * Defines conversions for the rules within the specified grammar.
  */
@@ -37,7 +36,8 @@ public record RuleConvertor(
         if (!conversions.containsKey(ROOT_RULE))
             conversions.put(ROOT_RULE, (elements) -> elements[0].getGeneration());
 
-        //TODO: Throw error if num of conversions are not the same as grammer rules including the root rule
+        if (conversions.size() < grammar.productionRules().size() + 1)
+            throw new IncompleteConversionsException(conversions, grammar.productionRules());
 
         this.grammar = grammar;
         this.bookends = bookends;
@@ -56,4 +56,34 @@ public record RuleConvertor(
         this(grammar, conversions, null);
     }
 
+    public class IncompleteConversionsException extends RuntimeException {
+
+        protected String message;
+
+        public IncompleteConversionsException(Map<ProductionRule, Generator> conversions, List<ProductionRule> productionRules) {
+            List<ProductionRule> notImplemented = new ArrayList<>();
+
+            for (ProductionRule productionRule : productionRules) {
+                if (!conversions.containsKey(productionRule))
+                    notImplemented.add(productionRule);
+            }
+
+            message = "There were no conversions for the following rules:\n";
+
+            if (!conversions.containsKey(ROOT_RULE))
+                message += "    ROOT_RULE\n";
+
+            for (ProductionRule productionRule : notImplemented) {
+                message += "    " + productionRule.toString() + "\n";
+            }
+
+            message = message.strip();
+        }
+
+        @Override
+        public String getMessage() {
+            return message;
+        }
+
+    }
 }
