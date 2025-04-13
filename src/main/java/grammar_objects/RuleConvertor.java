@@ -13,14 +13,14 @@ public record RuleConvertor(
     Map<ProductionRule, Generator> conversions,
     NullableTuple<String, String> bookends
 ) {
-    
-    public static final ProductionRule ROOT_RULE = null;
+    //TODO: Consider if the sentinal token should be listed in the productionSequence
+    public static final ProductionRule ROOT_RULE = new ProductionRule(null, null);
 
     /**
      * Defines conversions for the rules within the specified grammar
      * @param grammar The grammar for conversions
      * @param conversions The conversions for every grammar rule
-     * @param bookends Any constant strings which will bookend produced generations. May be null
+     * @param bookends Any constant strings which will bookend produced generations. May be null, in which case the Generator will be {@code (elements) -> elements[0].getGeneration() }
      */
     public RuleConvertor(
         Grammar grammar,
@@ -30,11 +30,18 @@ public record RuleConvertor(
         if (grammar == null) throw new RuntimeException("A grammar must be defined");
         if (conversions == null) throw new RuntimeException("Production rule conversions must be defined");
 
-        if(bookends == null)
+        if (bookends == null)
             bookends = new NullableTuple<String,String>("", "");
 
-        if (!conversions.containsKey(ROOT_RULE))
+        try {
+            if (!conversions.containsKey(ROOT_RULE))
+                conversions.put(ROOT_RULE, (elements) -> elements[0].getGeneration());
+        }
+        catch (NullPointerException e) {
+            conversions = new HashMap<>();
             conversions.put(ROOT_RULE, (elements) -> elements[0].getGeneration());
+            conversions.putAll(conversions);
+        }
 
         if (conversions.size() < grammar.productionRules().size() + 1)
             throw new IncompleteConversionsException(conversions, grammar.productionRules());
@@ -52,7 +59,7 @@ public record RuleConvertor(
     public RuleConvertor(
         Grammar grammar,
         Map<ProductionRule, Generator> conversions
-    ){
+    ) {
         this(grammar, conversions, null);
     }
 

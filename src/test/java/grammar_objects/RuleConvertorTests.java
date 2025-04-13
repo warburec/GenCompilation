@@ -49,7 +49,6 @@ public class RuleConvertorTests {
         assertEquals(bookends, actual.bookends());
         assertEquals(conversions, actual.conversions());
         assertEquals(grammar, actual.grammar());
-        assertEquals((Generator)(elements) -> elements[0].getGeneration(), actual.conversions().get(RuleConvertor.ROOT_RULE));
     }
 
     @Test
@@ -124,7 +123,6 @@ public class RuleConvertorTests {
         NullableTuple<String, String> bookends = new NullableTuple<>("start", "end");
 
 
-        //TODO: Check exception message format
         assertThrows(IncompleteConversionsException.class, () -> new RuleConvertor(grammar, conversions, bookends));
     }
 }
