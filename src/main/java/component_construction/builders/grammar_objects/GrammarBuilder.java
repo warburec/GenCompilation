@@ -3,7 +3,6 @@ package component_construction.builders.grammar_objects;
 import java.util.*;
 import grammar_objects.*;
 
-//TODO: Test
 public class GrammarBuilder {
 
     protected Set<Token> tokens = new HashSet<>();
@@ -70,8 +69,10 @@ public class GrammarBuilder {
      * @return The grammar that was built
      */
     public Grammar produceGrammar() {
+        if (sentinal == null) throw new MissingSentinalException();
         return new Grammar(tokens, nonTerminals, productionRules, sentinal);
     }
+
 
     private void addTokens(ProductionRule productionRule) {
         nonTerminals.add(productionRule.nonTerminal());
@@ -81,4 +82,14 @@ public class GrammarBuilder {
             else if (element instanceof NonTerminal) { nonTerminals.add((NonTerminal)element); }
         }
     }
+
+
+    public class MissingSentinalException extends RuntimeException {
+        
+        public MissingSentinalException() {
+            super("Sentinal not defined");
+        }
+
+    }
+
 }

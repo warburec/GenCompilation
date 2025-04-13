@@ -53,9 +53,8 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
             string += productionSequence[i].toString() + " ";
         }
 
-        if (productionSequence.length > 0) {
+        if (productionSequence.length > 0)
             string += productionSequence[productionSequence.length - 1].toString();
-        }
 
         string.stripTrailing();
         return string;
