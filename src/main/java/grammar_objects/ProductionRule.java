@@ -12,8 +12,16 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
          
         ProductionRule otherRule = (ProductionRule)obj;
 
-        if (nonTerminal == null && otherRule.nonTerminal() != null) { return false; }
-        if (!nonTerminal.equals(otherRule.nonTerminal())) { return false; }
+        if (nonTerminal == null) {
+            if (otherRule.nonTerminal() != null) { return false; }
+        }
+        else {
+            if (!nonTerminal.equals(otherRule.nonTerminal())) { return false; }
+        }
+
+        if (productionSequence == null || otherRule.productionSequence() == null)
+            return productionSequence == otherRule.productionSequence();
+
         if (productionSequence.length != otherRule.productionSequence().length) { return false; }
 
         LexicalElement[] otherProductionSequence = otherRule.productionSequence();
@@ -55,10 +63,15 @@ public record ProductionRule(NonTerminal nonTerminal, LexicalElement[] productio
 
     @Override
     public int hashCode() {
-        int hashCode = nonTerminal.hashCode() * 31;
+        int hashCode = 1;
+        
+        if (nonTerminal != null)
+            hashCode *= nonTerminal.hashCode() * 31;
 
-        for (LexicalElement lexicalElement : productionSequence) {
-            hashCode *= lexicalElement.hashCode();
+        if (productionSequence != null) {
+            for (LexicalElement lexicalElement : productionSequence) {
+                hashCode *= lexicalElement.hashCode();
+            }
         }
 
         return hashCode;
