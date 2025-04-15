@@ -21,7 +21,7 @@ public class BasicSLR1TestGrammar extends TestGrammar {
 
     @Override
     protected Grammar setUpGrammar(GrammarType type) {
-        return new BasicSLR1Grammar();
+        return BasicSLR1Grammar.produce();
     }
 
     @Override

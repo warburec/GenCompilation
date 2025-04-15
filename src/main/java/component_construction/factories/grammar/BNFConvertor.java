@@ -7,6 +7,8 @@ import grammar_objects.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import component_construction.builders.grammar_objects.GrammarBuilder;
+
 /**
  * A class for converting text written in BNF into Grammar objects
  * Notes:
@@ -45,33 +47,10 @@ public class BNFConvertor implements GrammarFactory {
     public BNFConvertor(String bnf) {        
         GrammarDetailsHolder detailsHolder = gatherGrammarDetails(bnf);
 
-        constructedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                for (Token token : detailsHolder.tokenHolder) {
-                    tokenOrganiser.addToken(token);
-                }
-            }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return detailsHolder.sentinal;
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                for (NonTerminal nonTerminal : detailsHolder.nonTerminalHolder) {
-                    nonTerminalOrganiser.addNonTerminal(nonTerminal);
-                }
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                for (ProductionRule rule : detailsHolder.ruleHolder) {
-                    ruleOrganiser.addRule(rule);
-                }
-            }
-        };
+        constructedGrammar = new GrammarBuilder()
+        .setSentinal(detailsHolder.sentinal)
+        .addRules(detailsHolder.ruleHolder)
+        .produceGrammar();
     }
 
     private GrammarDetailsHolder gatherGrammarDetails(String bnf) {
