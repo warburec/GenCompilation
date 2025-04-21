@@ -24,7 +24,7 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
 
     @Override
     protected Grammar setUpGrammar(GrammarType type) {
-        return new BasicIdentifierGrammar();
+        return BasicIdentifierGrammar.produce();
     }
 
     @Override
@@ -482,8 +482,8 @@ public class BasicIdentifierTestGrammar extends TestGrammar {
     protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
         ruleConvertorMap.put("Java", new HashMap<>());
 
-        ruleConvertorMap.get("Java").put("XToYToX", new XToYToX());
-        ruleConvertorMap.get("Java").put("XToYToXSemantic", new XToYToXSemantic());
+        ruleConvertorMap.get("Java").put("XToYToX", XToYToX.produce());
+        ruleConvertorMap.get("Java").put("XToYToXSemantic", XToYToXSemantic.produce());
     }
     
     @Override

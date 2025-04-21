@@ -1,5 +1,6 @@
 package grammars.integer_comparison;
 
+import component_construction.builders.grammar_objects.GrammarBuilder;
 import grammar_objects.*;
 
 // statement_list -> statement_list statement
@@ -26,53 +27,10 @@ import grammar_objects.*;
 // expression -> expression - numConstant
 // expression -> expression * numConstant
 // expression -> expression / numConstant
-public class IntegerCompGrammar extends Grammar {
+public class IntegerCompGrammar {
 
-    @Override
-    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-        tokenOrganiser
-        .addToken(new Token(";"))
-        .addToken(new Token("if"))
-        .addToken(new Token("("))
-        .addToken(new Token(")"))
-        .addToken(new Token("{"))
-        .addToken(new Token("}"))
-        .addToken(new Token("else"))
-        .addToken(new Token(">"))
-        .addToken(new Token(">="))
-        .addToken(new Token("=="))
-        .addToken(new Token("!="))
-        .addToken(new Token("<="))
-        .addToken(new Token("="))
-        .addToken(new Token("+"))
-        .addToken(new Token("-"))
-        .addToken(new Token("*"))
-        .addToken(new Token("/"))
-        .addToken(new Identifier("identifier"))
-        .addToken(new Literal("numConstant"));
-    }
-
-    @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("statement list");
-    }
-
-    @Override
-    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-        nonTerminalOrganiser
-        .addNonTerminal("statement list")
-        .addNonTerminal("statement")
-        .addNonTerminal("if statement")
-        .addNonTerminal("condition")
-        .addNonTerminal("conditional operator")
-        .addNonTerminal("assignment")
-        .addNonTerminal("expression");
-    }
-
-    @Override
-    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-        ruleOrganiser
-
+    public static Grammar produce() {
+        return new GrammarBuilder()
         .addRule(
             new NonTerminal("statement list"), 
             new LexicalElement[] {
@@ -250,7 +208,9 @@ public class IntegerCompGrammar extends Grammar {
                 new NonTerminal("expression"),
                 new Token("/"),
                 new Literal("numConstant")
-        });
+        })
+
+        .produceGrammar();
     }
 
 }

@@ -15,7 +15,7 @@ public class BasicCLR1TestGrammar extends TestGrammar {
 
     @Override
     protected Grammar setUpGrammar(GrammarType type) {
-        return new BasicCLR1Grammar();
+        return BasicCLR1Grammar.produce();
     }
 
     @Override

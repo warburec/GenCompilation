@@ -22,7 +22,7 @@ public class SelfReferentialTestGrammar extends TestGrammar {
 
     @Override
     protected Grammar setUpGrammar(GrammarType type) {
-        return new SelfReferentialGrammar();
+        return SelfReferentialGrammar.produce();
     }
 
     @Override

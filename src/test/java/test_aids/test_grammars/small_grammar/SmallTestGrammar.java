@@ -25,7 +25,7 @@ public class SmallTestGrammar extends TestGrammar {
 
     @Override
     protected Grammar setUpGrammar(GrammarType type) {
-        return new SmallGrammar();
+        return SmallGrammar.produce();
     }
 
     @Override
@@ -384,14 +384,14 @@ public class SmallTestGrammar extends TestGrammar {
     protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
         ruleConvertorMap.put("Java", new HashMap<>());
 
-        ruleConvertorMap.get("Java").put("1+0*1", new OpZtO());
-        ruleConvertorMap.get("Java").put("1", new One());
-        ruleConvertorMap.get("Java").put("emptyReduce", new EmptyReduce());
-        ruleConvertorMap.get("Java").put("1+0*1MissingReduction", new OpZtOMissingReduction());
+        ruleConvertorMap.get("Java").put("1+0*1", OpZtO.produce());
+        ruleConvertorMap.get("Java").put("1", One.produce());
+        ruleConvertorMap.get("Java").put("emptyReduce", EmptyReduce.produce());
+        ruleConvertorMap.get("Java").put("1+0*1MissingReduction", OpZtOMissingReduction.produce());
 
         ruleConvertorMap.put("C", new HashMap<>());
 
-        ruleConvertorMap.get("C").put("1+0*1", new COpZtO());
+        ruleConvertorMap.get("C").put("1+0*1", COpZtO.produce());
     }
 
     @Override

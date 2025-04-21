@@ -1,5 +1,6 @@
 package grammars.small_grammar;
 
+import component_construction.builders.grammar_objects.GrammarBuilder;
 import grammar_objects.*;
 
 /**
@@ -9,33 +10,11 @@ import grammar_objects.*;
  * B->0
  * B->1
  */
-public class SmallGrammar extends Grammar {
+public class SmallGrammar {
 
-    @Override
-    protected  void setUpTokens(TokenOrganiser tokenOrganiser) {
-        tokenOrganiser
-        .addToken("0")
-        .addToken("1")
-        .addToken("*")
-        .addToken("+");
-    }
-
-    @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("E");
-    }
-
-    @Override
-    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-        nonTerminalOrganiser
-        .addNonTerminal("E")
-        .addNonTerminal("B");
-    }
-
-    @Override
-    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-        ruleOrganiser
-
+    public static Grammar produce() {
+        return new GrammarBuilder()
+        .setSentinal(new NonTerminal("E"))
         .addRule(
             new NonTerminal("E"),
             new LexicalElement[] {
@@ -43,7 +22,6 @@ public class SmallGrammar extends Grammar {
                 new Token("+"),
                 new NonTerminal("B")
         })
-
         .addRule(
             new NonTerminal("E"),
             new LexicalElement[] {
@@ -51,24 +29,22 @@ public class SmallGrammar extends Grammar {
                 new Token("*"),
                 new NonTerminal("B")
         })
-
         .addRule(
             new NonTerminal("E"),
             new LexicalElement[] {
                 new NonTerminal("B")
         })
-
         .addRule(
             new NonTerminal("B"),
             new LexicalElement[] {
                 new Token("0")
         })
-
         .addRule(
             new NonTerminal("B"),
             new LexicalElement[] {
                 new Token("1")
-        });
+        })
+        .produceGrammar();
     }
 
 }

@@ -17,7 +17,7 @@ public class TypeCheckerTests {
         String language = "Java";
         String sentence = "XToYToXSemantic";
         TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
-        RuleConvertor ruleConvertor = new XToYToXSemantic();
+        RuleConvertor ruleConvertor = XToYToXSemantic.produce();
         CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor);
         ParseState rootParseState = grammar.getParseRoot("XToYToXSemantic");
 
