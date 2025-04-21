@@ -3,6 +3,7 @@ package grammar_objects;
 import java.util.*;
 
 import code_generation.Generator;
+import component_construction.ParameterError;
 import helper_objects.NullableTuple;
 
 /**
@@ -27,8 +28,8 @@ public record RuleConvertor(
         Map<ProductionRule, Generator> conversions,
         NullableTuple<String, String> bookends
     ) {
-        if (grammar == null) throw new RuntimeException("A grammar must be defined");
-        if (conversions == null) throw new RuntimeException("Production rule conversions must be defined");
+        if (grammar == null) throw new ParameterError("A grammar must be defined");
+        if (conversions == null) throw new ParameterError("Production rule conversions must be defined");
 
         if (bookends == null)
             bookends = new NullableTuple<String,String>("", "");

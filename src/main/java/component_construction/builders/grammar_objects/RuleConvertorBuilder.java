@@ -1,16 +1,16 @@
 package component_construction.builders.grammar_objects;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import code_generation.Generator;
 import grammar_objects.*;
 import helper_objects.NullableTuple;
 
-//TODO: Test
 public class RuleConvertorBuilder {
 
     protected Grammar grammar;
-    protected Map<ProductionRule, Generator> conversions;
+    protected Map<ProductionRule, Generator> conversions = new HashMap<>();
     protected NullableTuple<String, String> bookends = null;
     protected Generator defaultConversion = null;
 
@@ -104,6 +104,19 @@ public class RuleConvertorBuilder {
         ProductionRule rule = grammar.getRule(ruleNumber);
         conversions.put(rule, generatorFunction);
 
+        return this;
+    }
+
+    /**
+     * Adds the given conversion functions for the specified grammar rule
+     * @param conversions A map of grammar rules to generator functions
+     * @return This builder to allow method chaining
+     */
+    public RuleConvertorBuilder setConversions(Map<ProductionRule, Generator> conversions) {
+        for (Entry<ProductionRule, Generator> entry : conversions.entrySet()) {
+            setConversion(entry.getKey(), entry.getValue());
+        }
+        
         return this;
     }
 
