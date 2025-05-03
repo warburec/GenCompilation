@@ -22,8 +22,10 @@ sourceSets {
 dependencies {
     implementation platform('org.junit:junit-bom:5.10.3')
     implementation 'org.junit.jupiter:junit-jupiter'
+
     testImplementation platform('org.junit:junit-bom:5.10.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -38,6 +40,7 @@ tasks.named('test') {
     testLogging {
         events = [TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT]
         exceptionFormat = TestExceptionFormat.FULL
+
         showExceptions = true
         showCauses = true
         showStackTraces = true
@@ -46,6 +49,7 @@ tasks.named('test') {
             events = [TestLogEvent.STARTED, TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_ERROR, TestLogEvent.STANDARD_OUT]
             exceptionFormat = TestExceptionFormat.FULL
         }
+
         info.events = debug.events
         info.exceptionFormat = debug.exceptionFormat
 

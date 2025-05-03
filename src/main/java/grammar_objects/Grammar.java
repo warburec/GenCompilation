@@ -2,12 +2,24 @@ package grammar_objects;
 
 import java.util.*;
 
-public record Grammar(
-    Set<Token> tokens,
-    Set<NonTerminal> nonTerminals,
-    List<ProductionRule> productionRules,
-    NonTerminal sentinal
-) {
+public class Grammar {
+
+    protected Set<Token> tokens;
+    protected Set<NonTerminal> nonTerminals;
+    protected List<ProductionRule> productionRules;
+    protected NonTerminal sentinal;
+
+    public Grammar(
+        Set<Token> tokens,
+        Set<NonTerminal> nonTerminals,
+        List<ProductionRule> productionRules,
+        NonTerminal sentinal
+    ) {
+        this.tokens = tokens;
+        this.nonTerminals = nonTerminals;
+        this.productionRules = productionRules;
+        this.sentinal = sentinal;
+    }
 
     public ProductionRule getRule(int index) {
         return productionRules.get(index);
@@ -23,16 +35,14 @@ public record Grammar(
     }
 
     @Override
-    public boolean equals(Object object){
+    public boolean equals(Object object) {
         if(!(object instanceof Grammar)) { return false; }
 
         Grammar otherGrammar = (Grammar)object;
 
         if(!sentinal.equals(otherGrammar.sentinal)) { return false; }
-
         if(!tokens.equals(otherGrammar.tokens)) { return false; }
         if(!nonTerminals.equals(otherGrammar.nonTerminals)) { return false; }
-
         if(!productionRules.equals(otherGrammar.productionRules)) { return false; }
 
         return true;
