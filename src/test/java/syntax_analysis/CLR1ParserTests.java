@@ -8,7 +8,7 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import test_aids.*;
-// import test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
+import test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
 // import test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
 // import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
 // import test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
@@ -370,45 +370,45 @@ public class CLR1ParserTests {
     // //     assertEquals(expectedParseRoot, generatedParseRoot);
     // // }
 
-    // @Test
-    // public void CLR1Grammar() {
-    //     TestGrammar grammar = new BasicCLR1TestGrammar(GrammarType.CLR1);
-    //     GrammarParts grammarParts = grammar.getParts();
+    @Test
+    public void CLR1Grammar() {
+        TestGrammar grammar = new BasicCLR1TestGrammar().getGrammar();
+        GrammarParts grammarParts = grammar.getParts();
 
-    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    //                                             grammarParts.nonTerminals(),
-    //                                             grammarParts.productionRules(),
-    //                                             grammarParts.sentinal());
-    //     Set<State> generatedStates = syntaxAnalyser.getStates();
+        CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
 
-    //     Set<State> expectedStateSet = grammar.getStates();
-    //     assertEquals(expectedStateSet, generatedStates);
-    // }
+        Set<State> expectedStateSet = grammar.getStates();
+        assertEquals(expectedStateSet, generatedStates);
+    }
 
-    // @Test
-    // public void CLR1BasicParsing() throws ParseFailedException {
-    //     TestGrammar grammar = new BasicCLR1TestGrammar(GrammarType.CLR1);
-    //     GrammarParts grammarParts = grammar.getParts();
+    @Test
+    public void CLR1BasicParsing() throws ParseFailedException {
+        TestGrammar grammar = new BasicCLR1TestGrammar().getGrammar();
+        GrammarParts grammarParts = grammar.getParts();
 
-    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    //                                             grammarParts.nonTerminals(),
-    //                                             grammarParts.productionRules(),
-    //                                             grammarParts.sentinal());
+        CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
         
-    //     Token[] sentence = new Token[] {
-    //         new Token("a", 1, 1),
-    //         new Token("a", 1, 2),
-    //         new Token("b", 1, 3),
-    //         new Token("a", 1, 4),
-    //         new Token("a", 1, 5),
-    //         new Token("a", 1, 6),
-    //         new Token("b", 1, 7),
-    //     };
+        Token[] sentence = new Token[] {
+            new Token("a", 1, 1),
+            new Token("a", 1, 2),
+            new Token("b", 1, 3),
+            new Token("a", 1, 4),
+            new Token("a", 1, 5),
+            new Token("a", 1, 6),
+            new Token("b", 1, 7),
+        };
 
 
-    //     assertNotNull(syntaxAnalyser.analyse(sentence));
-    //     //TODO: Ensure tables/parse states are correct (not that they just don't throw errors and aren't null)
-    // }
+        assertNotNull(syntaxAnalyser.analyse(sentence));
+        //TODO: Ensure tables/parse states are correct (not that they just don't throw errors and aren't null)
+    }
     
-    // //TODO: Make tests to parse sentences that would cause SLR1 issues
+    //TODO: Make tests to parse sentences that would cause SLR1 issues
 }

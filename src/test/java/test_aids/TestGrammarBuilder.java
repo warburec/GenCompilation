@@ -2,8 +2,6 @@ package test_aids;
 
 import java.util.*;
 import java.util.Map.Entry;
-
-import component_construction.builders.grammar_objects.GrammarBuilder;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;

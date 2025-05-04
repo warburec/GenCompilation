@@ -31,7 +31,7 @@ public class SmallTestGrammar {
         TestGrammarBuilder builder = new TestGrammarBuilder(grammar);
 
         eof = builder.endOfFile;
-        states = setUpStates(builder.extraRootRule);
+        states = gatherStates(builder.extraRootRule);
 
         allTokens = new ArrayList<>();
         allTokens.addAll(grammar.getParts().tokens());
@@ -119,7 +119,7 @@ public class SmallTestGrammar {
         return grammar.getRule(index);
     }
 
-    private List<State> setUpStates(ProductionRule extraRootRule) {
+    private List<State> gatherStates(ProductionRule extraRootRule) {
         states = new ArrayList<State>();
         
         states.add(new State(
