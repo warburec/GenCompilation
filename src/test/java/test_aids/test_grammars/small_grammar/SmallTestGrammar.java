@@ -5,12 +5,11 @@ import grammar_objects.*;
 import grammars.small_grammar.SmallGrammar;
 import grammars.small_grammar.convertors.*;
 import syntax_analysis.grammar_structure_creation.*;
-import grammars.small_grammar.SmallGrammar;
 import syntax_analysis.grammar_structure_creation.State;
 import syntax_analysis.parsing.*;
 import test_aids.*;
+import test_aids.TestGrammarBuilder.TableGatherer;
 import test_aids.test_grammars.*;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,22 +22,22 @@ import java.util.stream.Collectors;
  */
 public class SmallTestGrammar {
 
-    Grammar grammar = SmallGrammar.produce();
+    private Grammar grammar = SmallGrammar.produce();
+    private EOF eof;
+    private List<State> states;
+    private List<Token> allTokens;
 
-    private ProductionRule getRule(int index) {
-        return grammar.getRule(index);
-    }
-
-    public TestGrammar getLR0Grammar() {
+    public TestGrammar getGrammar(GrammarType grammarType) {
         TestGrammarBuilder builder = new TestGrammarBuilder(grammar);
 
-        List<Token> allTokens = new ArrayList<>();
+        eof = builder.endOfFile;
+        states = setUpStates(builder.extraRootRule);
+
+        allTokens = new ArrayList<>();
         allTokens.addAll(grammar.getParts().tokens());
-        allTokens.add(builder.endOfFile);
+        allTokens.add(eof);
 
-        List<State> states = setUpStates(builder.extraRootRule);
-
-        return builder.setUp()
+        TableGatherer tableGatherer = builder.setUp()
         .addStates(states)
 
         //Tree branches
@@ -73,64 +72,11 @@ public class SmallTestGrammar {
             .addBranch(new Route(states.get(8), new Token("1")))
             .deselectState()
         
-        .commitStates()
+        .commitStates();
 
-        .selectState(states.get(0))
-            .addAction(new Token("0"), new Shift(states.get(7)))
-            .addAction(new Token("1"), new Shift(states.get(8)))
-            .deselectState()
-
-        .selectState(states.get(1))
-            .addAction(new Token("*"), new Shift(states.get(2)))
-            .addAction(new Token("+"), new Shift(states.get(4)))
-            .addAction(builder.endOfFile, new Accept())
-            .deselectState()
+        tableGatherer = setUpActionTable(grammarType, tableGatherer);
         
-        .selectState(states.get(2))
-            .addAction(new Token("0"), new Shift(states.get(7)))
-            .addAction(new Token("1"), new Shift(states.get(8)))
-            .deselectState()
-        
-        .selectState(states.get(3))
-            .addActions(allTokens.stream().collect(Collectors.toMap(
-                Function.identity(), 
-                token -> new Reduction(getRule(1))
-            )))
-            .deselectState()
-        
-        .selectState(states.get(4))
-            .addAction(new Token("0"), new Shift(states.get(7)))
-            .addAction(new Token("1"), new Shift(states.get(8)))
-            .deselectState()
-        
-        .selectState(states.get(5))
-            .addActions(allTokens.stream().collect(Collectors.toMap(
-                Function.identity(), 
-                token -> new Reduction(getRule(0))
-            )))
-            .deselectState()
-        
-        .selectState(states.get(6))
-            .addActions(allTokens.stream().collect(Collectors.toMap(
-                Function.identity(), 
-                token -> new Reduction(getRule(2))
-            )))
-            .deselectState()
-
-        .selectState(states.get(7))
-            .addActions(allTokens.stream().collect(Collectors.toMap(
-                Function.identity(), 
-                token -> new Reduction(getRule(3))
-            )))
-            .deselectState()
-
-        .selectState(states.get(8))
-            .addActions(allTokens.stream().collect(Collectors.toMap(
-                Function.identity(), 
-                token -> new Reduction(getRule(4))
-            )))
-            .deselectState()
-        
+        return tableGatherer
         .selectState(states.get(0))
             .addGoto(new NonTerminal("E"), states.get(1))
             .addGoto(new NonTerminal("B"), states.get(6))
@@ -169,9 +115,13 @@ public class SmallTestGrammar {
         .generateTestGrammar();
     }
 
-    private List<State> setUpStates(ProductionRule extraRootRule) {
-        List<State> states = new ArrayList<State>();
+    private ProductionRule getRule(int index) {
+        return grammar.getRule(index);
+    }
 
+    private List<State> setUpStates(ProductionRule extraRootRule) {
+        states = new ArrayList<State>();
+        
         states.add(new State(
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
@@ -249,78 +199,130 @@ public class SmallTestGrammar {
         return states;
     }
 
-    // @Override
-    // protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token builder.endOfFile) {
-    //     switch (type) {
-    //         case LR0 -> lr0ActionTable(type, actionTable, builder.endOfFile);
-    //         case SLR1 -> slr1ActionTable(type, actionTable, builder.endOfFile);
-    //         case CLR1 -> { /* Unimplemented */ }
-            
-    //         default -> throw new UnsupportedGrammarException(type);
-    //     }
-    // }
+    private TableGatherer setUpActionTable(GrammarType type, TableGatherer tableGatherer) {
+        switch (type) {
+            case LR0 -> lr0ActionTable(tableGatherer);
+            case SLR1 -> slr1ActionTable(tableGatherer);
+            case CLR1 -> { /* Unimplemented */}
 
-    // private void slr1ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token builder.endOfFile) {
-    //     Map<Token, Action> selectState(states.get(0));
-    //     .addAction(new Token("0"), new Shift(states.get(7)));
-    //     .addAction(new Token("1"), new Shift(states.get(8)));
+            default -> throw new UnsupportedGrammarException(type);
+        }
 
-    //     selectState(states.get(1));
-    //     .addAction(new Token("*"), new Shift(states.get(2)));
-    //     .addAction(new Token("+"), new Shift(states.get(4)));
-    //     .addAction(new EOF(), new Accept());
+        return tableGatherer;
+    }
+
+    private void lr0ActionTable(TableGatherer tableGatherer) {
+        tableGatherer
+        .selectState(states.get(0))
+            .addAction(new Token("0"), new Shift(states.get(7)))
+            .addAction(new Token("1"), new Shift(states.get(8)))
+            .deselectState()
+
+        .selectState(states.get(1))
+            .addAction(new Token("*"), new Shift(states.get(2)))
+            .addAction(new Token("+"), new Shift(states.get(4)))
+            .addAction(eof, new Accept())
+            .deselectState()
         
-    //     selectState(states.get(2));
-    //     .addAction(new Token("0"), new Shift(states.get(7)));
-    //     .addAction(new Token("1"), new Shift(states.get(8)));
+        .selectState(states.get(2))
+            .addAction(new Token("0"), new Shift(states.get(7)))
+            .addAction(new Token("1"), new Shift(states.get(8)))
+            .deselectState()
         
-    //     selectState(states.get(3));
-    //     .addAction(new Token("+"), new Reduction(getRule(1)));
-    //     .addAction(new Token("*"), new Reduction(getRule(1)));
-    //     .addAction(new EOF(), new Reduction(getRule(1)));
+        .selectState(states.get(3))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(1))
+            )))
+            .deselectState()
         
-    //     selectState(states.get(4));
-    //     .addAction(new Token("0"), new Shift(states.get(7)));
-    //     .addAction(new Token("1"), new Shift(states.get(8)));
+        .selectState(states.get(4))
+            .addAction(new Token("0"), new Shift(states.get(7)))
+            .addAction(new Token("1"), new Shift(states.get(8)))
+            .deselectState()
         
-    //     selectState(states.get(5));
-    //     .addAction(new Token("+"), new Reduction(getRule(0)));
-    //     .addAction(new Token("*"), new Reduction(getRule(0)));
-    //     .addAction(new EOF(), new Reduction(getRule(0)));
+        .selectState(states.get(5))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(0))
+            )))
+            .deselectState()
         
-    //     selectState(states.get(6));
-    //     .addAction(new Token("+"), new Reduction(getRule(2)));
-    //     .addAction(new Token("*"), new Reduction(getRule(2)));
-    //     .addAction(new EOF(), new Reduction(getRule(2)));
+        .selectState(states.get(6))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(2))
+            )))
+            .deselectState()
 
-    //     selectState(states.get(7));
-    //     .addAction(new Token("+"), new Reduction(getRule(3)));
-    //     .addAction(new Token("*"), new Reduction(getRule(3)));
-    //     .addAction(new EOF(), new Reduction(getRule(3)));
+        .selectState(states.get(7))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(3))
+            )))
+            .deselectState()
 
-    //     selectState(states.get(8));
-    //     .addAction(new Token("+"), new Reduction(getRule(4)));
-    //     .addAction(new Token("*"), new Reduction(getRule(4)));
-    //     .addAction(new EOF(), new Reduction(getRule(4)));
-    // }
+        .selectState(states.get(8))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(4))
+            )))
+            .deselectState();
+    }
 
-    // @Override
-    // protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
-    //     Map<NonTerminal, State> currentGotoActions = new HashMap<>();
+    private void slr1ActionTable(TableGatherer tableGatherer) {
+        tableGatherer
+        .selectState(states.get(0))
+            .addAction(new Token("0"), new Shift(states.get(7)))
+            .addAction(new Token("1"), new Shift(states.get(8)))
+            .deselectState()
 
-    //     currentGotoActions.put(new NonTerminal("E"), states.get(1));
-    //     currentGotoActions.put(new NonTerminal("B"), states.get(6));
-    //     gotoTable.put(states.get(0), new HashMap<>(currentGotoActions));
-    //     currentGotoActions.clear();
+        .selectState(states.get(1))
+            .addAction(new Token("*"), new Shift(states.get(2)))
+            .addAction(new Token("+"), new Shift(states.get(4)))
+            .addAction(new EOF(), new Accept())
+            .deselectState()
+        
+        .selectState(states.get(2))
+            .addAction(new Token("0"), new Shift(states.get(7)))
+            .addAction(new Token("1"), new Shift(states.get(8)))
+            .deselectState()
+        
+        .selectState(states.get(3))
+            .addAction(new Token("+"), new Reduction(getRule(1)))
+            .addAction(new Token("*"), new Reduction(getRule(1)))
+            .addAction(new EOF(), new Reduction(getRule(1)))
+            .deselectState()
+        
+        .selectState(states.get(4))
+            .addAction(new Token("0"), new Shift(states.get(7)))
+            .addAction(new Token("1"), new Shift(states.get(8)))
+            .deselectState()
+        
+        .selectState(states.get(5))
+            .addAction(new Token("+"), new Reduction(getRule(0)))
+            .addAction(new Token("*"), new Reduction(getRule(0)))
+            .addAction(new EOF(), new Reduction(getRule(0)))
+            .deselectState()
+        
+        .selectState(states.get(6))
+            .addAction(new Token("+"), new Reduction(getRule(2)))
+            .addAction(new Token("*"), new Reduction(getRule(2)))
+            .addAction(new EOF(), new Reduction(getRule(2)))
+            .deselectState()
 
-    //     currentGotoActions.put(new NonTerminal("B"), states.get(5));
-    //     gotoTable.put(states.get(4), new HashMap<>(currentGotoActions));
-    //     currentGotoActions.clear();
+        .selectState(states.get(7))
+            .addAction(new Token("+"), new Reduction(getRule(3)))
+            .addAction(new Token("*"), new Reduction(getRule(3)))
+            .addAction(new EOF(), new Reduction(getRule(3)))
+            .deselectState()
 
-    //     currentGotoActions.put(new NonTerminal("B"), states.get(3));
-    //     gotoTable.put(states.get(2), new HashMap<>(currentGotoActions));
-    //     currentGotoActions.clear();
-    // }
+        .selectState(states.get(8))
+            .addAction(new Token("+"), new Reduction(getRule(4)))
+            .addAction(new Token("*"), new Reduction(getRule(4)))
+            .addAction(new EOF(), new Reduction(getRule(4)))
+            .deselectState();
+    }
 
     /**
      * Parse tree for the sentence "1+0*1"
