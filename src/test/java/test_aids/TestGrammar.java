@@ -11,9 +11,9 @@ public class TestGrammar extends Grammar {
     protected List<State> states = new ArrayList<>();
     protected Map<State, Map<Token, Action>> actionTable = new HashMap<>();
     protected Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
-    protected RuleConvertor ruleConvertor;
-    protected String codeGeneration;
-    protected ParseState parseRoot;
+    protected Map<String, RuleConvertor> ruleConvertors;
+    protected Map<String, String> codeGenerations;
+    protected Map<String, ParseState> parseRoots;
 
     public TestGrammar(
         Set<Token> tokens,
@@ -23,17 +23,17 @@ public class TestGrammar extends Grammar {
         List<State> states,
         Map<State, Map<Token, Action>> actionTable,
         Map<State, Map<NonTerminal, State>> gotoTable,
-        RuleConvertor ruleConvertor,
-        String codeGeneration,
-        ParseState parseRoot
+        Map<String, RuleConvertor> ruleConvertors,
+        Map<String, String> codeGenerations,
+        Map<String, ParseState> parseRoots
     ) {
         super(tokens, nonTerminals, productionRules, sentinal);
         this.states = states;
         this.actionTable = actionTable;
         this.gotoTable = gotoTable;
-        this.ruleConvertor = ruleConvertor;
-        this.codeGeneration = codeGeneration;
-        this.parseRoot = parseRoot;
+        this.ruleConvertors = ruleConvertors;
+        this.codeGenerations = codeGenerations;
+        this.parseRoots = parseRoots;
     }
 
     public Set<State> getStates() {
@@ -57,4 +57,16 @@ public class TestGrammar extends Grammar {
         return gotoTable;
     }
 
+    public ParseState getParseRoot(String sentenceName) {
+        return parseRoots.get(sentenceName);
+    }
+
+    public RuleConvertor getRuleConvertor(String sentenceName) {
+        return ruleConvertors.get(sentenceName);
+    }
+
+    public String getCodeGeneration(String sentenceName) {
+        return codeGenerations.get(sentenceName);
+    }
+    
 }

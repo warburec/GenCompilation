@@ -69,4 +69,21 @@ public class Grammar {
 
         return out;
     }
+
+    public Set<Token> getTokens() {
+        return tokens;
+    }
+
+    public Set<NonTerminal> getNonTerminals() {
+        return nonTerminals;
+    }
+
+    public List<ProductionRule> getProductionRules() {
+        return productionRules;
+    }
+
+    public NonTerminal getSentinal() {
+        return sentinal;
+    }
+    
 }
