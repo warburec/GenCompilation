@@ -13,19 +13,101 @@ import test_aids.*;
  * A –> aA
  * A –> b
  */
-public class BasicSLR1TestGrammar extends TestGrammar {
+public class BasicSLR1TestGrammar {
 
-    public BasicSLR1TestGrammar(GrammarType type) {
-        super(type);
+    private Grammar grammar = BasicSLR1Grammar.produce();
+    private List<State> states;
+
+    public TestGrammar getGrammar() {
+        TestGrammarBuilder builder = new TestGrammarBuilder(grammar);
+
+        states = gatherStates(builder.extraRootRule);
+
+        return builder.setUp()
+        .addStates(states)
+        .selectState(states.get(0))
+            .addBranch(new Route(states.get(1), new NonTerminal("S")))
+            .addBranch(new Route(states.get(2), new NonTerminal("A")))
+            .addBranch(new Route(states.get(4), new Token("a")))
+            .addBranch(new Route(states.get(6), new Token("b")))
+            .deselectState()
+
+        .selectState(states.get(2))
+            .addBranch(new Route(states.get(3), new NonTerminal("A")))
+            .addBranch(new Route(states.get(4), new Token("a")))
+            .addBranch(new Route(states.get(6), new Token("b")))
+            .deselectState()
+
+        .selectState(states.get(4))
+            .addBranch(new Route(states.get(5), new NonTerminal("A")))
+            .addBranch(new Route(states.get(4), new Token("a")))
+            .addBranch(new Route(states.get(6), new Token("b")))
+            .deselectState()
+        
+        .commitStates()
+
+        .selectState(states.get(0))
+            .addAction(new Token("a"), new Shift(states.get(4)))
+            .addAction(new Token("b"), new Shift(states.get(6)))
+            .deselectState()
+
+        //Accept EOF at state 1
+        .selectState(states.get(1))
+            .addAction(new EOF(), new Accept())
+            .deselectState()
+
+        .selectState(states.get(2))
+            .addAction(new Token("a"), new Shift(states.get(4)))
+            .addAction(new Token("b"), new Shift(states.get(6)))
+            .deselectState()
+
+        .selectState(states.get(3))
+            .addAction(new EOF(), new Reduction(getRule(0)))
+            .deselectState()
+
+        .selectState(states.get(4))
+            .addAction(new Token("a"), new Shift(states.get(4)))
+            .addAction(new Token("b"), new Shift(states.get(6)))
+            .deselectState()
+
+        .selectState(states.get(5))
+            .addAction(new Token("a"), new Reduction(getRule(1)))
+            .addAction(new Token("b"), new Reduction(getRule(1)))
+            .addAction(new EOF(), new Reduction(getRule(1)))
+            .deselectState()
+
+        .selectState(states.get(6))
+            .addAction(new Token("a"), new Reduction(getRule(2)))
+            .addAction(new Token("b"), new Reduction(getRule(2)))
+            .addAction(new EOF(), new Reduction(getRule(2)))
+            .deselectState()
+        
+        .selectState(states.get(0))
+            .addGoto(new NonTerminal("S"), states.get(1))
+            .addGoto(new NonTerminal("A"), states.get(2))
+            .deselectState()
+
+        .selectState(states.get(2))
+            .addGoto(new NonTerminal("A"), states.get(3))
+            .deselectState()
+
+        .selectState(states.get(4))
+            .addGoto(new NonTerminal("A"), states.get(5))
+            .deselectState()
+        
+        .commitTables()
+
+        .setParseTreeRoot("CompleteSentence", completeSentenceParse())
+
+        .commitParseTrees()
+        .commitRuleConvertors()
+        .commitCodeGenerations()
+        .generateTestGrammar();
     }
 
-    @Override
-    protected Grammar setUpGrammar(GrammarType type) {
-        return BasicSLR1Grammar.produce();
-    }
-
-    @Override
-    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
+    private List<State> gatherStates(ProductionRule extraRootRule) {
+        states = new ArrayList<State>();
+        
         states.add(new State(
             Set.of(
                 new GrammarPosition(extraRootRule, 0),
@@ -39,7 +121,7 @@ public class BasicSLR1TestGrammar extends TestGrammar {
             Set.of(
                 new GrammarPosition(extraRootRule, 1)
             ),
-            getState(0)
+            states.get(0)
         ));
         states.add(new State(
             Set.of(
@@ -47,13 +129,13 @@ public class BasicSLR1TestGrammar extends TestGrammar {
                 new GrammarPosition(getRule(1), 0),
                 new GrammarPosition(getRule(2), 0)
             ),
-            getState(0)
+            states.get(0)
         ));
         states.add(new State(
             Set.of(
                 new GrammarPosition(getRule(0), 2)
             ),
-            getState(2)
+            states.get(2)
         ));
         states.add(new State(
             Set.of(
@@ -61,83 +143,22 @@ public class BasicSLR1TestGrammar extends TestGrammar {
                 new GrammarPosition(getRule(1), 0),
                 new GrammarPosition(getRule(2), 0)
             ),
-            getState(2)
+            states.get(2)
         ));
         states.add(new State(
             Set.of(
                 new GrammarPosition(getRule(1), 2)
             ),
-            getState(4)
+            states.get(4)
         ));
         states.add(new State(
             Set.of(
                 new GrammarPosition(getRule(2), 1)
             ),
-            getState(4)
+            states.get(4)
         ));
 
-        getState(0).addBranch(new Route(getState(1), new NonTerminal("S")));
-        getState(0).addBranch(new Route(getState(2), new NonTerminal("A")));
-        getState(0).addBranch(new Route(getState(4), new Token("a")));
-        getState(0).addBranch(new Route(getState(6), new Token("b")));
-
-        getState(2).addBranch(new Route(getState(3), new NonTerminal("A")));
-        getState(2).addBranch(new Route(getState(4), new Token("a")));
-        getState(2).addBranch(new Route(getState(6), new Token("b")));
-
-        getState(4).addBranch(new Route(getState(5), new NonTerminal("A")));
-        getState(4).addBranch(new Route(getState(4), new Token("a")));
-        getState(4).addBranch(new Route(getState(6), new Token("b")));
-    }
-    
-    @Override
-    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
-        Map<Token, Action> stateActions = actionTable.get(getState(0));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
-        stateActions.put(new Token("b"), new Shift(getState(6)));
-
-        //Accept EOF at state 1
-        stateActions = actionTable.get(getState(1));
-        stateActions.put(new EOF(), new Accept());
-
-        stateActions = actionTable.get(getState(2));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
-        stateActions.put(new Token("b"), new Shift(getState(6)));
-
-        stateActions = actionTable.get(getState(3));
-        stateActions.put(new EOF(), new Reduction(getRule(0)));
-
-        stateActions = actionTable.get(getState(4));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
-        stateActions.put(new Token("b"), new Shift(getState(6)));
-
-        stateActions = actionTable.get(getState(5));
-        stateActions.put(new Token("a"), new Reduction(getRule(1)));
-        stateActions.put(new Token("b"), new Reduction(getRule(1)));
-        stateActions.put(new EOF(), new Reduction(getRule(1)));
-
-        stateActions = actionTable.get(getState(6));
-        stateActions.put(new Token("a"), new Reduction(getRule(2)));
-        stateActions.put(new Token("b"), new Reduction(getRule(2)));
-        stateActions.put(new EOF(), new Reduction(getRule(2)));
-    }
-
-    @Override
-    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
-        Map<NonTerminal, State> currentGotoActions = gotoTable.get(getState(0));
-        currentGotoActions.put(new NonTerminal("S"), getState(1));
-        currentGotoActions.put(new NonTerminal("A"), getState(2));
-
-        currentGotoActions = gotoTable.get(getState(2));
-        currentGotoActions.put(new NonTerminal("A"), getState(3));
-
-        currentGotoActions = gotoTable.get(getState(4));
-        currentGotoActions.put(new NonTerminal("A"), getState(5));
-    }
-
-    @Override
-    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
-        parseRootMap.put("CompleteSentence", () -> completeSentenceParse());
+        return states;
     }
     
      /**
@@ -147,55 +168,48 @@ public class BasicSLR1TestGrammar extends TestGrammar {
     private ParseState completeSentenceParse() {
         List<ParseState> parseStates = new ArrayList<>();
 
-        parseStates.add(new ShiftedState(getState(6), new Token("b")));
+        parseStates.add(new ShiftedState(states.get(6), new Token("b")));
 
 
-        parseStates.add(new ReducedState(getState(2), getRule(2), Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(states.get(2), getRule(2), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(0)
                                                                                                     })));      
 
-        parseStates.add(new ShiftedState(getState(4), new Token("a")));
-        parseStates.add(new ShiftedState(getState(4), new Token("a")));
-        parseStates.add(new ShiftedState(getState(4), new Token("a")));
-        parseStates.add(new ShiftedState(getState(6), new Token("b")));
+        parseStates.add(new ShiftedState(states.get(4), new Token("a")));
+        parseStates.add(new ShiftedState(states.get(4), new Token("a")));
+        parseStates.add(new ShiftedState(states.get(4), new Token("a")));
+        parseStates.add(new ShiftedState(states.get(6), new Token("b")));
 
         
-        parseStates.add(new ReducedState(getState(5), getRule(2), Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(states.get(5), getRule(2), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(5)
                                                                                                     })));
         
-        parseStates.add(new ReducedState(getState(5), getRule(1), Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(states.get(5), getRule(1), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(4),
                                                                                                         parseStates.get(6)
                                                                                                     })));
         
-        parseStates.add(new ReducedState(getState(5), getRule(1), Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(states.get(5), getRule(1), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(3),
                                                                                                         parseStates.get(7)
                                                                                                     })));
         
-        parseStates.add(new ReducedState(getState(3), getRule(1), Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(states.get(3), getRule(1), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(2),
                                                                                                         parseStates.get(8)
                                                                                                     })));
         
         
-        parseStates.add(new ReducedState(getState(1), getRule(0), Arrays.asList(new ParseState[] {
+        parseStates.add(new ReducedState(states.get(1), getRule(0), Arrays.asList(new ParseState[] {
                                                                                                         parseStates.get(1),
                                                                                                         parseStates.get(9)
                                                                                                     })));
 
         return parseStates.get(parseStates.size() - 1);
     }
-
-    @Override
-    protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
-        // Unimplemented
-    }
-
-    @Override
-    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
-        // Unimplemented
-    }
     
+    private ProductionRule getRule(int index) {
+        return grammar.getRule(index);
+    }
 }
