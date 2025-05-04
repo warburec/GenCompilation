@@ -16,7 +16,7 @@ public class TestGrammarBuilder {
     public final EOF endOfFile = new EOF();
 
     protected Grammar grammar;
-    protected List<State> states = new ArrayList<>();
+    protected Set<State> states = new HashSet<>();
     protected Map<State, Map<Token, Action>> actionTable = new HashMap<>();
     protected Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
     protected Map<String, RuleConvertor> ruleConvertors = new HashMap<>();
@@ -58,7 +58,13 @@ public class TestGrammarBuilder {
             return this;
         }
 
+        /**
+         * Selects the state for addingBranches.
+         * @param state The state to be selecte. If the state was not already added then this operation will also add the state to the TestGrammar being built.
+         * @return This builder for method chaining.
+         */
         public SelectedStateGatherer selectState(State state) {
+            builder.states.add(state);
             return new SelectedStateGatherer(this, state);
         }
 
@@ -104,6 +110,9 @@ public class TestGrammarBuilder {
         }
 
         public SelectedTableGatherer selectState(State state) {
+            if (!builder.states.contains(state))
+                throw new StateNotCommitted(state);
+
             return new SelectedTableGatherer(this, state);
         }
 
@@ -228,6 +237,14 @@ public class TestGrammarBuilder {
             );
         }
         
+    }
+
+    public class StateNotCommitted extends RuntimeException {
+
+        public StateNotCommitted(State state) {
+            super("The state was not committed to the test grammar: " + state);
+        }
+
     }
 
 }

@@ -8,9 +8,9 @@ import syntax_analysis.parsing.ParseState;
 
 public class TestGrammar extends Grammar {
     
-    protected List<State> states = new ArrayList<>();
-    protected Map<State, Map<Token, Action>> actionTable = new HashMap<>();
-    protected Map<State, Map<NonTerminal, State>> gotoTable = new HashMap<>();
+    protected Set<State> states;
+    protected Map<State, Map<Token, Action>> actionTable;
+    protected Map<State, Map<NonTerminal, State>> gotoTable;
     protected Map<String, RuleConvertor> ruleConvertors;
     protected Map<String, String> codeGenerations;
     protected Map<String, ParseState> parseRoots;
@@ -20,7 +20,7 @@ public class TestGrammar extends Grammar {
         Set<NonTerminal> nonTerminals,
         List<ProductionRule> productionRules,
         NonTerminal sentinal,
-        List<State> states,
+        Set<State> states,
         Map<State, Map<Token, Action>> actionTable,
         Map<State, Map<NonTerminal, State>> gotoTable,
         Map<String, RuleConvertor> ruleConvertors,
@@ -37,16 +37,7 @@ public class TestGrammar extends Grammar {
     }
 
     public Set<State> getStates() {
-        return new HashSet<>(states);
-    }
-
-    /**
-     * Gets a state populated in-order by setUpStates()
-     * @param index The index of the state to be returned
-     * @return The state found
-     */
-    protected State getState(int index) {
-        return states.get(index);
+        return states;
     }
 
     public Map<State, Map<Token, Action>> getActionTable() {

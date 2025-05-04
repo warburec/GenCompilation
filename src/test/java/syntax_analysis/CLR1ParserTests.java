@@ -9,9 +9,9 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import test_aids.*;
 import test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
-// import test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
+import test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
 // import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
-// import test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
+import test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
 import test_aids.test_grammars.small_grammar.SmallTestGrammar;
 
 public class CLR1ParserTests {
@@ -47,58 +47,58 @@ public class CLR1ParserTests {
         assertTrue(generatedStates.size() >= expectedStateSet.size());
     }
 
-    // // @Test
-    // // public void smallTestGrammarAction() {
-    // //     SLR1TestGrammar grammar = new SmallTestGrammar();
-    // //     GrammarParts grammarParts = ((LR0TestGrammar)grammar).getParts();
+    // @Test
+    // public void smallTestGrammarAction() {
+    //     SLR1TestGrammar grammar = new SmallTestGrammar();
+    //     GrammarParts grammarParts = ((LR0TestGrammar)grammar).getParts();
 
-    // //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    // //                                             grammarParts.nonTerminals(),
-    // //                                             grammarParts.productionRules(),
-    // //                                             grammarParts.sentinal());
-    // //     Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
+    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+    //                                             grammarParts.nonTerminals(),
+    //                                             grammarParts.productionRules(),
+    //                                             grammarParts.sentinal());
+    //     Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-    // //     Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
-    // //     assertEquals(expectedActionTable, generatedActionTable);
-    // // }
+    //     Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
+    //     assertEquals(expectedActionTable, generatedActionTable);
+    // }
 
-    // // @Test
-    // // public void smallTestGrammarGoto() {
-    // //     LR0TestGrammar grammar = new SmallTestGrammar();
-    // //     GrammarParts grammarParts = grammar.getParts();
+    // @Test
+    // public void smallTestGrammarGoto() {
+    //     LR0TestGrammar grammar = new SmallTestGrammar();
+    //     GrammarParts grammarParts = grammar.getParts();
 
-    // //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    // //                                             grammarParts.nonTerminals(),
-    // //                                             grammarParts.productionRules(),
-    // //                                             grammarParts.sentinal());
-    // //     Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
+    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+    //                                             grammarParts.nonTerminals(),
+    //                                             grammarParts.productionRules(),
+    //                                             grammarParts.sentinal());
+    //     Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
-    // //     Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
-    // //     assertEquals(expectedGotoTable, generatedGotoTable);
-    // // }
+    //     Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+    //     assertEquals(expectedGotoTable, generatedGotoTable);
+    // }
 
-    // // @Test
-    // // public void parsingTestGrammarCompleteSentence() throws ParseFailedException {
-    // //     LR0TestGrammar grammar = new SmallTestGrammar();
-    // //     GrammarParts grammarParts = grammar.getParts();
-    // //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    // //                                             grammarParts.nonTerminals(),
-    // //                                             grammarParts.productionRules(),
-    // //                                             grammarParts.sentinal());
-    // //     //1+0*1
-    // //     Token[] inputTokens = new Token[] {
-    // //         new Token("1"),
-    // //         new Token("+"),
-    // //         new Token("0"),
-    // //         new Token("*"),
-    // //         new Token("1")
-    // //     };
+    // @Test
+    // public void parsingTestGrammarCompleteSentence() throws ParseFailedException {
+    //     LR0TestGrammar grammar = new SmallTestGrammar();
+    //     GrammarParts grammarParts = grammar.getParts();
+    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+    //                                             grammarParts.nonTerminals(),
+    //                                             grammarParts.productionRules(),
+    //                                             grammarParts.sentinal());
+    //     //1+0*1
+    //     Token[] inputTokens = new Token[] {
+    //         new Token("1"),
+    //         new Token("+"),
+    //         new Token("0"),
+    //         new Token("*"),
+    //         new Token("1")
+    //     };
         
-    // //     ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
+    //     ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
 
-    // //     ParseState expectedParseRoot = grammar.getParseRoot("1+0*1");
-    // //     assertEquals(expectedParseRoot, generatedParseRoot);
-    // // }
+    //     ParseState expectedParseRoot = grammar.getParseRoot("1+0*1");
+    //     assertEquals(expectedParseRoot, generatedParseRoot);
+    // }
 
     @Test
     public void parsingTestGrammarIncompleteSentence() throws ParseFailedException {
@@ -267,108 +267,108 @@ public class CLR1ParserTests {
     // //     assertEquals(expectedParseRoot, generatedParseRoot);
     // // }
 
-    // @Test
-    // public void nonDeterminism() {
-    //     ProductionRule[] productionRules = new ProductionRule[] {
-    //         new ProductionRule(
-    //             new NonTerminal("S"),
-    //             new LexicalElement[] {
-    //                 new NonTerminal("A")
-    //             }
-    //         ),
-    //         new ProductionRule(
-    //             new NonTerminal("S"),
-    //             new LexicalElement[] {
-    //                 new NonTerminal("B")
-    //             }
-    //         ),
-    //         new ProductionRule(
-    //             new NonTerminal("A"),
-    //             new LexicalElement[] {
-    //                 new Token("a")
-    //             }
-    //         ),
-    //         new ProductionRule(
-    //             new NonTerminal("B"),
-    //             new LexicalElement[] {
-    //                 new Token("a")
-    //             }
-    //         )
-    //     };
-    //     NonTerminal sentinel = new NonTerminal("S");
+    @Test
+    public void nonDeterminism() {
+        ProductionRule[] productionRules = new ProductionRule[] {
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new NonTerminal("A")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("S"),
+                new LexicalElement[] {
+                    new NonTerminal("B")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("A"),
+                new LexicalElement[] {
+                    new Token("a")
+                }
+            ),
+            new ProductionRule(
+                new NonTerminal("B"),
+                new LexicalElement[] {
+                    new Token("a")
+                }
+            )
+        };
+        NonTerminal sentinel = new NonTerminal("S");
 
-    //     assertThrows(NonDeterminismException.class, () -> {
-    //         new CLR1Parser(productionRules, sentinel);
-    //     });
-    // }
+        assertThrows(NonDeterminismException.class, () -> {
+            new CLR1Parser(productionRules, sentinel);
+        });
+    }
+
+    @Test
+    public void basicSLR1GrammarStates() {
+        TestGrammar grammar = new BasicSLR1TestGrammar().getGrammar();
+        GrammarParts grammarParts = grammar.getParts();
+
+        CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+                                                grammarParts.nonTerminals(),
+                                                grammarParts.productionRules(),
+                                                grammarParts.sentinal());
+        Set<State> generatedStates = syntaxAnalyser.getStates();
+
+        Set<State> expectedStateSet = grammar.getStates();
+        // assertEquals(expectedStateSet, generatedStates);
+        assertTrue(generatedStates.size() >= expectedStateSet.size()); //TODO: Create test tables and states
+    }
 
     // @Test
-    // public void basicSLR1GrammarStates() {
-    //     TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
-    //     GrammarParts grammarParts = grammar.getParts();
+    // public void basicSLR1GrammarAction() {
+    //     SLR1TestGrammar grammar = new BasicSLR1Grammar();
+    //     GrammarParts grammarParts = ((Grammar)grammar).getParts();
 
     //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
     //                                             grammarParts.nonTerminals(),
     //                                             grammarParts.productionRules(),
     //                                             grammarParts.sentinal());
-    //     Set<State> generatedStates = syntaxAnalyser.getStates();
+    //     Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
 
-    //     Set<State> expectedStateSet = grammar.getStates();
-    //     // assertEquals(expectedStateSet, generatedStates);
-    //     assertTrue(generatedStates.size() >= expectedStateSet.size()); //TODO: Create test tables and states
+    //     Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
+    //     assertEquals(expectedActionTable, generatedActionTable);
     // }
 
-    // // @Test
-    // // public void basicSLR1GrammarAction() {
-    // //     SLR1TestGrammar grammar = new BasicSLR1Grammar();
-    // //     GrammarParts grammarParts = ((Grammar)grammar).getParts();
+    // @Test
+    // public void basicSLR1GrammarGoto() {
+    //     SLR1TestGrammar grammar = new BasicSLR1Grammar();
+    //     GrammarParts grammarParts = ((Grammar)grammar).getParts();
 
-    // //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    // //                                             grammarParts.nonTerminals(),
-    // //                                             grammarParts.productionRules(),
-    // //                                             grammarParts.sentinal());
-    // //     Map<State, Map<Token, Action>> generatedActionTable = syntaxAnalyser.getActionTable();
+    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+    //                                             grammarParts.nonTerminals(),
+    //                                             grammarParts.productionRules(),
+    //                                             grammarParts.sentinal());
+    //     Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
 
-    // //     Map<State, Map<Token, Action>> expectedActionTable = grammar.getSLR1ActionTable();
-    // //     assertEquals(expectedActionTable, generatedActionTable);
-    // // }
+    //     Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
+    //     assertEquals(expectedGotoTable, generatedGotoTable);
+    // }
 
-    // // @Test
-    // // public void basicSLR1GrammarGoto() {
-    // //     SLR1TestGrammar grammar = new BasicSLR1Grammar();
-    // //     GrammarParts grammarParts = ((Grammar)grammar).getParts();
-
-    // //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    // //                                             grammarParts.nonTerminals(),
-    // //                                             grammarParts.productionRules(),
-    // //                                             grammarParts.sentinal());
-    // //     Map<State, Map<NonTerminal, State>> generatedGotoTable = syntaxAnalyser.getGotoTable();
-
-    // //     Map<State, Map<NonTerminal, State>> expectedGotoTable = grammar.getGotoTable();
-    // //     assertEquals(expectedGotoTable, generatedGotoTable);
-    // // }
-
-    // // @Test
-    // // public void basicSLR1GrammarCompleteSentence() throws ParseFailedException {
-    // //     SLR1TestGrammar grammar = new BasicSLR1Grammar();
-    // //     GrammarParts grammarParts = ((Grammar)grammar).getParts();
-    // //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
-    // //                                             grammarParts.nonTerminals(),
-    // //                                             grammarParts.productionRules(),
-    // //                                             grammarParts.sentinal());
-    // //     Token[] inputTokens = new Token[] {
-    // //         new Token("b"),
-    // //         new Token("a"),
-    // //         new Token("a"),
-    // //         new Token("a"),
-    // //         new Token("b")
-    // //     };
+    // @Test
+    // public void basicSLR1GrammarCompleteSentence() throws ParseFailedException {
+    //     SLR1TestGrammar grammar = new BasicSLR1Grammar();
+    //     GrammarParts grammarParts = ((Grammar)grammar).getParts();
+    //     CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
+    //                                             grammarParts.nonTerminals(),
+    //                                             grammarParts.productionRules(),
+    //                                             grammarParts.sentinal());
+    //     Token[] inputTokens = new Token[] {
+    //         new Token("b"),
+    //         new Token("a"),
+    //         new Token("a"),
+    //         new Token("a"),
+    //         new Token("b")
+    //     };
         
-    // //     ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
+    //     ParseState generatedParseRoot = syntaxAnalyser.analyse(inputTokens);
 
-    // //     ParseState expectedParseRoot = grammar.getParseRoot("CompleteSentence");
-    // //     assertEquals(expectedParseRoot, generatedParseRoot);
-    // // }
+    //     ParseState expectedParseRoot = grammar.getParseRoot("CompleteSentence");
+    //     assertEquals(expectedParseRoot, generatedParseRoot);
+    // }
 
     @Test
     public void CLR1Grammar() {

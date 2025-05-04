@@ -1,11 +1,13 @@
 package test_aids.test_grammars.self_referential;
 
 import java.util.*;
-
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import grammar_objects.*;
 import grammars.self_referential.SelfReferentialGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import test_aids.*;
+import test_aids.TestGrammarBuilder.*;
 import test_aids.test_grammars.UnsupportedGrammarException;
 
 /**
@@ -14,29 +16,79 @@ import test_aids.test_grammars.UnsupportedGrammarException;
  * L → l L //Self-referential
  * L → o
  */
-public class SelfReferentialTestGrammar extends TestGrammar {
+public class SelfReferentialTestGrammar {
 
-    public SelfReferentialTestGrammar(GrammarType type) {
-        super(type);
+    private Grammar grammar = SelfReferentialGrammar.produce();
+    private EOF eof;
+    private ProductionRule extraRootRule;
+    private List<State> states;
+    private List<Token> allTokens;
+
+    public TestGrammar getGrammar(GrammarType grammarType) {
+        TestGrammarBuilder builder = new TestGrammarBuilder(grammar);
+
+        eof = builder.endOfFile;
+        extraRootRule = builder.extraRootRule;
+
+        allTokens = new ArrayList<>();
+        allTokens.addAll(grammar.getParts().tokens());
+        allTokens.add(eof);
+
+        states = setUpStates(grammarType, builder.extraRootRule);
+
+        TableGatherer tableGatherer = builder.setUp()
+        .addStates(states)
+        //Branches are already linked
+        .commitStates();
+
+        tableGatherer = setUpActionTable(grammarType, tableGatherer);
+
+        return tableGatherer
+        .selectState(states.get(0))
+            .addGoto(new NonTerminal("H"), states.get(1))
+            .deselectState()
+
+        .selectState(states.get(2))
+            .addGoto(new NonTerminal("A"), states.get(3))
+            .deselectState()
+
+        .selectState(states.get(4))
+            .addGoto(new NonTerminal("L"), states.get(5))
+            .deselectState()
+
+        .selectState(states.get(6))
+            .addGoto(new NonTerminal("L"), states.get(7))
+            .deselectState()
+
+        .commitTables()
+
+        .commitParseTrees()
+        .commitRuleConvertors()
+        .commitCodeGenerations()
+        .generateTestGrammar();
+
     }
 
-    @Override
-    protected Grammar setUpGrammar(GrammarType type) {
-        return SelfReferentialGrammar.produce();
-    }
+    /**
+     * Creates states and links necessary branches
+     * @param grammarType
+     * @param extraRootRule
+     * @return
+     */
+    private List<State> setUpStates(GrammarType grammarType, ProductionRule extraRootRule) {
+        List<State> states = new ArrayList<>();
 
-    @Override
-    protected void setUpStates(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
-        switch (type) {
-            case LR0 -> lr0States(type, states, extraRootRule, endOfFile);
-            case SLR1 -> lr0States(type, states, extraRootRule, endOfFile);
-            case CLR1 -> clr1States(type, states, extraRootRule, endOfFile);
+        switch (grammarType) {
+            case LR0, SLR1 -> lr0States(states);
+            case CLR1 -> clr1States(states);
             
-            default -> throw new UnsupportedGrammarException(type);
+            default -> throw new UnsupportedGrammarException(grammarType);
         }
+
+        return states;
     }
 
-    private void lr0States(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
+    private void lr0States(List<State> states) {
         states.add(new State( //0
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 0),
@@ -49,7 +101,7 @@ public class SelfReferentialTestGrammar extends TestGrammar {
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(extraRootRule, 1),
             }),
-            getState(0)
+            states.get(0)
         ));
 
         states.add(new State( //2
@@ -57,14 +109,14 @@ public class SelfReferentialTestGrammar extends TestGrammar {
                 new GrammarPosition(getRule(0), 1),
                 new GrammarPosition(getRule(1), 0)
             }),
-            getState(0)
+            states.get(0)
         ));
 
         states.add(new State( //3
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(0), 2),
             }),
-            getState(2)
+            states.get(2)
         ));
 
         states.add(new State( //4
@@ -73,14 +125,14 @@ public class SelfReferentialTestGrammar extends TestGrammar {
                 new GrammarPosition(getRule(2), 0),
                 new GrammarPosition(getRule(3), 0)
             }),
-            getState(2)
+            states.get(2)
         ));
 
         states.add(new State( //5
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(1), 2)
             }),
-            getState(4)
+            states.get(4)
         ));
 
         states.add(new State( //6
@@ -89,49 +141,49 @@ public class SelfReferentialTestGrammar extends TestGrammar {
                 new GrammarPosition(getRule(2), 0),
                 new GrammarPosition(getRule(3), 0)
             }),
-            getState(4)
+            states.get(4)
         ));
 
         states.add(new State( //7
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(2), 2)
             }),
-            getState(6)
+            states.get(6)
         ));
 
         states.add(new State( //8
             Set.of(new GrammarPosition[] {
                 new GrammarPosition(getRule(3), 1)
             }),
-            getState(6)
+            states.get(6)
         ));
 
         //Tree branches
-        getState(0)
-            .addBranch(new Route(getState(1), new NonTerminal("H")))
-            .addBranch(new Route(getState(2), new Token("h")));
+        states.get(0)
+            .addBranch(new Route(states.get(1), new NonTerminal("H")))
+            .addBranch(new Route(states.get(2), new Token("h")));
         
-        getState(2)
-            .addBranch(new Route(getState(3), new NonTerminal("A")))
-            .addBranch(new Route(getState(4), new Token("a")));
+        states.get(2)
+            .addBranch(new Route(states.get(3), new NonTerminal("A")))
+            .addBranch(new Route(states.get(4), new Token("a")));
         
-        getState(4)
-            .addBranch(new Route(getState(5), new NonTerminal("L")))
-            .addBranch(new Route(getState(6), new Token("l")));
+        states.get(4)
+            .addBranch(new Route(states.get(5), new NonTerminal("L")))
+            .addBranch(new Route(states.get(6), new Token("l")));
         
-        getState(6)
-            .addBranch(new Route(getState(7), new NonTerminal("L")))
-            .addBranch(new Route(getState(8), new Token("o")));
+        states.get(6)
+            .addBranch(new Route(states.get(7), new NonTerminal("L")))
+            .addBranch(new Route(states.get(8), new Token("o")));
         
         //Graph branches, links to existing states
-        getState(4)
-            .addBranch(new Route(getState(8), new Token("o")));
+        states.get(4)
+            .addBranch(new Route(states.get(8), new Token("o")));
         
-        getState(6)
-            .addBranch(new Route(getState(6), new Token("l")));
+        states.get(6)
+            .addBranch(new Route(states.get(6), new Token("l")));
     }
 
-    private void clr1States(GrammarType type, List<State> states, ProductionRule extraRootRule, Token endOfFile) {
+    private void clr1States(List<State> states) {
         states.add(new State( //0
             Set.of(new CLR1Position[] {
                 new CLR1Position(extraRootRule, 0, Set.of(new EOF())),
@@ -144,7 +196,7 @@ public class SelfReferentialTestGrammar extends TestGrammar {
             Set.of(new CLR1Position[] {
                 new CLR1Position(extraRootRule, 1, Set.of(new EOF())),
             }),
-            getState(0)
+            states.get(0)
         ));
 
         states.add(new State( //2
@@ -152,14 +204,14 @@ public class SelfReferentialTestGrammar extends TestGrammar {
                 new CLR1Position(getRule(0), 1, Set.of(new EOF())),
                 new CLR1Position(getRule(1), 0, Set.of(new EOF()))
             }),
-            getState(0)
+            states.get(0)
         ));
 
         states.add(new State( //3
             Set.of(new CLR1Position[] {
                 new CLR1Position(getRule(0), 2, Set.of(new EOF())),
             }),
-            getState(2)
+            states.get(2)
         ));
 
         states.add(new State( //4
@@ -168,14 +220,14 @@ public class SelfReferentialTestGrammar extends TestGrammar {
                 new CLR1Position(getRule(2), 0, Set.of(new EOF())),
                 new CLR1Position(getRule(3), 0, Set.of(new EOF()))
             }),
-            getState(2)
+            states.get(2)
         ));
 
         states.add(new State( //5
             Set.of(new CLR1Position[] {
                 new CLR1Position(getRule(1), 2, Set.of(new EOF()))
             }),
-            getState(4)
+            states.get(4)
         ));
 
         states.add(new State( //6
@@ -184,169 +236,158 @@ public class SelfReferentialTestGrammar extends TestGrammar {
                 new CLR1Position(getRule(2), 0, Set.of(new EOF())),
                 new CLR1Position(getRule(3), 0, Set.of(new EOF()))
             }),
-            getState(4)
+            states.get(4)
         ));
 
         states.add(new State( //7
             Set.of(new CLR1Position[] {
                 new CLR1Position(getRule(2), 2, Set.of(new EOF()))
             }),
-            getState(6)
+            states.get(6)
         ));
 
         states.add(new State( //8
             Set.of(new CLR1Position[] {
                 new CLR1Position(getRule(3), 1, Set.of(new EOF()))
             }),
-            getState(6)
+            states.get(6)
         ));
 
         //Tree branches
-        getState(0)
-            .addBranch(new Route(getState(1), new NonTerminal("H")))
-            .addBranch(new Route(getState(2), new Token("h")));
+        states.get(0)
+            .addBranch(new Route(states.get(1), new NonTerminal("H")))
+            .addBranch(new Route(states.get(2), new Token("h")));
         
-        getState(2)
-            .addBranch(new Route(getState(3), new NonTerminal("A")))
-            .addBranch(new Route(getState(4), new Token("a")));
+        states.get(2)
+            .addBranch(new Route(states.get(3), new NonTerminal("A")))
+            .addBranch(new Route(states.get(4), new Token("a")));
         
-        getState(4)
-            .addBranch(new Route(getState(5), new NonTerminal("L")))
-            .addBranch(new Route(getState(6), new Token("l")));
+        states.get(4)
+            .addBranch(new Route(states.get(5), new NonTerminal("L")))
+            .addBranch(new Route(states.get(6), new Token("l")));
         
-        getState(6)
-            .addBranch(new Route(getState(7), new NonTerminal("L")))
-            .addBranch(new Route(getState(8), new Token("o")));
+        states.get(6)
+            .addBranch(new Route(states.get(7), new NonTerminal("L")))
+            .addBranch(new Route(states.get(8), new Token("o")));
         
         //Graph branches, links to existing states
-        getState(4)
-            .addBranch(new Route(getState(8), new Token("o")));
+        states.get(4)
+            .addBranch(new Route(states.get(8), new Token("o")));
         
-        getState(6)
-            .addBranch(new Route(getState(6), new Token("l")));
+        states.get(6)
+            .addBranch(new Route(states.get(6), new Token("l")));
     }
 
-    @Override
-    protected void setUpActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
+    protected TableGatherer setUpActionTable(GrammarType type, TableGatherer tableGatherer) {
         switch (type) {
-            case LR0 -> lr0ActionTable(type, actionTable, endOfFile);
-            case SLR1 -> slr1ActionTable(type, actionTable, endOfFile);
+            case LR0 -> lr0ActionTable(tableGatherer);
+            case SLR1 -> slr1ActionTable(tableGatherer);
             case CLR1 -> { /* Unimplemented */ }
             
             default -> throw new UnsupportedGrammarException(type);
         }
+
+        return tableGatherer;
     }
 
-    private void lr0ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
-        List<Token> allTokens = new ArrayList<>();
-        allTokens.addAll(grammar.getParts().tokens());
-        allTokens.add(endOfFile);
-
-        Map<Token, Action> stateActions = actionTable.get(getState(0));
-        stateActions.put(new Token("h"), new Shift(getState(2)));
+    private void lr0ActionTable(TableGatherer tableGatherer) {
+        tableGatherer
+        .selectState(states.get(0))
+            .addAction(new Token("h"), new Shift(states.get(2)))
+            .deselectState()
 
         //Accept EOF at state 1
-        stateActions = actionTable.get(getState(1));
-        stateActions.put(endOfFile, new Accept());
+        .selectState(states.get(1))
+            .addAction(eof, new Accept())
+            .deselectState()
 
-        stateActions = actionTable.get(getState(2));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
+        .selectState(states.get(2))
+            .addAction(new Token("a"), new Shift(states.get(4)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(3));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(0)));
-        }
+        .selectState(states.get(3))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(0))
+            )))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(4));
-        stateActions.put(new Token("l"), new Shift(getState(6)));
-        stateActions.put(new Token("o"), new Shift(getState(8)));
+        .selectState(states.get(4))
+            .addAction(new Token("l"), new Shift(states.get(6)))
+            .addAction(new Token("o"), new Shift(states.get(8)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(5));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(1)));
-        }
+        .selectState(states.get(5))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(1))
+            )))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(6));
-        stateActions.put(new Token("l"), new Shift(getState(6)));
-        stateActions.put(new Token("o"), new Shift(getState(8)));
+        .selectState(states.get(6))
+            .addAction(new Token("l"), new Shift(states.get(6)))
+            .addAction(new Token("o"), new Shift(states.get(8)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(7));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(2)));
-        }
+        .selectState(states.get(7))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(2))
+            )))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(8));
-        for(Token token : allTokens) {
-            stateActions.put(token, new Reduction(getRule(3)));
-        }
+        .selectState(states.get(8))
+            .addActions(allTokens.stream().collect(Collectors.toMap(
+                Function.identity(), 
+                token -> new Reduction(getRule(3))
+            )))
+            .deselectState();
     }
 
-    private void slr1ActionTable(GrammarType type, Map<State, Map<Token, Action>> actionTable, Token endOfFile) {
-        Map<Token, Action> stateActions = actionTable.get(getState(0));
-        stateActions.put(new Token("h"), new Shift(getState(2)));
+    private void slr1ActionTable(TableGatherer tableGatherer) {
+        tableGatherer
+        .selectState(states.get(0))
+            .addAction(new Token("h"), new Shift(states.get(2)))
+            .deselectState()
 
         //Accept EOF at state 1
-        stateActions = actionTable.get(getState(1));
-        stateActions.put(new EOF(), new Accept());
+        .selectState(states.get(1))
+            .addAction(new EOF(), new Accept())
+            .deselectState()
 
-        stateActions = actionTable.get(getState(2));
-        stateActions.put(new Token("a"), new Shift(getState(4)));
+        .selectState(states.get(2))
+            .addAction(new Token("a"), new Shift(states.get(4)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(3));
-        stateActions.put(new EOF(), new Reduction(getRule(0)));
+        .selectState(states.get(3))
+            .addAction(new EOF(), new Reduction(getRule(0)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(4));
-        stateActions.put(new Token("l"), new Shift(getState(6)));
-        stateActions.put(new Token("o"), new Shift(getState(8)));
+        .selectState(states.get(4))
+            .addAction(new Token("l"), new Shift(states.get(6)))
+            .addAction(new Token("o"), new Shift(states.get(8)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(5));
-        stateActions.put(new EOF(), new Reduction(getRule(1)));
+        .selectState(states.get(5))
+            .addAction(new EOF(), new Reduction(getRule(1)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(6));
-        stateActions.put(new Token("l"), new Shift(getState(6)));
-        stateActions.put(new Token("o"), new Shift(getState(8)));
+        .selectState(states.get(6))
+            .addAction(new Token("l"), new Shift(states.get(6)))
+            .addAction(new Token("o"), new Shift(states.get(8)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(7));
-        stateActions.put(new EOF(), new Reduction(getRule(2)));
+        .selectState(states.get(7))
+            .addAction(new EOF(), new Reduction(getRule(2)))
+            .deselectState()
 
-        stateActions = actionTable.get(getState(8));
-        stateActions.put(new EOF(), new Reduction(getRule(3)));
-    }
-
-    @Override
-    protected void setUpGotoTable(GrammarType type, Map<State, Map<NonTerminal, State>> gotoTable) {
-        Map<NonTerminal, State> currentGotoActions = new HashMap<>();
-
-        currentGotoActions.put(new NonTerminal("H"), getState(1));
-        gotoTable.put(getState(0), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-
-        currentGotoActions.put(new NonTerminal("A"), getState(3));
-        gotoTable.put(getState(2), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-
-        currentGotoActions.put(new NonTerminal("L"), getState(5));
-        gotoTable.put(getState(4), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-
-        currentGotoActions.put(new NonTerminal("L"), getState(7));
-        gotoTable.put(getState(6), new HashMap<>(currentGotoActions));
-        currentGotoActions.clear();
-    }
-
-    @Override
-    protected void setUpParseTrees(Map<String, ParseTreeBuilder> parseRootMap) {
-        // Unimplemented
-    }
-
-    @Override
-    protected void setUpRuleConvertors(GrammarType type, Map<String, Map<String, RuleConvertor>> ruleConvertorMap) {
-        // Unimplemented
-    }
-
-    @Override
-    protected void setUpCodeGenerations(GrammarType type, Map<String, Map<String, String>> codeGenerations) {
-        // Unimplemented
+        .selectState(states.get(8))
+            .addAction(new EOF(), new Reduction(getRule(3)))
+            .deselectState();
     }
     
+    private ProductionRule getRule(int index) {
+        return grammar.getRule(index);
+    }
+
 }
