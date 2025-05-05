@@ -5,10 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import code_generation.*;
 import grammar_objects.*;
-import grammars.basic_identifier.convertors.XToYToXSemantic;
 import syntax_analysis.parsing.ParseState;
 import test_aids.*;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
 
 public class TypeCheckerTests {
     
@@ -16,14 +15,14 @@ public class TypeCheckerTests {
     public void XToYToXGeneration() {
         String language = "Java";
         String sentence = "XToYToXSemantic";
-        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
-        RuleConvertor ruleConvertor = new XToYToXSemantic();
+        TestGrammar grammar = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0);
+        RuleConvertor ruleConvertor = grammar.getRuleConvertor(language + " " + sentence);
         CodeGenerator codeGenerator = new BasicCodeGenerator(ruleConvertor);
-        ParseState rootParseState = grammar.getParseRoot("XToYToXSemantic");
+        ParseState rootParseState = grammar.getParseRoot(sentence);
 
         String resultingCode = codeGenerator.generate(rootParseState);
 
-        String expectedCode = grammar.getGeneratedCode(sentence, language);
+        String expectedCode = grammar.getCodeGeneration(language + " " + sentence);
         assertEquals(expectedCode, resultingCode);
     }
     

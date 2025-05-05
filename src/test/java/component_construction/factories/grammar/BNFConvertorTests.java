@@ -2,6 +2,7 @@ package component_construction.factories.grammar;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import component_construction.builders.grammar_objects.GrammarBuilder;
 import component_construction.factories.grammar.BNFConvertor.InvalidEscapeCharacterException;
 import grammar_objects.*;
 
@@ -13,32 +14,15 @@ public class BNFConvertorTests {
             A -> b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -55,48 +39,27 @@ public class BNFConvertorTests {
             C -> d
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("c"));
-                tokenOrganiser.addToken(new Token("d"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("B"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("B"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("C"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("C"), 
+            new LexicalElement[] {
+                new Token("d")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("B"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("C"), 
-                    new LexicalElement[] {
-                        new Token("d")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -111,34 +74,16 @@ public class BNFConvertorTests {
             A -> a b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("a"));
-                tokenOrganiser.addToken(new Token("b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("a"),
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("a"),
-                        new Token("b")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -153,34 +98,16 @@ public class BNFConvertorTests {
             A -> N b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new NonTerminal("N"),
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("N"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new NonTerminal("N"),
-                        new Token("b")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -195,34 +122,16 @@ public class BNFConvertorTests {
             A -> t:b t:B
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("B"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b"),
+                new Token("B")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b"),
-                        new Token("B")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -239,50 +148,28 @@ public class BNFConvertorTests {
             B -> d
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("c"));
-                tokenOrganiser.addToken(new Token("d"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("a"))
+        .addRule(new ProductionRule(
+            new NonTerminal("a"), 
+            new LexicalElement[] {
+                new NonTerminal("b"),
+                new NonTerminal("B")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("a");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("b"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("a"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("b"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("B"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("B"), 
+            new LexicalElement[] {
+                new Token("d")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("a"), 
-                    new LexicalElement[] {
-                        new NonTerminal("b"),
-                        new NonTerminal("B")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("b"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("B"), 
-                    new LexicalElement[] {
-                        new Token("d")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -297,32 +184,15 @@ public class BNFConvertorTests {
             A -> t:t:b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("t:b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("t:b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("t:b")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -338,40 +208,21 @@ public class BNFConvertorTests {
             n:n:B -> c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new NonTerminal("n:B"),
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("n:B"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("n:B"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new NonTerminal("n:B"),
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("n:B"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -386,36 +237,17 @@ public class BNFConvertorTests {
             A -> \\  b\\  t:\\ \\\s
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token(" "));
-                tokenOrganiser.addToken(new Token("b "));
-                tokenOrganiser.addToken(new Token("  "));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token(" "),
+                new Token("b "),
+                new Token("  ")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token(" "),
-                        new Token("b "),
-                        new Token("  ")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -432,50 +264,28 @@ public class BNFConvertorTests {
             n:C\\ C -> b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("a"));
-                tokenOrganiser.addToken(new Token("b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal(" A"))
+        .addRule(new ProductionRule(
+            new NonTerminal(" A"), 
+            new LexicalElement[] {
+                new NonTerminal("B  "),
+                new NonTerminal("C C")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal(" A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("B  "), 
+            new LexicalElement[] {
+                new Token("a")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal(" A"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("B  "));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("C C"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("C C"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal(" A"), 
-                    new LexicalElement[] {
-                        new NonTerminal("B  "),
-                        new NonTerminal("C C")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("B  "), 
-                    new LexicalElement[] {
-                        new Token("a")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("C C"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -490,36 +300,17 @@ public class BNFConvertorTests {
             A -> \\\n b\\\n t:\\\n\\\n
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("\n"));
-                tokenOrganiser.addToken(new Token("b\n"));
-                tokenOrganiser.addToken(new Token("\n\n"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("\n"),
+                new Token("b\n"),
+                new Token("\n\n")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("\n"),
-                        new Token("b\n"),
-                        new Token("\n\n")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -536,51 +327,28 @@ public class BNFConvertorTests {
             n:C\\\nC -> b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("a"));
-                tokenOrganiser.addToken(new Token("b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("\nA"))
+        .addRule(new ProductionRule(
+            new NonTerminal("\nA"), 
+            new LexicalElement[] {
+                new NonTerminal("B\n\n"),
+                new NonTerminal("C\nC")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("\nA");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("B\n\n"), 
+            new LexicalElement[] {
+                new Token("a")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("\nA"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("B\n\n"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("C\nC"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("C\nC"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("\nA"), 
-                    new LexicalElement[] {
-                        new NonTerminal("B\n\n"),
-                        new NonTerminal("C\nC")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("B\n\n"), 
-                    new LexicalElement[] {
-                        new Token("a")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("C\nC"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-            }
-        };
-
+        ))
+        .produceGrammar();
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
 
@@ -594,36 +362,17 @@ public class BNFConvertorTests {
             A -> -> t:a-> \\ ->\\\s
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("->"));
-                tokenOrganiser.addToken(new Token("a->"));
-                tokenOrganiser.addToken(new Token(" -> "));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("->"),
+                new Token("a->"),
+                new Token(" -> ")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("->"),
-                        new Token("a->"),
-                        new Token(" -> ")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -639,43 +388,23 @@ public class BNFConvertorTests {
             n:N-> -> c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("->A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("->A"), 
+            new LexicalElement[] {
+                new NonTerminal("N->"),
+                new NonTerminal("N->"),
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("->A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("N->"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("->A"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("N->"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("->A"), 
-                    new LexicalElement[] {
-                        new NonTerminal("N->"),
-                        new NonTerminal("N->"),
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("N->"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -692,53 +421,31 @@ public class BNFConvertorTests {
             C -> \\e
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new EmptyToken());
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new NonTerminal("B"),
+                new NonTerminal("C"),
+                new EmptyToken(),
+                new Token("b"),
+                new EmptyToken()
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("B"), 
+            new LexicalElement[] {
+                new EmptyToken()
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("B"));
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("C"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("C"), 
+            new LexicalElement[] {
+                new EmptyToken()
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new NonTerminal("B"),
-                        new NonTerminal("C"),
-                        new EmptyToken(),
-                        new Token("b"),
-                        new EmptyToken()
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("B"), 
-                    new LexicalElement[] {
-                        new EmptyToken()
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("C"), 
-                    new LexicalElement[] {
-                        new EmptyToken()
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -753,32 +460,15 @@ public class BNFConvertorTests {
             A\\  -> b
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A "))
+        .addRule(new ProductionRule(
+            new NonTerminal("A "), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A ");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A "));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A "), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -793,40 +483,21 @@ public class BNFConvertorTests {
             A -> b | c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -841,36 +512,17 @@ public class BNFConvertorTests {
             A -> b \\| c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("|"));
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b"),
+                new Token("|"),
+                new Token("c")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
-            }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b"),
-                        new Token("|"),
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -905,40 +557,21 @@ public class BNFConvertorTests {
             A -> c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -954,40 +587,21 @@ public class BNFConvertorTests {
             | c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
-            }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -1005,56 +619,33 @@ public class BNFConvertorTests {
             \t| e
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new Token("c"));
-                tokenOrganiser.addToken(new Token("d"));
-                tokenOrganiser.addToken(new Token("e"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("d")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("d")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("e")
-                    }
-                ));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("e")
             }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -1071,48 +662,27 @@ public class BNFConvertorTests {
             | c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new EmptyToken());
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new EmptyToken()
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new EmptyToken()
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();
@@ -1127,48 +697,27 @@ public class BNFConvertorTests {
             A -> b | | c
             """;
         
-        Grammar expectedGrammar = new Grammar() {
-            @Override
-            protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-                tokenOrganiser.addToken(new Token("b"));
-                tokenOrganiser.addToken(new EmptyToken());
-                tokenOrganiser.addToken(new Token("c"));
+        Grammar expectedGrammar = new GrammarBuilder()
+        .setSentinal(new NonTerminal("A"))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("b")
             }
-
-            @Override
-            protected NonTerminal setUpSentinal() {
-                return new NonTerminal("A");
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new EmptyToken()
             }
-
-            @Override
-            protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-                nonTerminalOrganiser.addNonTerminal(new NonTerminal("A"));
+        ))
+        .addRule(new ProductionRule(
+            new NonTerminal("A"), 
+            new LexicalElement[] {
+                new Token("c")
             }
-
-            @Override
-            protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("b")
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new EmptyToken()
-                    }
-                ));
-
-                ruleOrganiser.addRule(new ProductionRule(
-                    new NonTerminal("A"), 
-                    new LexicalElement[] {
-                        new Token("c")
-                    }
-                ));
-            }
-        };
+        ))
+        .produceGrammar();
 
         
         Grammar producedGrammar = new BNFConvertor(bnf).produceGrammar();

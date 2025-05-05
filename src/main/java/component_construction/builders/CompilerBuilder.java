@@ -174,7 +174,6 @@ public class CompilerBuilder {
         //Note: Allowing null lexical components
         
         if(msgParts.size() == 0) return; //No error
-
         if(msgParts.size() == 1) throw new ParameterError(msgParts.get(0) + " not provided");
 
         String msg = msgParts.get(0);

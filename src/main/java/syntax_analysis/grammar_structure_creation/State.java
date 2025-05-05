@@ -1,5 +1,7 @@
 package syntax_analysis.grammar_structure_creation;
 
+import static helper_objects.ToStringFormatting.indentFormat;
+
 import java.util.*;
 import java.util.Map.*;
 
@@ -107,13 +109,6 @@ public class State {
 
     @Override
     public String toString() {
-        String string = "State:\n";
-
-        for (GrammarPosition position : positions) {
-            string += "\t" + position.toString() + "\n";
-        }
-
-        string.stripTrailing();
-        return string;
+       return "State:\n" + indentFormat(positions);
     }
 }

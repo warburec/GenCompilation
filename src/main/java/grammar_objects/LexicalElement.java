@@ -13,20 +13,18 @@ public abstract class LexicalElement {
 
     @Override
     public boolean equals(Object obj) {
-        if (!this.getClass().isInstance(obj)) {
-            return false;
-        }
+        if (!this.getClass().isInstance(obj)) { return false; }
          
         LexicalElement otherElement = (LexicalElement) obj;
 
-        if(name == null) { return otherElement.getName() == null; }
+        if (name == null) { return otherElement.getName() == null; }
 
         return getName().equals(otherElement.getName());
     }
 
     @Override
     public int hashCode() {
-        if(name == null) { return 0; }
+        if (name == null) { return 0; }
         return name.hashCode();
     }
 

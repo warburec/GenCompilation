@@ -12,7 +12,7 @@ import grammars.basic_identifier.convertors.XToYToXSemantic;
 import lexical_analysis.DynamicTokenRegex;
 import syntax_analysis.parsing.ParseFailedException;
 import test_aids.GrammarType;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
 
 public class CompilerTests {
     
@@ -24,8 +24,8 @@ public class CompilerTests {
             new GeneralLexicalAnalyserFactory(),
             new CLR1ParserFactory(), 
             new BasicCodeGenFactory(), 
-            new BasicIdentifierGrammar(), 
-            new XToYToXSemantic(), 
+            BasicIdentifierGrammar.produce(), 
+            XToYToXSemantic.produce(), 
             new String[] {" ", "\n", "\r", "\t"}, 
             new String[] {"+", "=", ";"},
             new String[] {},
@@ -47,7 +47,7 @@ public class CompilerTests {
         String output = compiler.compile(inputSentence);
 
 
-        String expected = new BasicIdentifierTestGrammar(GrammarType.LR0).getGeneratedCode("XToYToXSemantic", "Java");
+        String expected = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0).getCodeGeneration("Java XToYToXSemantic");
         assertEquals(expected, output);
     }
 }

@@ -1,5 +1,6 @@
 package grammars.basic_identifier;
 
+import component_construction.builders.grammar_objects.GrammarBuilder;
 import grammar_objects.*;
 
 /**
@@ -8,48 +9,22 @@ import grammar_objects.*;
  * <statement> := identifier = <element> + <element>;
  * <element> := identifier | number
  */
-public class BasicIdentifierGrammar extends Grammar {
+public class BasicIdentifierGrammar {
 
-    @Override
-    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-        tokenOrganiser
-        .addToken(new Token("="))
-        .addToken(new Token("+"))
-        .addToken(new Token(";"))
-        .addToken(new Identifier("identifier"))
-        .addToken(new Literal("number"));
-    }
-
-    @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("statement list");
-    }
-
-    @Override
-    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-        nonTerminalOrganiser
-        .addNonTerminal("statement list")
-        .addNonTerminal("statement")
-        .addNonTerminal("element");
-    }
-
-    @Override
-    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-        ruleOrganiser
-
+    public static Grammar produce() {
+        return new GrammarBuilder()
+        .setSentinal(new NonTerminal("statement list"))
         .addRule(
             new NonTerminal("statement list"),
             new LexicalElement[] {
                 new NonTerminal("statement")
         })
-        
         .addRule(
             new NonTerminal("statement list"),
             new LexicalElement[] {
                 new NonTerminal("statement list"),
                 new NonTerminal("statement")
         })
-        
         .addRule(
             new NonTerminal("statement"),
             new LexicalElement[] {
@@ -60,18 +35,17 @@ public class BasicIdentifierGrammar extends Grammar {
                 new NonTerminal("element"),
                 new Token(";")
         })
-
         .addRule(
             new NonTerminal("element"),
             new LexicalElement[] {
                 new Identifier("identifier")
         })
-        
         .addRule(
             new NonTerminal("element"),
             new LexicalElement[] {
                 new Literal("number")
-        });
+        })
+        .produceGrammar();
     }
 
 }

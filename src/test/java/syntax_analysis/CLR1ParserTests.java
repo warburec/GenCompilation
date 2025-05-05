@@ -8,11 +8,11 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import test_aids.*;
-import test_aids.test_grammars.basic_CLR1.BasicCLR1TestGrammar;
-import test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
-import test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
-import test_aids.test_grammars.small_grammar.SmallTestGrammar;
+import test_aids.test_grammars.BasicCLR1TestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.BasicSLR1TestGrammar;
+import test_aids.test_grammars.SelfReferentialTestGrammar;
+import test_aids.test_grammars.SmallTestGrammar;
 
 public class CLR1ParserTests {
     
@@ -33,7 +33,7 @@ public class CLR1ParserTests {
 
     @Test
     public void smallTestGrammarStates() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.CLR1);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.CLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -102,7 +102,7 @@ public class CLR1ParserTests {
 
     @Test
     public void parsingTestGrammarIncompleteSentence() throws ParseFailedException {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -122,7 +122,7 @@ public class CLR1ParserTests {
 
     @Test
     public void parsingTestGrammarIncorrectSentence() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -143,7 +143,7 @@ public class CLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarStates() {
-        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.CLR1);
+        TestGrammar grammar = new SelfReferentialTestGrammar().getGrammar(GrammarType.CLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -188,7 +188,7 @@ public class CLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarStates() {
-        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -304,7 +304,7 @@ public class CLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarStates() {
-        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new BasicSLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -372,7 +372,7 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1Grammar() {
-        TestGrammar grammar = new BasicCLR1TestGrammar(GrammarType.CLR1);
+        TestGrammar grammar = new BasicCLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),
@@ -387,7 +387,7 @@ public class CLR1ParserTests {
 
     @Test
     public void CLR1BasicParsing() throws ParseFailedException {
-        TestGrammar grammar = new BasicCLR1TestGrammar(GrammarType.CLR1);
+        TestGrammar grammar = new BasicCLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         CLR1Parser syntaxAnalyser = new CLR1Parser(grammarParts.tokens(),

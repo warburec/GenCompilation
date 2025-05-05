@@ -12,9 +12,9 @@ public class BasicCodeGenerator implements CodeGenerator {
     protected String postGeneration;
 
     public BasicCodeGenerator(RuleConvertor ruleConvertor) {
-        this.ruleConvertor = ruleConvertor.getConversions();
+        this.ruleConvertor = ruleConvertor.conversions();
 
-        NullableTuple<String, String> bookends = ruleConvertor.getBookends();
+        NullableTuple<String, String> bookends = ruleConvertor.bookends();
 
         this.preGeneration = bookends.value1();
         this.postGeneration = bookends.value2();
@@ -150,17 +150,16 @@ public class BasicCodeGenerator implements CodeGenerator {
 
         @Override
         public String toString() {
-            String string = "";
+            String string = "parseState: ";
 
-            string += "parseState: ";
             if(parseState == null) {
                 string += null;
             }
             else {
                 string += parseState.toString();
             }
-            string += "\n";
 
+            string += "\n";
             string += "elementsGenerated: " + elementsGenerated;
 
             return string;

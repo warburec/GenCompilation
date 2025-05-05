@@ -1,5 +1,6 @@
 package grammars.basic_SLR1;
 
+import component_construction.builders.grammar_objects.GrammarBuilder;
 import grammar_objects.*;
 
 /**
@@ -7,31 +8,11 @@ import grammar_objects.*;
  * A –> aA
  * A –> b
  */
-public class BasicSLR1Grammar extends Grammar {
+public class BasicSLR1Grammar {
 
-    @Override
-    protected void setUpTokens(TokenOrganiser tokenOrganiser) {
-        tokenOrganiser
-        .addToken("a")
-        .addToken("b");
-    }
-
-    @Override
-    protected NonTerminal setUpSentinal() {
-        return new NonTerminal("S");
-    }
-
-    @Override
-    protected void setUpNonTerminals(NonTerminalOrganiser nonTerminalOrganiser) {
-        nonTerminalOrganiser
-        .addNonTerminal("S")
-        .addNonTerminal("A");
-    }
-
-    @Override
-    protected void setUpProductionRules(RuleOrganiser ruleOrganiser) {
-        ruleOrganiser
-
+    public static Grammar produce() {
+        return new GrammarBuilder()
+        .setSentinal(new NonTerminal("S"))
         .addRule(
             new NonTerminal("S"),
             new LexicalElement[] {
@@ -51,7 +32,8 @@ public class BasicSLR1Grammar extends Grammar {
             new LexicalElement[] {
                 new Token("b")
             }
-        );
+        )
+        .produceGrammar();
     }
 
 }

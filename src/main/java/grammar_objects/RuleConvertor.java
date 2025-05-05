@@ -3,85 +3,95 @@ package grammar_objects;
 import java.util.*;
 
 import code_generation.Generator;
+import component_construction.ParameterError;
 import helper_objects.NullableTuple;
 
-public abstract class RuleConvertor {
-    public static final Integer ROOT_RULE_INDEX = null;
-    public static final ProductionRule ROOT_RULE = null;
+/**
+ * Defines conversions for the rules within the specified grammar.
+ */
+public record RuleConvertor(
+    Grammar grammar,
+    Map<ProductionRule, Generator> conversions,
+    NullableTuple<String, String> bookends
+) {
+    //TODO: Consider if the sentinal token should be listed in the productionSequence
+    public static final ProductionRule ROOT_RULE = new ProductionRule(null, null);
 
-    private Grammar grammar;
-    private NullableTuple<String, String> bookends;
-    private Map<ProductionRule, Generator> conversions = new HashMap<>();
+    /**
+     * Defines conversions for the rules within the specified grammar
+     * @param grammar The grammar for conversions
+     * @param conversions The conversions for every grammar rule
+     * @param bookends Any constant strings which will bookend produced generations. May be null, in which case the Generator will be {@code (elements) -> elements[0].getGeneration() }
+     */
+    public RuleConvertor(
+        Grammar grammar,
+        Map<ProductionRule, Generator> conversions,
+        NullableTuple<String, String> bookends
+    ) {
+        if (grammar == null) throw new ParameterError("A grammar must be defined");
+        if (conversions == null) throw new ParameterError("Production rule conversions must be defined");
 
-    public RuleConvertor() {
-        grammar = setUpGrammar();
-        bookends = setUpBookends();
-
-        if(bookends == null) {
+        if (bookends == null)
             bookends = new NullableTuple<String,String>("", "");
+
+        try {
+            if (!conversions.containsKey(ROOT_RULE))
+                conversions.put(ROOT_RULE, (elements) -> elements[0].getGeneration());
+        }
+        catch (NullPointerException e) {
+            conversions = new HashMap<>();
+            conversions.put(ROOT_RULE, (elements) -> elements[0].getGeneration());
+            conversions.putAll(conversions);
         }
 
-        setUpRuleConvertors(new RuleOrganiser());
+        if (conversions.size() < grammar.getProductionRules().size() + 1)
+            throw new IncompleteConversionsException(conversions, grammar.getProductionRules());
+
+        this.grammar = grammar;
+        this.bookends = bookends;
+        this.conversions = conversions;
     }
 
     /**
-     * Set up the grammar for this convertor
-     * @return The grammar to be used
+     * Defines conversions for the rules within the specified grammar
+     * @param grammar The grammar for conversions
+     * @param conversions The conversions for every grammar rule
      */
-    protected abstract Grammar setUpGrammar();
-
-    /**
-     * Set up the constant starting and ending strings for conversions
-     * @return A NullableTuple of the starting string and ending string, may be null in which case the bookends will be taken as ("","")
-     */
-    protected abstract NullableTuple<String, String> setUpBookends();
-
-    /**
-     * Sets up code conversions for each production rule, for when the rules are sanctioned
-     * @param ruleOrganiser A helper object for conversion setup
-     */
-    protected abstract void setUpRuleConvertors(RuleOrganiser ruleOrganiser);
-
-    /**
-     * Gets the start and ending strings for conversions
-     * @return A tuple of the starting and ending strings
-     */
-    public NullableTuple<String, String> getBookends() {
-        return bookends;
+    public RuleConvertor(
+        Grammar grammar,
+        Map<ProductionRule, Generator> conversions
+    ) {
+        this(grammar, conversions, null);
     }
 
-    /**
-     * Gets the mapping of production rules to the Generators for their conversions
-     * @return The conversion map
-     */
-    public Map<ProductionRule, Generator> getConversions() {
-        return conversions;
-    }
+    public class IncompleteConversionsException extends RuntimeException {
 
-    protected class RuleOrganiser {
+        protected String message;
 
-        /**
-         * Sets the conversion code to run when the specified rule is sanctioned 
-         * @param ruleNumber The rule index. ROOT_RULE_INDEX, to run code after the final rule is sanctioned (useful for formatting).
-         * @param generatorFunction The function to be run when the specified rule is sanctioned.
-         * @return The original organiser object to allof method chaining.
-         */
-        public RuleOrganiser setConversion(Integer ruleNumber, Generator generatorFunction) {
-            if(ruleNumber < 0 && ruleNumber != ROOT_RULE_INDEX) { 
-                throw new RuntimeException("The given rule number must be >= 0 or ROOT_RULE_INDEX");
+        public IncompleteConversionsException(Map<ProductionRule, Generator> conversions, List<ProductionRule> productionRules) {
+            List<ProductionRule> notImplemented = new ArrayList<>();
+
+            for (ProductionRule productionRule : productionRules) {
+                if (!conversions.containsKey(productionRule))
+                    notImplemented.add(productionRule);
             }
 
-            ProductionRule rule = null;
+            message = "There were no conversions for the following rules:\n";
 
-            if(ruleNumber != ROOT_RULE_INDEX) {
-                rule = grammar.getRule(ruleNumber);
+            if (!conversions.containsKey(ROOT_RULE))
+                message += "    ROOT_RULE\n";
+
+            for (ProductionRule productionRule : notImplemented) {
+                message += "    " + productionRule.toString() + "\n";
             }
 
-            conversions.put(rule, generatorFunction);
+            message = message.strip();
+        }
 
-            return this;
+        @Override
+        public String getMessage() {
+            return message;
         }
 
     }
-
 }
