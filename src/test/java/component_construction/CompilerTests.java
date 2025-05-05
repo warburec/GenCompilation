@@ -47,7 +47,7 @@ public class CompilerTests {
         String output = compiler.compile(inputSentence);
 
 
-        String expected = new BasicIdentifierTestGrammar(GrammarType.LR0).getGeneratedCode("XToYToXSemantic", "Java");
+        String expected = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0).getCodeGeneration("Java XToYToXSemantic");
         assertEquals(expected, output);
     }
 }

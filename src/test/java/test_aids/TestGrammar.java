@@ -1,7 +1,9 @@
 package test_aids;
 
-import java.util.*;
+import static helper_objects.ToStringFormatting.indentFormat;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.ParseState;
@@ -58,6 +60,40 @@ public class TestGrammar extends Grammar {
 
     public String getCodeGeneration(String sentenceName) {
         return codeGenerations.get(sentenceName);
+    }
+
+    @Override
+    public String toString() {
+        String out = super.toString() + "\n";
+
+        out += "States:\n" + indentFormat(states) + "\n\n";
+
+        out += "ActionTable:\n" + indentFormat(actionTable.entrySet().stream()
+            .map(entry -> entry.getKey().toString() + ": " + entry.getValue().toString())
+            .collect(Collectors.toList())
+        ) + "\n\n";
+
+        out += "GotoTable:\n" + indentFormat(actionTable.entrySet().stream()
+            .map(entry -> entry.getKey().toString() + ": " + entry.getValue().toString())
+            .collect(Collectors.toList())
+        ) + "\n\n";
+
+        out += "RuleConvertors:\n" + indentFormat(actionTable.entrySet().stream()
+            .map(entry -> entry.getKey().toString() + ": " + entry.getValue().toString())
+            .collect(Collectors.toList())
+        ) + "\n\n";
+
+        out += "CodeGenerations:\n" + indentFormat(actionTable.entrySet().stream()
+            .map(entry -> entry.getKey().toString() + ": " + entry.getValue().toString())
+            .collect(Collectors.toList())
+        ) + "\n\n";
+
+        out += "ParseRoots:\n" + indentFormat(actionTable.entrySet().stream()
+            .map(entry -> entry.getKey().toString() + ": " + entry.getValue().toString())
+            .collect(Collectors.toList())
+        ) + "\n";
+
+        return out;
     }
     
 }
