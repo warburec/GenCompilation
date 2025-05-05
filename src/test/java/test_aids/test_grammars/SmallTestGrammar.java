@@ -1,4 +1,4 @@
-package test_aids.test_grammars.small_grammar;
+package test_aids.test_grammars;
 
 import java.util.*;
 import grammar_objects.*;
@@ -9,7 +9,8 @@ import syntax_analysis.grammar_structure_creation.State;
 import syntax_analysis.parsing.*;
 import test_aids.*;
 import test_aids.TestGrammarBuilder.TableGatherer;
-import test_aids.test_grammars.*;
+import test_aids.test_grammars.exceptions.UnsupportedGrammarException;
+
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

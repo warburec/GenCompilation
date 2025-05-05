@@ -1,4 +1,4 @@
-package test_aids.test_grammars.basic_identifier;
+package test_aids.test_grammars;
 
 import java.util.*;
 import java.util.function.Function;
@@ -10,7 +10,7 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import test_aids.*;
 import test_aids.TestGrammarBuilder.TableGatherer;
-import test_aids.test_grammars.*;
+import test_aids.test_grammars.exceptions.UnsupportedGrammarException;
 
 /**
  * <statement list> := <statement> |

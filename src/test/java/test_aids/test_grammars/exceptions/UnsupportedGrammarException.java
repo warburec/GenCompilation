@@ -1,4 +1,4 @@
-package test_aids.test_grammars;
+package test_aids.test_grammars.exceptions;
 
 import test_aids.GrammarType;
 

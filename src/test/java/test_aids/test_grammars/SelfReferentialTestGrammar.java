@@ -1,4 +1,4 @@
-package test_aids.test_grammars.self_referential;
+package test_aids.test_grammars;
 
 import java.util.*;
 import java.util.function.Function;
@@ -8,7 +8,7 @@ import grammars.self_referential.SelfReferentialGrammar;
 import syntax_analysis.grammar_structure_creation.*;
 import test_aids.*;
 import test_aids.TestGrammarBuilder.*;
-import test_aids.test_grammars.UnsupportedGrammarException;
+import test_aids.test_grammars.exceptions.UnsupportedGrammarException;
 
 /**
  * H → h A

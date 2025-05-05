@@ -7,7 +7,7 @@ import code_generation.*;
 import grammar_objects.*;
 import syntax_analysis.parsing.ParseState;
 import test_aids.*;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
 
 public class TypeCheckerTests {
     

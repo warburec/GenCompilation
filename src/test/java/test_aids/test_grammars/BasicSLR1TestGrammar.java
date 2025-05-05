@@ -1,4 +1,4 @@
-package test_aids.test_grammars.basic_SLR1;
+package test_aids.test_grammars;
 
 import java.util.*;
 

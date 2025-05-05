@@ -12,7 +12,7 @@ import grammars.basic_identifier.convertors.XToYToXSemantic;
 import lexical_analysis.DynamicTokenRegex;
 import syntax_analysis.parsing.ParseFailedException;
 import test_aids.GrammarType;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
 
 public class CompilerTests {
     

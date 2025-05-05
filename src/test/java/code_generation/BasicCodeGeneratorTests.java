@@ -7,8 +7,8 @@ import code_generation.BasicCodeGenerator.IncompleteReductionException;
 import grammar_objects.RuleConvertor;
 import syntax_analysis.parsing.ParseState;
 import test_aids.*;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
-import test_aids.test_grammars.small_grammar.SmallTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.SmallTestGrammar;
 
 public class BasicCodeGeneratorTests {
     

@@ -8,9 +8,9 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import test_aids.*;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
-import test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
-import test_aids.test_grammars.small_grammar.SmallTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.SelfReferentialTestGrammar;
+import test_aids.test_grammars.SmallTestGrammar;
 
 public class LR0ParserTests {
     
