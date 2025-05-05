@@ -8,10 +8,10 @@ import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import test_aids.*;
-import test_aids.test_grammars.basic_SLR1.BasicSLR1TestGrammar;
-import test_aids.test_grammars.basic_identifier.BasicIdentifierTestGrammar;
-import test_aids.test_grammars.self_referential.SelfReferentialTestGrammar;
-import test_aids.test_grammars.small_grammar.SmallTestGrammar;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.BasicSLR1TestGrammar;
+import test_aids.test_grammars.SelfReferentialTestGrammar;
+import test_aids.test_grammars.SmallTestGrammar;
 
 public class SLR1ParserTests {
     
@@ -32,7 +32,7 @@ public class SLR1ParserTests {
 
     @Test
     public void smallTestGrammarStates() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -47,7 +47,7 @@ public class SLR1ParserTests {
 
     @Test
     public void smallTestGrammarAction() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.SLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -62,7 +62,7 @@ public class SLR1ParserTests {
 
     @Test
     public void smallTestGrammarGoto() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -77,7 +77,7 @@ public class SLR1ParserTests {
 
     @Test
     public void parsingTestGrammarCompleteSentence() throws ParseFailedException {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -100,7 +100,7 @@ public class SLR1ParserTests {
 
     @Test
     public void parsingTestGrammarIncompleteSentence() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -120,7 +120,7 @@ public class SLR1ParserTests {
 
     @Test
     public void parsingTestGrammarIncorrectSentence() {
-        TestGrammar grammar = new SmallTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SmallTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -141,7 +141,7 @@ public class SLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarStates() {
-        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SelfReferentialTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -156,7 +156,7 @@ public class SLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarAction() {
-        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new SelfReferentialTestGrammar().getGrammar(GrammarType.SLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -171,7 +171,7 @@ public class SLR1ParserTests {
 
     @Test
     public void selfReferentialGrammarGoto() {
-        TestGrammar grammar = new SelfReferentialTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new SelfReferentialTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -186,7 +186,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarStates() {
-        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -201,7 +201,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarAction() {
-        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new BasicIdentifierTestGrammar().getGrammar(GrammarType.SLR1);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -216,7 +216,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicIdentifierGrammarGoto() {
-        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -231,7 +231,7 @@ public class SLR1ParserTests {
 
     @Test
     public void XToYToXGrammarCompleteSentence() throws ParseFailedException {
-        TestGrammar grammar = new BasicIdentifierTestGrammar(GrammarType.LR0);
+        TestGrammar grammar = new BasicIdentifierTestGrammar().getGrammar(GrammarType.LR0);
         GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),
@@ -301,7 +301,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarStates() {
-        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new BasicSLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -316,7 +316,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarAction() {
-        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new BasicSLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -331,7 +331,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarGoto() {
-        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new BasicSLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
 
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
@@ -346,7 +346,7 @@ public class SLR1ParserTests {
 
     @Test
     public void basicSLR1GrammarCompleteSentence() throws ParseFailedException {
-        TestGrammar grammar = new BasicSLR1TestGrammar(GrammarType.SLR1);
+        TestGrammar grammar = new BasicSLR1TestGrammar().getGrammar();
         GrammarParts grammarParts = grammar.getParts();
         SLR1Parser syntaxAnalyser = new SLR1Parser(grammarParts.tokens(),
                                                 grammarParts.nonTerminals(),

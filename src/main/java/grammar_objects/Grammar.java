@@ -1,13 +1,27 @@
 package grammar_objects;
 
+import static helper_objects.ToStringFormatting.indentFormat;
+
 import java.util.*;
 
-public record Grammar(
-    Set<Token> tokens,
-    Set<NonTerminal> nonTerminals,
-    List<ProductionRule> productionRules,
-    NonTerminal sentinal
-) {
+public class Grammar {
+
+    protected Set<Token> tokens;
+    protected Set<NonTerminal> nonTerminals;
+    protected List<ProductionRule> productionRules;
+    protected NonTerminal sentinal;
+
+    public Grammar(
+        Set<Token> tokens,
+        Set<NonTerminal> nonTerminals,
+        List<ProductionRule> productionRules,
+        NonTerminal sentinal
+    ) {
+        this.tokens = tokens;
+        this.nonTerminals = nonTerminals;
+        this.productionRules = productionRules;
+        this.sentinal = sentinal;
+    }
 
     public ProductionRule getRule(int index) {
         return productionRules.get(index);
@@ -23,16 +37,14 @@ public record Grammar(
     }
 
     @Override
-    public boolean equals(Object object){
+    public boolean equals(Object object) {
         if(!(object instanceof Grammar)) { return false; }
 
         Grammar otherGrammar = (Grammar)object;
 
         if(!sentinal.equals(otherGrammar.sentinal)) { return false; }
-
         if(!tokens.equals(otherGrammar.tokens)) { return false; }
         if(!nonTerminals.equals(otherGrammar.nonTerminals)) { return false; }
-
         if(!productionRules.equals(otherGrammar.productionRules)) { return false; }
 
         return true;
@@ -43,20 +55,27 @@ public record Grammar(
         String out = "";
 
         out += "Sentinal:\n\t" + sentinal.toString() + "\n\n";
-        out += "Tokens:\n" + tabFormat(tokens) + "\n";
-        out += "Non-terminals:\n" + tabFormat(nonTerminals) + "\n";
-        out += "Production Rules:\n" + tabFormat(productionRules) + "\n";
+        out += "Tokens:\n" + indentFormat(tokens) + "\n\n";
+        out += "Non-terminals:\n" + indentFormat(nonTerminals) + "\n\n";
+        out += "Production Rules:\n" + indentFormat(productionRules) + "\n";
 
         return out;
     }
 
-    private <E> String tabFormat(Collection<E> collection) {
-        String out = "";
-
-        for (Object object : collection) {
-            out += "\t" + object.toString() + "\n";
-        }
-
-        return out;
+    public Set<Token> getTokens() {
+        return tokens;
     }
+
+    public Set<NonTerminal> getNonTerminals() {
+        return nonTerminals;
+    }
+
+    public List<ProductionRule> getProductionRules() {
+        return productionRules;
+    }
+
+    public NonTerminal getSentinal() {
+        return sentinal;
+    }
+    
 }

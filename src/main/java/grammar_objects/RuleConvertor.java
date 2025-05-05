@@ -44,8 +44,8 @@ public record RuleConvertor(
             conversions.putAll(conversions);
         }
 
-        if (conversions.size() < grammar.productionRules().size() + 1)
-            throw new IncompleteConversionsException(conversions, grammar.productionRules());
+        if (conversions.size() < grammar.getProductionRules().size() + 1)
+            throw new IncompleteConversionsException(conversions, grammar.getProductionRules());
 
         this.grammar = grammar;
         this.bookends = bookends;
