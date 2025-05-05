@@ -1,5 +1,7 @@
 package grammar_objects;
 
+import static helper_objects.ToStringFormatting.indentFormat;
+
 import java.util.*;
 
 public class Grammar {
@@ -53,19 +55,9 @@ public class Grammar {
         String out = "";
 
         out += "Sentinal:\n\t" + sentinal.toString() + "\n\n";
-        out += "Tokens:\n" + tabFormat(tokens) + "\n";
-        out += "Non-terminals:\n" + tabFormat(nonTerminals) + "\n";
-        out += "Production Rules:\n" + tabFormat(productionRules) + "\n";
-
-        return out;
-    }
-
-    private <E> String tabFormat(Collection<E> collection) {
-        String out = "";
-
-        for (Object object : collection) {
-            out += "\t" + object.toString() + "\n";
-        }
+        out += "Tokens:\n" + indentFormat(tokens) + "\n\n";
+        out += "Non-terminals:\n" + indentFormat(nonTerminals) + "\n\n";
+        out += "Production Rules:\n" + indentFormat(productionRules) + "\n";
 
         return out;
     }
