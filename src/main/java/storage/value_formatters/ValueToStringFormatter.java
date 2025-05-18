@@ -7,11 +7,13 @@ import java.util.regex.*;
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.*;
 
+/**
+ * A simple and limited ValueFormatter, not intended for storage of complex data
+ * Parses and produces strings in the form { "entry1":value1, ..., "entryN":value }
+ */
 public class ValueToStringFormatter implements ValueFormatter<String> {
 
-    protected static final String KEY_VALUE_SEPERATOR = " : ";
-    protected static final String INDENT = "  ";
-
+    protected static final String INDENT = "    ";
     protected static final String ANY_WHITESPACE = "[\n\t ]*";
 
     @Override
@@ -20,10 +22,16 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
         if (value instanceof IntegerStorageValue) return formatValue((IntegerStorageValue)value);
         if (value instanceof MapStorageValue) return formatValue((MapStorageValue)value);
 
-        //TODO: Add more value types and ensure types are differentiatable from their stored formats
+        //TODO: Add more value types and ensure types are differentiable from their stored formats
         throw new UnsupportedValueException(value);
     }
 
+    /**
+     * Produces a StorageValue representation of the provided data.
+     * Note: Errors will not be thrown for incorrect values, ensure the input data is correctly formed.
+     * @param formattedData The formatted data to be parsed.
+     * @return The StorageValue representation of the input data.
+     */
     @Override
     public StorageValue<?> parse(String formattedData) throws UnsupportedValueException {
         if (formattedData.startsWith("\"")) return parseStringFormat(formattedData);
@@ -65,10 +73,10 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
         if (mapEntries.isEmpty()) return "{}";
 
         for (Entry<String, StorageValue<?>> entry : mapEntries) {
-            out += "\"" + entry.getKey() + ":" + entry.getValue() + ",\n";
+            out += "\"" + entry.getKey() + "\":" + format(entry.getValue()) + ",\n";
         }
 
-        out = out.substring(0, out.length() - 3); //Remove trailing ",\n"
+        out = out.substring(0, out.length() - 2); //Remove trailing ",\n"
 
         return "{\n" + indent(out) + "\n}";
     }
@@ -82,11 +90,11 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
 
         Map<String, StorageValue<?>> map = new HashMap<>();
 
-        Pattern entryPattern = Pattern.compile(
-            "\\\"(?<key>[a-zA-Z0-9_\\-]*?)\\\"" + ANY_WHITESPACE + ":" + ANY_WHITESPACE + "(?<value>\\{.*\\}|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
-            Pattern.DOTALL | Pattern.MULTILINE
-        );
-        Matcher entryMatcher = entryPattern.matcher(formattedData);
+        Matcher entryMatcher  = Pattern.compile(
+                "\\\"(?<key>[a-zA-Z0-9_\\-]*?)\\\"" + ANY_WHITESPACE + ":" + ANY_WHITESPACE + "(?<value>\\{.*\\}|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
+                Pattern.DOTALL | Pattern.MULTILINE
+            )
+            .matcher(formattedData);
 
         while (entryMatcher.find()) {
             map.put(
@@ -99,7 +107,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
     }
 
     private String indent(String string) {
-        return INDENT + string.replace("\n", INDENT);
+        return INDENT + string.replace("\n", "\n" + INDENT);
     }
 
     protected record ValueFormat(String startDelimiter, String internalRegex, String endDelimiter) {}
