@@ -2,40 +2,17 @@ package storage.value_formatters;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.*;
 
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.*;
-import helper_objects.ValueEnum;
 
 public class ValueToStringFormatter implements ValueFormatter<String> {
 
     protected static final String KEY_VALUE_SEPERATOR = " : ";
     protected static final String INDENT = "  ";
 
-    protected static enum PREFIXES implements ValueEnum<String> {
-        STRING("str:"),
-        INTEGER("int:"),
-        MAP("map:");
-        
-        private String value;
-        
-        private PREFIXES(String value) {
-            this.value = value;
-        }
-        
-        @Override
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
-    boolean storageUsed = false;
-    List<String> existingKeys = new ArrayList<String>();
+    protected static final String ANY_WHITESPACE = "[\n\t ]*";
 
     @Override
     public String format(StorageValue<?> value) throws UnsupportedValueException {
@@ -49,9 +26,9 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
 
     @Override
     public StorageValue<?> parse(String formattedData) throws UnsupportedValueException {
-        if (formattedData.startsWith(PREFIXES.STRING.getValue())) return parseStringFormat(formattedData);
-        if (formattedData.startsWith(PREFIXES.INTEGER.getValue())) return parseIntegerFormat(formattedData);
-        if (formattedData.startsWith(PREFIXES.MAP.getValue())) return parseMapFormat(formattedData);
+        if (formattedData.startsWith("\"")) return parseStringFormat(formattedData);
+        if (formattedData.matches("[0-9]+.*")) return parseIntegerFormat(formattedData);
+        if (formattedData.startsWith("{")) return parseMapFormat(formattedData);
 
         //TODO: Add more value types
         throw new UnsupportedValueException();
@@ -59,67 +36,71 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
 
 
     private String formatValue(StringStorageValue value) {
-        String formattedString = PREFIXES.STRING.getValue();
-        formattedString += value.getValue().replace("\\", "\\\\");
-        
-        return formattedString;
+        return "\"" + 
+            value.getValue().replace("\"", "\\\"").replace("\\", "\\\\") + 
+            "\"";
     }
 
     private StringStorageValue parseStringFormat(String formattedData) {
-        formattedData = formattedData.replaceFirst(PREFIXES.STRING.getValue(), "");
+        if (!formattedData.endsWith("\"")) throw new RuntimeException("The string " + formattedData + " must end with \"");
+
+        formattedData = formattedData.substring(1, formattedData.length() - 1);
         formattedData = formattedData.replace("\\\\", "\\");
+
         return new StringStorageValue(formattedData);
     }
 
     private String formatValue(IntegerStorageValue value) {
-        return PREFIXES.INTEGER + String.valueOf(value.getValue());
+        return String.valueOf(value.getValue());
     }
 
     private IntegerStorageValue parseIntegerFormat(String formattedData) {
-        formattedData = formattedData.replaceFirst(PREFIXES.INTEGER.getValue(), "");
         return new IntegerStorageValue(Integer.parseInt(formattedData));
     }
     
     private String formatValue(MapStorageValue value) {
+        String out = "";
         Set<Entry<String, StorageValue<?>>> mapEntries = value.getValue().entrySet();
+
         if (mapEntries.isEmpty()) return "{}";
 
-        String out = PREFIXES.MAP + "{\n";
-
         for (Entry<String, StorageValue<?>> entry : mapEntries) {
-            out += INDENT + entry.getKey() + ":" + entry.getValue() + ",\n"; //TODO: Test for values containing "",\n"
+            out += "\"" + entry.getKey() + ":" + entry.getValue() + ",\n";
         }
 
         out = out.substring(0, out.length() - 3); //Remove trailing ",\n"
 
-        return out + "}";
+        return "{\n" + indent(out) + "\n}";
     }
 
-    /**
-     * Note: Map values cannot contain ",\n"
-     * @param formattedData
-     * @return
-     */
     private MapStorageValue parseMapFormat(String formattedData) {
-        formattedData = formattedData.replaceFirst(PREFIXES.MAP.getValue(), "");
+        if (!formattedData.endsWith("}")) throw new RuntimeException("The map " + formattedData + " must end with }");
+        if (formattedData.matches("\\{" + ANY_WHITESPACE + "\\}")) return new MapStorageValue(Map.of());
 
-        if (formattedData.equals("{}") || formattedData.equals("{\n}"))
-            return new MapStorageValue(Map.of());
-
-        formattedData = formattedData.replaceFirst("\\{\n", "");
-        formattedData = formattedData.substring(0, formattedData.length() - 2); // Remove ending "}"
+        formattedData = formattedData.substring(1, formattedData.length() - 1);
+        formattedData = formattedData.strip();
 
         Map<String, StorageValue<?>> map = new HashMap<>();
 
-        for (String entry : formattedData.split(",\n")) {
-            String[] parts = entry.split(":", 2);
+        Pattern entryPattern = Pattern.compile(
+            "\\\"(?<key>[a-zA-Z0-9_\\-]*?)\\\"" + ANY_WHITESPACE + ":" + ANY_WHITESPACE + "(?<value>\\{.*\\}|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
+            Pattern.DOTALL | Pattern.MULTILINE
+        );
+        Matcher entryMatcher = entryPattern.matcher(formattedData);
 
+        while (entryMatcher.find()) {
             map.put(
-                parts[0], 
-                this.parse(parts[1])
+                entryMatcher.group("key"), 
+                parse(entryMatcher.group("value"))
             );
         }
 
         return new MapStorageValue(map);
     }
+
+    private String indent(String string) {
+        return INDENT + string.replace("\n", INDENT);
+    }
+
+    protected record ValueFormat(String startDelimiter, String internalRegex, String endDelimiter) {}
 }

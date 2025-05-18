@@ -11,10 +11,12 @@ import storage.storage_values.*;
 
 public class ValueToStringFormatterTests {
     
+    //TODO: Rework for JSON-like map, string, and int formats
+
     @Test
     public void parseFormattedString() {
         String str = "Java";
-        String formattedString = "str:" + str;
+        String formattedString = "\"" + str + "\"";
         ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
 
         StorageValue<?> actualValue = valueFormatter.parse(formattedString);
@@ -34,7 +36,7 @@ public class ValueToStringFormatterTests {
     @Test
     public void parseFormattedInteger() {
         Integer integer = 10;
-        String formattedString = "int:" + Integer.toString(integer);
+        String formattedString = Integer.toString(integer);
         ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
 
         StorageValue<?> actualValue = valueFormatter.parse(formattedString);
@@ -44,17 +46,9 @@ public class ValueToStringFormatterTests {
     }
 
     @Test
-    public void parseUnformattedInteger() {
-        String str = "10";
-        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
-
-        assertThrows(UnsupportedValueException.class, () -> valueFormatter.parse(str));
-    }
-
-    @Test
     public void parseFormattedEmptyMap() {
-        String formattedString1 = "map:{}";
-        String formattedString2 = "map:{\n}";
+        String formattedString1 = "{}";
+        String formattedString2 = "{\n}";
         ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
 
         StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
@@ -68,10 +62,10 @@ public class ValueToStringFormatterTests {
     @Test
     public void parseFormattedSimpleMap() {
         Tuple<String, String> testString = new NotEmptyTuple<>("testStringKey", "testString");
-        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testintKey", 30);
-        String formattedString1 = "map:{\n" + 
-            testString.value1() + ":str:" + testString.value2() + ",\n" +
-            testInt.value1() + ":int:" + testInt.value2() + "\n"+
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        String formattedString1 = "{\n" + 
+        "   \"" + testString.value1() + "\":\"" + testString.value2() + "\",\n" +
+        "   \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
         "}";
         ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
 
@@ -83,6 +77,34 @@ public class ValueToStringFormatterTests {
         ));
         assertEquals(expectedValue, actualValue1);
     }
+
+    @Test
+    public void nestedMap() {
+        Tuple<String, String> testString1 = new NotEmptyTuple<>("testStringKey1", "testString1");
+        Tuple<String, String> testString2 = new NotEmptyTuple<>("testStringKey2", "testString2");
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        String formattedString1 = "{\n" + 
+        "   \"innerMap\":{\n" +
+        "       \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+        "       \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+        "   },\n" +
+        "   \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+        "}";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+
+        MapStorageValue expectedValue = new MapStorageValue(Map.ofEntries(
+            Map.entry("innerMap", new MapStorageValue(Map.ofEntries(
+                Map.entry(testString1.value1(), new StringStorageValue(testString1.value2())),
+                Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+            ))),
+            Map.entry(testString2.value1(), new StringStorageValue(testString2.value2()))
+        ));
+        assertEquals(expectedValue, actualValue1);
+    }
+
+    //TODO: Test case where map keys are missing surrounding quotes
 
     //TODO: Test MapStorageValue with various contents (including nested maps)
     //TODO: Fomatting of StorageValues
