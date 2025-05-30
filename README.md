@@ -83,8 +83,8 @@ Make a pull request. Make an issue for large changes. Ensure unit tests are prov
 
 ## Contributors
 
-<a href="https://github.com/warburec/Generalised-Compilation/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=warburec/Generalised-Compilation" />
+<a href="https://github.com/warburec/GenCompilation/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=warburec/GenCompilation" />
 </a>
 
 ## License
