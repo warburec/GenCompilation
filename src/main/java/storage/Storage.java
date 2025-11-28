@@ -14,10 +14,10 @@ import storage.value_formatters.*;
  */
 public class Storage {
 
-    public String targetFilepath = "." + File.separator + "compilerthis.txt";
-    public ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
-    public FileWriter<?> fileWriter = new StringFileEditor();
-    public FileReader<?> fileReader = new StringFileEditor();
+    private String targetFilepath = "." + File.separator + "compilerthis.txt";
+    private ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
+    private FileWriter<?> fileWriter = new StringFileEditor();
+    private FileReader<?> fileReader = new StringFileEditor();
 
     //#region Constructors
 
