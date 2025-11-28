@@ -7,18 +7,18 @@ import java.nio.file.*;
 public class StringFileEditor extends FileEditor<String> {
 
     @Override
-    public void store(String path, String contents) throws UncheckedIOException {
+    public void store(Path path, String contents) throws UncheckedIOException {
         try {
-            Files.writeString(Paths.get(path), contents);
+            Files.writeString(path, contents);
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to store content to \"" + path + "\"", e);
         }
     }
 
     @Override
-    public String readFrom(String path) throws UncheckedIOException {
+    public String readFrom(Path path) throws UncheckedIOException {
         try {
-            return Files.readString(Paths.get(path), StandardCharsets.UTF_8);
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to read the contents from \"" + path + "\"", e);
         }

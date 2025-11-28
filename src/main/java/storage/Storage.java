@@ -1,6 +1,7 @@
 package storage;
 
 import java.io.*;
+import java.nio.file.Path;
 
 import storage.file_editors.*;
 import storage.file_editors.FileWriter;
@@ -14,7 +15,7 @@ import storage.value_formatters.*;
  */
 public class Storage {
 
-    private String targetFilepath = "." + File.separator + "compilerthis.txt";
+    private Path targetFilepath = Path.of("." + File.separator + "compilerFile.txt");
     private ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
     private FileWriter<?> fileWriter = new StringFileEditor();
     private FileReader<?> fileReader = new StringFileEditor();
@@ -27,13 +28,18 @@ public class Storage {
 
     //#region Configuration
 
-    public Storage setAbsoluteTargetPath(String filepath) {
+    public Storage setTargetPath(Path filepath) {
         targetFilepath = filepath;
         return this;
     }
 
+    public Storage setAbsoluteTargetPath(String filepath) {
+        targetFilepath = Path.of(filepath);
+        return this;
+    }
+
     public Storage setRelativeTargetPath(String filepath) {
-        targetFilepath = "./" + filepath;
+        targetFilepath = Path.of("." + File.separator + filepath);
         return this;
     }
 
