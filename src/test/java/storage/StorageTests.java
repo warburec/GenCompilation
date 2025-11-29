@@ -1,5 +1,7 @@
 package storage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.annotation.*;
@@ -46,11 +48,48 @@ public class StorageTests {
     }
 
     @Test
-    @UseTestFile
-    public void testMethod(Path testFile) throws IOException {
-        //TODO
+    public void setTargetPath() {
+        Path expectedPath = Path.of("./testPath");
+        Storage storage = new Storage();
+
+        storage.setTargetPath(expectedPath);
+        Path actualPath = storage.getTargetFilepath();
+
+        assertEquals(expectedPath, actualPath);
     }
 
+    @Test
+    public void setAbsoluteTargetPath() {
+        Path expectedPath = Path.of("testPath");
+        Storage storage = new Storage();
+
+        storage.setAbsoluteTargetPath(expectedPath.toString());
+        Path actualPath = storage.getTargetFilepath();
+
+        assertEquals(expectedPath, actualPath);
+    }
+
+    @Test
+    public void setRelativeTargetPath() {
+        String fileName = "testPath.txt";
+        Storage storage = new Storage();
+        
+        storage.setRelativeTargetPath(fileName);
+        Path actualPath = storage.getTargetFilepath();
+        
+        Path expectedPath = Path.of("./" + fileName);
+        assertEquals(expectedPath, actualPath);
+    }
+
+    // @Test
+    // @UseTestFile
+    // public void sampleTest(Path testFile) throws IOException {
+    //     Storage storage = new Storage();
+
+    //     storage.setTargetPath(testFile);
+    // }
+
+    // Storage setTargetPath(Path filepath)
     // Storage setAbsoluteTargetPath(String filepath)
     // Storage setRelativeTargetPath(String filepath)
     // Storage setFormatter(ValueFormatter<F> formatter)

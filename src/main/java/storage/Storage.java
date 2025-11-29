@@ -26,6 +26,14 @@ public class Storage {
 
     //#endregion
 
+    //#region Getters
+
+    public Path getTargetFilepath() {
+        return targetFilepath;
+    }
+
+    //#endregion
+
     //#region Configuration
 
     public Storage setTargetPath(Path filepath) {
