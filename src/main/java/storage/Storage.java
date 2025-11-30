@@ -153,16 +153,21 @@ public class Storage {
     public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
         TypeToken<T> typeToken = TypeToken.<T>instantiate();
 
-        try {
-            FileWriter<T> fileWriter = (FileWriter<T>)this.fileWriter;
-            ValueFormatter<T> formatter = (ValueFormatter<T>)this.formatter;
+        FileWriter<T> fileWriter;
+        ValueFormatter<T> formatter;
 
+        try {
+            fileWriter = (FileWriter<T>)this.fileWriter;
+            formatter = (ValueFormatter<T>)this.formatter;
+        } catch (ClassCastException e) {
+            throw new RuntimeException("The type " + typeToken.getContainedClass().getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
+        }
+
+        try {
             fileWriter.store(
                 targetFilepath, 
                 formatter.format(storageObject)
             );
-        } catch (ClassCastException e) {
-            throw new RuntimeException("The type " + typeToken.getContainedClass().getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

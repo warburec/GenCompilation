@@ -1,21 +1,20 @@
 package test_aids.test_storage;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 
 import storage.file_editors.FileEditor;
 
-public class TestFileEditor extends FileEditor<Object> {
+public class TestFileEditor extends FileEditor<String> {
 
     @Override
-    public Object readFrom(Path path) throws IOException {
-        return Files.readAllBytes(path);
+    public String readFrom(Path path) throws IOException {
+        return Files.readString(path);
     }
 
     @Override
-    public void store(Path path, Object contents) throws IOException {
-        Files.write(path, (byte[])contents);
+    public void store(Path path, String contents) throws IOException {
+        Files.writeString(path, contents.toString());
     }
     
 }

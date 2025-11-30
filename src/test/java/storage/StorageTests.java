@@ -106,14 +106,6 @@ public class StorageTests {
         assertEquals(expectedString, actualString);
     }
 
-    // @Test
-    // @UseTestFile
-    // public void sampleTest(Path testFile) throws IOException {
-    //     Storage storage = new Storage();
-
-    //     storage.setTargetPath(testFile);
-    // }
-
     // Storage setFormatter(ValueFormatter<F> formatter)
     // Storage setFileWriter(FileWriter<W> fileWriter)
     // Storage setFileReader(FileReader<R> fileReader)
