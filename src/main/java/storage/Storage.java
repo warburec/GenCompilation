@@ -118,7 +118,7 @@ public class Storage {
         convertAndStore(storageObject, formatter, outputStream);
     }
 
-    public <F> StorageValue<?> load(InputStream inputStream) {
+    public <F> StorageValue<?> load(InputStream inputStream) throws UncheckedIOException, RuntimeException {
         Class<F> expectedValueType = TypeToken.<F>instantiate().getContainedClass();
 
         try (ObjectInputStream reader = new ObjectInputStream(inputStream)) {
@@ -136,7 +136,7 @@ public class Storage {
 
     //#region FileStorage
     
-    public void store(Storable storageObject) {
+    public void store(Storable storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
         store(storageObject.getStorageRepresentation());
     }
 
@@ -150,30 +150,34 @@ public class Storage {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void store(StorageValue<T> storageObject) {
-        FileWriter<T> fileWriter;
-        ValueFormatter<T> formatter;
+    public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
+        TypeToken<T> typeToken = TypeToken.<T>instantiate();
 
         try {
-            fileWriter = (FileWriter<T>)this.fileWriter;
-            formatter = (ValueFormatter<T>)this.formatter;
-        }
-        catch (ClassCastException e) {
-            throw e; 
-        }
+            FileWriter<T> fileWriter = (FileWriter<T>)this.fileWriter;
+            ValueFormatter<T> formatter = (ValueFormatter<T>)this.formatter;
 
-        fileWriter.store(
-            targetFilepath, 
-            formatter.format(storageObject)
-        );
+            fileWriter.store(
+                targetFilepath, 
+                formatter.format(storageObject)
+            );
+        } catch (ClassCastException e) {
+            throw new RuntimeException("The type " + typeToken.getContainedClass().getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
-    public void loadInto(Loadable targetObject) {
+    public void loadInto(Loadable targetObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
        targetObject.load(load());
     }
 
-    public StorageValue<?> load() {
-        return formatter.parse(fileReader.readFrom(targetFilepath));
+    public StorageValue<?> load() throws UnsupportedValueException, UncheckedIOException {
+        try {
+            return formatter.parse(fileReader.readFrom(targetFilepath));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     //#endregion

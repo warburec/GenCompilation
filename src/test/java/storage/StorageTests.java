@@ -2,13 +2,14 @@ package storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.lang.annotation.*;
 import java.nio.file.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.io.TempDir;
+import test_aids.test_storage.*;
+import storage.storage_values.*;
 
 @ExtendWith(StorageTests.UseTestFileExtension.class)
 public class StorageTests {
@@ -52,8 +53,10 @@ public class StorageTests {
         Path expectedPath = Path.of("./testPath");
         Storage storage = new Storage();
 
+
         storage.setTargetPath(expectedPath);
         Path actualPath = storage.getTargetFilepath();
+
 
         assertEquals(expectedPath, actualPath);
     }
@@ -63,8 +66,10 @@ public class StorageTests {
         Path expectedPath = Path.of("testPath");
         Storage storage = new Storage();
 
+
         storage.setAbsoluteTargetPath(expectedPath.toString());
         Path actualPath = storage.getTargetFilepath();
+
 
         assertEquals(expectedPath, actualPath);
     }
@@ -74,11 +79,31 @@ public class StorageTests {
         String fileName = "testPath.txt";
         Storage storage = new Storage();
         
+
         storage.setRelativeTargetPath(fileName);
         Path actualPath = storage.getTargetFilepath();
         
+
         Path expectedPath = Path.of("./" + fileName);
         assertEquals(expectedPath, actualPath);
+    }
+
+    @Test
+    @UseTestFile
+    public void store(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new StringStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestFileEditor())
+            .setFormatter(new TestValueFormatter());
+
+
+        storage.store(storageValue);
+        String actualString = Files.readString(testFile);
+
+
+        assertEquals(expectedString, actualString);
     }
 
     // @Test
@@ -89,9 +114,6 @@ public class StorageTests {
     //     storage.setTargetPath(testFile);
     // }
 
-    // Storage setTargetPath(Path filepath)
-    // Storage setAbsoluteTargetPath(String filepath)
-    // Storage setRelativeTargetPath(String filepath)
     // Storage setFormatter(ValueFormatter<F> formatter)
     // Storage setFileWriter(FileWriter<W> fileWriter)
     // Storage setFileReader(FileReader<R> fileReader)

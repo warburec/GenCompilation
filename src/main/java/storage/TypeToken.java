@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 public abstract class TypeToken<T> {
     private Type type;
 
-    private TypeToken(){
+    private TypeToken() {
         Type superClass = getClass().getGenericSuperclass();
         this.type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
     }
