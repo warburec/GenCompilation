@@ -99,7 +99,7 @@ public class Storage {
     }
 
     public <F> void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException {
-        Class<F> expectedValueType = TypeToken.<F>instantiate().getContainedClass();
+        Class<F> expectedValueType = TypeReference.<F>instantiate().getContainedClass();
 
         try (ObjectInputStream reader = new ObjectInputStream(inputStream)) {
             objectToLoad.load(
@@ -119,7 +119,7 @@ public class Storage {
     }
 
     public <F> StorageValue<?> load(InputStream inputStream) throws UncheckedIOException, RuntimeException {
-        Class<F> expectedValueType = TypeToken.<F>instantiate().getContainedClass();
+        Class<F> expectedValueType = TypeReference.<F>instantiate().getContainedClass();
 
         try (ObjectInputStream reader = new ObjectInputStream(inputStream)) {
             return formatter.parse(expectedValueType.cast(reader.readObject()));
@@ -151,7 +151,7 @@ public class Storage {
 
     @SuppressWarnings("unchecked")
     public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
-        TypeToken<T> typeToken = TypeToken.<T>instantiate();
+        Class<T> typeToken = TypeReference.<T>instantiate().getContainedClass();
 
         FileWriter<T> fileWriter;
         ValueFormatter<T> formatter;
@@ -160,7 +160,7 @@ public class Storage {
             fileWriter = (FileWriter<T>)this.fileWriter;
             formatter = (ValueFormatter<T>)this.formatter;
         } catch (ClassCastException e) {
-            throw new RuntimeException("The type " + typeToken.getContainedClass().getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
+            throw new RuntimeException("The type " + typeToken.getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
         }
 
         try {
@@ -179,7 +179,8 @@ public class Storage {
 
     public StorageValue<?> load() throws UnsupportedValueException, UncheckedIOException {
         try {
-            return formatter.parse(fileReader.readFrom(targetFilepath));
+            Object data = fileReader.readFrom(targetFilepath);
+            return formatter.parse(data);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -195,6 +196,7 @@ public class Storage {
 
         public ChosenFormatter(ValueFormatter<F> formatter) {
             innerFormatter = formatter;
+            format = TypeReference.<F>instantiate().getContainedClass();
         }
 
         @Override
@@ -204,7 +206,8 @@ public class Storage {
 
         @Override
         public StorageValue<?> parse(Object formattedData) throws UnsupportedValueException {
-            return innerFormatter.parse(format.cast(formattedData));
+            F data = format.cast(formattedData);
+            return innerFormatter.parse(data);
         }
         
     }

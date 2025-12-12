@@ -2,10 +2,14 @@ package storage;
 
 import java.lang.reflect.*;
 
-public abstract class TypeToken<T> {
+/**
+ * A class for holding compile-time type information during runtime. 
+ * Implementation of the "Type Token" design pattern.
+ */
+public abstract class TypeReference<T> {
     private Type type;
 
-    private TypeToken() {
+    private TypeReference() {
         Type superClass = getClass().getGenericSuperclass();
         this.type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
     }
@@ -19,7 +23,7 @@ public abstract class TypeToken<T> {
         return (Class<T>) type.getClass();
     }
 
-    public static <T> TypeToken<T> instantiate() {
-        return new TypeToken<T>() {};
+    public static <T> TypeReference<T> instantiate() {
+        return new TypeReference<T>() {};
     }
 }
