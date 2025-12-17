@@ -1,8 +1,8 @@
 package storage;
 
 import java.io.*;
+import java.lang.reflect.ParameterizedType;
 import java.nio.file.Path;
-
 import storage.file_editors.*;
 import storage.file_editors.FileWriter;
 import storage.file_editors.FileReader;
@@ -194,9 +194,11 @@ public class Storage {
         ValueFormatter<F> innerFormatter;
         Class<F> format;
 
+        @SuppressWarnings("unchecked")
         public ChosenFormatter(ValueFormatter<F> formatter) {
             innerFormatter = formatter;
-            format = TypeReference.<F>instantiate().getContainedClass();
+            ParameterizedType formatterType = (ParameterizedType)(formatter.getClass().getGenericInterfaces()[0]);
+            format = (Class<F>)formatterType.getActualTypeArguments()[0];
         }
 
         @Override

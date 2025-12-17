@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.*;
 import java.lang.annotation.*;
 import java.nio.file.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.io.TempDir;
-import test_aids.test_storage.*;
 import storage.storage_values.*;
+import test_aids.test_storage.*;
 
 @ExtendWith(StorageTests.UseTestFileExtension.class)
 public class StorageTests {
@@ -106,10 +106,25 @@ public class StorageTests {
         assertEquals(expectedString, actualString);
     }
 
-    // Storage setFormatter(ValueFormatter<F> formatter)
-    // Storage setFileWriter(FileWriter<W> fileWriter)
-    // Storage setFileReader(FileReader<R> fileReader)
-    // Storage setFileEditor(FileEditor<E> fileEditor)
+    @Test
+    @UseTestFile
+    public void loadString(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestFileEditor())
+            .setFormatter(new TestValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+
+        StorageValue<?> actualStorageValue = storage.load();
+
+        
+        StorageValue<?> expectedStorageValue = new TestStorageValue(testString);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
     // void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UncheckedIOException
     // void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws UncheckedIOException
     // void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException
