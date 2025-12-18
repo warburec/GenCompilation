@@ -125,6 +125,21 @@ public class StorageTests {
         assertEquals(expectedStorageValue, actualStorageValue);
     }
 
+    @Test
+    @UseTestFile
+    public void loadEmpty(Path testFile) throws IOException {
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestFileEditor())
+            .setFormatter(new TestValueFormatter());
+
+        StorageValue<?> actualStorageValue = storage.load();
+
+        
+        StorageValue<?> expectedStorageValue = new TestStorageValue("");
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
     // void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UncheckedIOException
     // void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws UncheckedIOException
     // void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException
