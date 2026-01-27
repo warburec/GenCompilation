@@ -147,7 +147,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    public void load(Path testFile) throws IOException {
+    public void loadFromInputStream(Path testFile) throws IOException {
         String testString = "testString";
         Storage storage = new Storage()
             .setTargetPath(testFile)
@@ -170,5 +170,24 @@ public class StorageTests {
     // void store(Storable storageObject, String filePath) throws UncheckedIOException, RuntimeException
     // void store(StorageValue<T> storageObject)
     // void loadInto(Loadable targetObject)
-    // StorageValue<?> load()
+    
+    @UseTestFile
+    public void loadFromTargetPath(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStreamEditor())
+            .setFormatter(new TestValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+
+        StorageValue<?> actualStorageValue = storage.load();
+
+        
+        StorageValue<?> expectedStorageValue = new TestStorageValue(testString);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    //TODO: Apply for non-string types
 }
