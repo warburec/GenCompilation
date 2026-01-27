@@ -95,7 +95,7 @@ public class StorageTests {
         StorageValue<?> storageValue = new StringStorageValue(expectedString);
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestFileEditor())
+            .setFileEditor(new TestStreamEditor())
             .setFormatter(new TestValueFormatter());
 
 
@@ -112,7 +112,7 @@ public class StorageTests {
         String testString = "testString";
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestFileEditor())
+            .setFileEditor(new TestStreamEditor())
             .setFormatter(new TestValueFormatter());
 
         Files.writeString(testFile, testString);
@@ -130,7 +130,7 @@ public class StorageTests {
     public void loadEmpty(Path testFile) throws IOException {
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestFileEditor())
+            .setFileEditor(new TestStreamEditor())
             .setFormatter(new TestValueFormatter());
 
         StorageValue<?> actualStorageValue = storage.load();
@@ -144,7 +144,28 @@ public class StorageTests {
     // void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws UncheckedIOException
     // void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException
     // void store(Storable storageObject, OutputStream outputStream) throws UncheckedIOException, RuntimeException
-    // StorageValue<?> load(InputStream inputStream)
+
+    @Test
+    @UseTestFile
+    public void load(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStreamEditor())
+            .setFormatter(new TestValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        StorageValue<?> actualStorageValue = storage.<String>load(inputStream);
+
+        
+        StorageValue<?> expectedStorageValue = new TestStorageValue(testString);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
     // void store(Storable storageObject)
     // void store(Storable storageObject, String filePath) throws UncheckedIOException, RuntimeException
     // void store(StorageValue<T> storageObject)

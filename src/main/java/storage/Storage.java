@@ -4,8 +4,6 @@ import java.io.*;
 import java.lang.reflect.ParameterizedType;
 import java.nio.file.Path;
 import storage.file_editors.*;
-import storage.file_editors.FileWriter;
-import storage.file_editors.FileReader;
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.StorageValue;
 import storage.value_formatters.*;
@@ -17,8 +15,8 @@ public class Storage {
 
     private Path targetFilepath = Path.of("." + File.separator + "compilerFile.txt");
     private ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
-    private FileWriter<?> fileWriter = new StringFileEditor();
-    private FileReader<?> fileReader = new StringFileEditor();
+    private StreamWriter<?> streamWriter = new DefaultUTF8StreamEditor();
+    private StreamReader<?> streamReader = new DefaultUTF8StreamEditor();
 
     //#region Constructors
 
@@ -56,19 +54,19 @@ public class Storage {
         return this;
     }
 
-    public <W> Storage setFileWriter(FileWriter<W> fileWriter) {
-        this.fileWriter = fileWriter;
+    public <W> Storage setFileWriter(StreamWriter<W> fileWriter) {
+        this.streamWriter = fileWriter;
         return this;
     }
 
-    public <R> Storage setFileReader(FileReader<R> fileReader) {
-        this.fileReader = fileReader;
+    public <R> Storage setFileReader(StreamReader<R> fileReader) {
+        this.streamReader = fileReader;
         return this;
     }
 
-    public <E> Storage setFileEditor(FileEditor<E> fileEditor) {
-        this.fileWriter = fileEditor;
-        this.fileReader = fileEditor;
+    public <E> Storage setFileEditor(StreamEditor<E> fileEditor) {
+        this.streamWriter = fileEditor;
+        this.streamReader = fileEditor;
         return this;
     }
 
@@ -118,16 +116,16 @@ public class Storage {
         convertAndStore(storageObject, formatter, outputStream);
     }
 
+    @SuppressWarnings("unchecked")
     public <F> StorageValue<?> load(InputStream inputStream) throws UncheckedIOException, RuntimeException {
-        Class<F> expectedValueType = TypeReference.<F>instantiate().getContainedClass();
-
-        try (ObjectInputStream reader = new ObjectInputStream(inputStream)) {
-            return formatter.parse(expectedValueType.cast(reader.readObject()));
+        try {
+            F value = (F)streamReader.readFrom(inputStream);
+            return formatter.parse(value);
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
         } 
-        catch (UnsupportedValueException | ClassNotFoundException e) {
+        catch (UnsupportedValueException e) {
             throw new RuntimeException(e);
         }
     }
@@ -153,19 +151,19 @@ public class Storage {
     public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
         Class<T> typeToken = TypeReference.<T>instantiate().getContainedClass();
 
-        FileWriter<T> fileWriter;
+        StreamWriter<T> streamWriter;
         ValueFormatter<T> formatter;
 
         try {
-            fileWriter = (FileWriter<T>)this.fileWriter;
+            streamWriter = (StreamWriter<T>)this.streamWriter;
             formatter = (ValueFormatter<T>)this.formatter;
         } catch (ClassCastException e) {
             throw new RuntimeException("The type " + typeToken.getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
         }
 
-        try {
-            fileWriter.store(
-                targetFilepath, 
+        try (FileOutputStream outputStream = new FileOutputStream(targetFilepath.toFile())) {
+            streamWriter.addTo(
+                outputStream, 
                 formatter.format(storageObject)
             );
         } catch (IOException e) {
@@ -178,8 +176,8 @@ public class Storage {
     }
 
     public StorageValue<?> load() throws UnsupportedValueException, UncheckedIOException {
-        try {
-            Object data = fileReader.readFrom(targetFilepath);
+        try (FileInputStream inputStream = new FileInputStream(targetFilepath.toFile())) {
+            Object data = streamReader.readFrom(inputStream);
             return formatter.parse(data);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
