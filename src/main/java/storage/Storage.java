@@ -15,7 +15,7 @@ public class Storage {
 
     private Path targetFilepath = Path.of("." + File.separator + "compilerFile.txt");
     private ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
-    private StreamWriter<?> streamWriter = new DefaultUTF8StreamEditor();
+    private ChosenStreamWriter streamWriter = new ChosenStreamWriter(new DefaultUTF8StreamEditor());
     private StreamReader<?> streamReader = new DefaultUTF8StreamEditor();
 
     //#region Constructors
@@ -54,20 +54,54 @@ public class Storage {
         return this;
     }
 
+    public <W> Storage setStreamWriter(StreamWriter<W> streamWriter) {
+        this.streamWriter = new ChosenStreamWriter(streamWriter);
+        return this;
+    }
+
+    public <R> Storage setStreamReader(StreamReader<R> streamReader) {
+        this.streamReader = streamReader;
+        return this;
+    }
+
+    public <E> Storage setStreamEditor(StreamEditor<E> streamEditor) {
+        this.streamWriter = new ChosenStreamWriter(streamEditor);
+        this.streamReader = streamEditor;
+        return this;
+    }
+
+    //#endregion
+
+    //#region ConvenienceMethods
+
+    /**
+     * An equvalent method to setStreamWriter(StreamWriter<W> streamWriter)
+     * @param <W>
+     * @param fileWriter
+     * @return
+     */
     public <W> Storage setFileWriter(StreamWriter<W> fileWriter) {
-        this.streamWriter = fileWriter;
-        return this;
+        return setStreamWriter(fileWriter);
     }
 
+    /**
+     * An equvalent method to setStreamReader(StreamReader<R> streamReader)
+     * @param <W>
+     * @param fileWriter
+     * @return
+     */
     public <R> Storage setFileReader(StreamReader<R> fileReader) {
-        this.streamReader = fileReader;
-        return this;
+        return setStreamReader(fileReader);
     }
 
+    /**
+     * An equvalent method to setStreamEditor(StreamEditor<E> streamEditor)
+     * @param <W>
+     * @param fileWriter
+     * @return
+     */
     public <E> Storage setFileEditor(StreamEditor<E> fileEditor) {
-        this.streamWriter = fileEditor;
-        this.streamReader = fileEditor;
-        return this;
+        return setStreamEditor(fileEditor);
     }
 
     //#endregion
@@ -76,18 +110,21 @@ public class Storage {
 
     /**
      * 
+     * @param <F>
      * @param storageObject
      * @param formatter Only set for execution of this function. Use setFormatter to use this for multiple executions.
      * @param outputStream
+     * @throws UnsupportedValueException
      * @throws UncheckedIOException
+     * @throws RuntimeException
      */
-    public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UncheckedIOException {
-        try (ObjectOutputStream writer = new ObjectOutputStream(outputStream)) {
-            writer.writeObject(
+    public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
+        try {
+            streamWriter.addTo(
+                outputStream, 
                 formatter.format(storageObject.getStorageRepresentation())
             );
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
@@ -107,7 +144,7 @@ public class Storage {
         catch (IOException e) {
             throw new UncheckedIOException(e);
         } 
-        catch (UnsupportedValueException | ClassNotFoundException e) {
+        catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -147,20 +184,7 @@ public class Storage {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
-        Class<T> typeToken = TypeReference.<T>instantiate().getContainedClass();
-
-        StreamWriter<T> streamWriter;
-        ValueFormatter<T> formatter;
-
-        try {
-            streamWriter = (StreamWriter<T>)this.streamWriter;
-            formatter = (ValueFormatter<T>)this.formatter;
-        } catch (ClassCastException e) {
-            throw new RuntimeException("The type " + typeToken.getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
-        }
-
         try (FileOutputStream outputStream = new FileOutputStream(targetFilepath.toFile())) {
             streamWriter.addTo(
                 outputStream, 
@@ -209,7 +233,28 @@ public class Storage {
             F data = format.cast(formattedData);
             return innerFormatter.parse(data);
         }
-        
+    }
+
+    private class ChosenStreamWriter {
+        StreamWriter<?> innerStreamWriter;
+
+        public ChosenStreamWriter(StreamWriter<?> streamWriter) {
+            innerStreamWriter = streamWriter;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <F> void addTo(OutputStream stream, F contents) throws IOException, RuntimeException {
+            Class<F> typeReference = TypeReference.<F>instantiate().getContainedClass();
+            StreamWriter<F> streamWriter;
+
+            try {
+                streamWriter = (StreamWriter<F>)innerStreamWriter;
+            } catch (ClassCastException e) {
+                throw new RuntimeException("The type " + typeReference.getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
+            }
+
+            streamWriter.addTo(stream, contents);
+        }
     }
 
     //#endregion

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.io.TempDir;
 import storage.storage_values.*;
+import storage.value_formatters.ValueFormatter;
 import test_aids.test_storage.*;
 
 @ExtendWith(StorageTests.UseTestFileExtension.class)
@@ -92,7 +93,7 @@ public class StorageTests {
     @UseTestFile
     public void store(Path testFile) throws IOException {
         String expectedString = "testString";
-        StorageValue<?> storageValue = new StringStorageValue(expectedString);
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
         Storage storage = new Storage()
             .setTargetPath(testFile)
             .setFileEditor(new TestStreamEditor())
@@ -140,7 +141,29 @@ public class StorageTests {
         assertEquals(expectedStorageValue, actualStorageValue);
     }
 
-    // void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UncheckedIOException
+    @Test
+    @UseTestFile
+    void convertAndStore(Path testFile)  throws IOException {
+        String expectedString = "testString";
+
+        Storable storable = new TestStorable(expectedString);
+        ValueFormatter<String> formatter = new TestValueFormatter();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStreamEditor());
+
+        OutputStream outputStream = new FileOutputStream(testFile.toFile());
+
+
+        try (outputStream) {
+            storage.convertAndStore(storable, formatter, outputStream);
+        }
+        
+        
+        String actualString = Files.readString(testFile);
+        assertEquals(expectedString, actualString);
+    }
+
     // void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws UncheckedIOException
     // void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException
     // void store(Storable storageObject, OutputStream outputStream) throws UncheckedIOException, RuntimeException
