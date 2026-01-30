@@ -164,7 +164,29 @@ public class StorageTests {
         assertEquals(expectedString, actualString);
     }
 
-    // void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws UncheckedIOException
+    @Test
+    @UseTestFile
+    void convertAndLoadInto(Path testFile)  throws IOException {
+        String expectedString = "testString";
+
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestValueFormatter())
+            .setFileEditor(new TestStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            storage.convertAndLoadInto(loadable, inputStream);
+        }
+    
+        assertEquals(expectedString, loadable.getValue());
+    }
+
     // void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException
     // void store(Storable storageObject, OutputStream outputStream) throws UncheckedIOException, RuntimeException
 

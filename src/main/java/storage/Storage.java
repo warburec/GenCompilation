@@ -133,18 +133,19 @@ public class Storage {
         convertAndLoadInto(objectToLoad, formatter, inputStream);
     }
 
+    @SuppressWarnings("unchecked")
     public <F> void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException {
-        Class<F> expectedValueType = TypeReference.<F>instantiate().getContainedClass();
-
-        try (ObjectInputStream reader = new ObjectInputStream(inputStream)) {
+        try (inputStream) {
+            F value = (F)streamReader.readFrom(inputStream);
+            
             objectToLoad.load(
-                formatter.parse(expectedValueType.cast(reader.readObject()))
+                formatter.parse(value)
             );
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
         } 
-        catch (ClassNotFoundException e) {
+        catch (UnsupportedValueException e) {
             throw new RuntimeException(e);
         }
     }
