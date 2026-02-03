@@ -307,7 +307,24 @@ public class StorageTests {
         assertEquals(expectedString, actualString);
     }
 
-    // void loadInto(Loadable targetObject)
+    @Test
+    @UseTestFile
+    void LoadInto(Path testFile)  throws IOException {
+        String expectedString = "testString";
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestValueFormatter())
+            .setFileEditor(new TestStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+        
+
+        storage.loadInto(loadable);
+
+    
+        assertEquals(expectedString, loadable.getValue());
+    }
     
     @UseTestFile
     public void loadFromTargetPath(Path testFile) throws IOException {
@@ -328,4 +345,5 @@ public class StorageTests {
     }
 
     //TODO: Apply for non-string types
+    //TODO: Consider edge cases for all tests
 }
