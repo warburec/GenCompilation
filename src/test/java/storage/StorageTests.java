@@ -254,7 +254,24 @@ public class StorageTests {
         assertEquals(expectedStorageValue, actualStorageValue);
     }
 
-    // void store(Storable storageObject)
+    @Test
+    @UseTestFile
+    public void storeStorable(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStreamEditor())
+            .setFormatter(new TestValueFormatter());
+
+
+        storage.store(storable);
+        String actualString = Files.readString(testFile);
+
+
+        assertEquals(expectedString, actualString);
+    }
+    
     // void store(Storable storageObject, String filePath) throws UncheckedIOException, RuntimeException
     // void store(StorageValue<T> storageObject)
     // void loadInto(Loadable targetObject)
