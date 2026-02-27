@@ -490,7 +490,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    public void storeStorageValue(Path testFile) throws IOException {
+    public void storeStorageValueOfString(Path testFile) throws IOException {
         String expectedString = "testString";
         StorageValue<?> storageValue = new TestStorageValue(expectedString);
         Storage storage = new Storage()
@@ -504,6 +504,24 @@ public class StorageTests {
 
 
         assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorageValueOfInteger(Path testFile) throws IOException {
+        int expectedInteger = 10;
+        StorageValue<?> storageValue = new TestStorageValue(expectedInteger);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestIntegerStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+
+        storage.store(storageValue);
+        int actualInteger = Integer.parseInt(Files.readString(testFile));
+
+
+        assertEquals(expectedInteger, actualInteger);
     }
 
     @Test
