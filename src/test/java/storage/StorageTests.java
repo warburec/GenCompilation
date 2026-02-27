@@ -526,7 +526,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void LoadInto(Path testFile)  throws IOException {
+    void LoadStringInto(Path testFile)  throws IOException {
         String expectedString = "testString";
         TestLoadable loadable = new TestLoadable();
         Storage storage = new Storage()
@@ -541,6 +541,25 @@ public class StorageTests {
 
     
         assertEquals(expectedString, loadable.getValue());
+    }
+
+    @Test
+    @UseTestFile
+    void LoadIntegerInto(Path testFile)  throws IOException {
+        int expectedInteger = 10;
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestIntegerValueFormatter())
+            .setFileEditor(new TestIntegerStreamEditor());
+
+        Files.writeString(testFile, Integer.toString(expectedInteger));
+        
+
+        storage.loadInto(loadable);
+
+    
+        assertEquals(expectedInteger, loadable.getValue());
     }
     
     @UseTestFile
