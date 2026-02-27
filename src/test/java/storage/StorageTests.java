@@ -562,8 +562,9 @@ public class StorageTests {
         assertEquals(expectedInteger, loadable.getValue());
     }
     
+    @Test
     @UseTestFile
-    public void loadFromTargetPath(Path testFile) throws IOException {
+    public void loadStringFromTargetPath(Path testFile) throws IOException {
         String testString = "testString";
         Storage storage = new Storage()
             .setTargetPath(testFile)
@@ -577,6 +578,25 @@ public class StorageTests {
 
         
         StorageValue<?> expectedStorageValue = new TestStorageValue(testString);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    @Test
+    @UseTestFile
+    public void loadIntegerFromTargetPath(Path testFile) throws IOException {
+        int testInteger = 10;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestIntegerStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        Files.writeString(testFile, Integer.toString(testInteger));
+
+
+        StorageValue<?> actualStorageValue = storage.load();
+
+        
+        StorageValue<?> expectedStorageValue = new TestStorageValue(testInteger);
         assertEquals(expectedStorageValue, actualStorageValue);
     }
 
