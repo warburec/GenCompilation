@@ -1,6 +1,7 @@
 package storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.*;
 import java.lang.annotation.*;
@@ -165,7 +166,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    public void loadEmpty(Path testFile) throws IOException {
+    public void loadEmptyString(Path testFile) throws IOException {
         Storage storage = new Storage()
             .setTargetPath(testFile)
             .setFileEditor(new TestStringStreamEditor())
@@ -176,6 +177,17 @@ public class StorageTests {
         
         StorageValue<?> expectedStorageValue = new TestStorageValue("");
         assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    @Test
+    @UseTestFile
+    public void loadEmptyInteger(Path testFile) throws IOException {
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestIntegerStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        assertThrows(NumberFormatException.class, () -> storage.load());
     }
 
     @Test
