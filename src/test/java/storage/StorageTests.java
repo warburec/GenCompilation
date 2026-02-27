@@ -96,8 +96,8 @@ public class StorageTests {
         StorageValue<?> storageValue = new TestStorageValue(expectedString);
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
 
         storage.store(storageValue);
@@ -114,8 +114,8 @@ public class StorageTests {
         StorageValue<?> storageValue = new TestStorageValue(expectedInt);
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
 
         storage.store(storageValue);
@@ -131,8 +131,8 @@ public class StorageTests {
         String testString = "testString";
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
         Files.writeString(testFile, testString);
 
@@ -146,11 +146,30 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void loadInteger(Path testFile) throws IOException {
+        int testInteger = 10;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestIntegerStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        Files.writeString(testFile, Integer.toString(testInteger));
+
+
+        StorageValue<?> actualStorageValue = storage.load();
+
+        
+        StorageValue<?> expectedStorageValue = new TestStorageValue(testInteger);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    @Test
+    @UseTestFile
     public void loadEmpty(Path testFile) throws IOException {
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
         StorageValue<?> actualStorageValue = storage.load();
 
@@ -165,10 +184,10 @@ public class StorageTests {
         String expectedString = "testString";
 
         Storable storable = new TestStorable(expectedString);
-        ValueFormatter<String> formatter = new TestValueFormatter();
+        ValueFormatter<String> formatter = new TestStringValueFormatter();
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor());
+            .setFileEditor(new TestStringStreamEditor());
 
         OutputStream outputStream = new FileOutputStream(testFile.toFile());
 
@@ -190,8 +209,8 @@ public class StorageTests {
         TestLoadable loadable = new TestLoadable();
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFormatter(new TestValueFormatter())
-            .setFileEditor(new TestStreamEditor());
+            .setFormatter(new TestStringValueFormatter())
+            .setFileEditor(new TestStringStreamEditor());
 
         Files.writeString(testFile, expectedString);
 
@@ -211,11 +230,11 @@ public class StorageTests {
         String expectedString = "testString";
 
         TestLoadable loadable = new TestLoadable();
-        ValueFormatter<?> formatter = new TestValueFormatter();
+        ValueFormatter<?> formatter = new TestStringValueFormatter();
         
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor());
+            .setFileEditor(new TestStringStreamEditor());
 
         Files.writeString(testFile, expectedString);
 
@@ -236,8 +255,8 @@ public class StorageTests {
         Storable storable = new TestStorable(expectedString);
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
         OutputStream outputStream = new FileOutputStream(testFile.toFile());
 
@@ -257,8 +276,8 @@ public class StorageTests {
         String testString = "testString";
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
         Files.writeString(testFile, testString);
 
@@ -279,8 +298,8 @@ public class StorageTests {
         Storable storable = new TestStorable(expectedString);
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
 
         storage.store(storable);
@@ -296,8 +315,8 @@ public class StorageTests {
         String expectedString = "testString";
         Storable storable = new TestStorable(expectedString);
         Storage storage = new Storage()
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
 
         storage.store(storable, testFile.toString());
@@ -314,8 +333,8 @@ public class StorageTests {
         StorageValue<?> storageValue = new TestStorageValue(expectedString);
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
 
         storage.store(storageValue);
@@ -332,8 +351,8 @@ public class StorageTests {
         TestLoadable loadable = new TestLoadable();
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFormatter(new TestValueFormatter())
-            .setFileEditor(new TestStreamEditor());
+            .setFormatter(new TestStringValueFormatter())
+            .setFileEditor(new TestStringStreamEditor());
 
         Files.writeString(testFile, expectedString);
         
@@ -349,8 +368,8 @@ public class StorageTests {
         String testString = "testString";
         Storage storage = new Storage()
             .setTargetPath(testFile)
-            .setFileEditor(new TestStreamEditor())
-            .setFormatter(new TestValueFormatter());
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
 
         Files.writeString(testFile, testString);
 
@@ -364,4 +383,6 @@ public class StorageTests {
 
     //TODO: Apply for non-string types
     //TODO: Consider edge cases for all tests
+        //Include mismatched component types. e.g. Read file as integer and attempt formatting of string input.
+        //Ensure descriptive exceptions for this case.
 }
