@@ -238,7 +238,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertAndLoadInto(Path testFile)  throws IOException {
+    void convertAndLoadStringInto(Path testFile)  throws IOException {
         String expectedString = "testString";
 
         TestLoadable loadable = new TestLoadable();
@@ -256,7 +256,32 @@ public class StorageTests {
             storage.convertAndLoadInto(loadable, inputStream);
         }
     
+        
         assertEquals(expectedString, loadable.getValue());
+    }
+
+    @Test
+    @UseTestFile
+    void convertAndLoadIntegerInto(Path testFile)  throws IOException {
+        int expectedInteger= 10;
+
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestIntegerValueFormatter())
+            .setFileEditor(new TestIntegerStreamEditor());
+
+        Files.writeString(testFile, Integer.toString(expectedInteger));
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            storage.convertAndLoadInto(loadable, inputStream);
+        }
+    
+
+        assertEquals(expectedInteger, loadable.getValue());
     }
 
     @Test
