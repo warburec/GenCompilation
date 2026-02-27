@@ -91,7 +91,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    public void store(Path testFile) throws IOException {
+    public void storeString(Path testFile) throws IOException {
         String expectedString = "testString";
         StorageValue<?> storageValue = new TestStorageValue(expectedString);
         Storage storage = new Storage()
@@ -105,6 +105,24 @@ public class StorageTests {
 
 
         assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    @UseTestFile
+    public void storeInteger(Path testFile) throws IOException {
+        int expectedInt = 10;
+        StorageValue<?> storageValue = new TestStorageValue(expectedInt);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStreamEditor())
+            .setFormatter(new TestValueFormatter());
+
+
+        storage.store(storageValue);
+        int actualString = Integer.parseInt(Files.readString(testFile));
+
+
+        assertEquals(expectedInt, actualString);
     }
 
     @Test
