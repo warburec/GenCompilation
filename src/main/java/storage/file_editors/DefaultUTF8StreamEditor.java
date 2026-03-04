@@ -3,7 +3,7 @@ package storage.file_editors;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class DefaultUTF8StreamEditor extends StreamEditor<String> {
+public class DefaultUTF8StreamEditor implements StreamEditor<String> {
 
     @Override
     public String readFrom(InputStream stream) throws IOException {

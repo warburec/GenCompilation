@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import storage.file_editors.StreamEditor;
 
-public class TestIntegerStreamEditor extends StreamEditor<Integer> {
+public class TestIntegerStreamEditor implements StreamEditor<Integer> {
     
     @Override
     public Integer readFrom(InputStream stream) throws IOException {

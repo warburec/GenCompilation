@@ -1,3 +1,3 @@
 package storage.file_editors;
 
-public abstract class StreamEditor <T> implements StreamReader<T>, StreamWriter<T> {}
+public interface StreamEditor <T> extends StreamReader<T>, StreamWriter<T> {}

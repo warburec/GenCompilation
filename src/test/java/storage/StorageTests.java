@@ -1,7 +1,6 @@
 package storage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.lang.annotation.*;
@@ -600,8 +599,8 @@ public class StorageTests {
         assertEquals(expectedStorageValue, actualStorageValue);
     }
 
-    //TODO: Apply for non-string types
     //TODO: Consider edge cases for all tests
+        //Include formatter and FileEditor which implement multiple interfaces/input-types
         //Include mismatched component types. e.g. Read file as integer and attempt formatting of string input.
         //Ensure descriptive exceptions for this case.
 }
