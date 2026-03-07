@@ -3,6 +3,8 @@ package storage;
 import java.io.*;
 import java.lang.reflect.ParameterizedType;
 import java.nio.file.Path;
+
+import storage.exceptions.*;
 import storage.file_editors.*;
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.StorageValue;
@@ -15,8 +17,8 @@ public class Storage {
 
     private Path targetFilepath = Path.of("." + File.separator + "compilerFile.txt");
     private ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
-    private ChosenStreamWriter streamWriter = new ChosenStreamWriter(new DefaultUTF8StreamEditor());
-    private StreamReader<?> streamReader = new DefaultUTF8StreamEditor();
+    private ChosenStreamWriter<?> streamWriter = new ChosenStreamWriter<>(new DefaultUTF8StreamEditor());
+    private ChosenStreamReader<?> streamReader = new ChosenStreamReader<>(new DefaultUTF8StreamEditor());
 
     //#region Constructors
 
@@ -55,18 +57,18 @@ public class Storage {
     }
 
     public <W> Storage setStreamWriter(StreamWriter<W> streamWriter) {
-        this.streamWriter = new ChosenStreamWriter(streamWriter);
+        this.streamWriter = new ChosenStreamWriter<>(streamWriter);
         return this;
     }
 
     public <R> Storage setStreamReader(StreamReader<R> streamReader) {
-        this.streamReader = streamReader;
+        this.streamReader = new ChosenStreamReader<>(streamReader);
         return this;
     }
 
     public <E> Storage setStreamEditor(StreamEditor<E> streamEditor) {
-        this.streamWriter = new ChosenStreamWriter(streamEditor);
-        this.streamReader = streamEditor;
+        this.streamWriter = new ChosenStreamWriter<>(streamEditor);
+        this.streamReader = new ChosenStreamReader<>(streamEditor);
         return this;
     }
 
@@ -185,11 +187,22 @@ public class Storage {
         }
     }
 
-    public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
+    public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException, StorageFormatMismatchException {
+        checkForFormatMismatch(formatter, streamWriter);
+        
+        Object formattedObject;
+
+        try {
+            formattedObject = formatter.format(storageObject);
+        }
+        catch (Exception e) {
+            throw new FormatterException(e);
+        }
+
         try (FileOutputStream outputStream = new FileOutputStream(targetFilepath.toFile())) {
             streamWriter.addTo(
                 outputStream, 
-                formatter.format(storageObject)
+                formattedObject
             );
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -213,15 +226,12 @@ public class Storage {
 
     //#region ComponentWrappers
     
-    private class ChosenFormatter <F> implements ValueFormatter<Object> {
+    private class ChosenFormatter <F> extends FormatHolder<F> implements ValueFormatter<Object> {
         ValueFormatter<F> innerFormatter;
-        Class<F> format;
 
-        @SuppressWarnings("unchecked")
         public ChosenFormatter(ValueFormatter<F> formatter) {
+            super(formatter);
             innerFormatter = formatter;
-            ParameterizedType formatterType = (ParameterizedType)(formatter.getClass().getGenericInterfaces()[0]);
-            format = (Class<F>)formatterType.getActualTypeArguments()[0];
         }
 
         @Override
@@ -236,26 +246,53 @@ public class Storage {
         }
     }
 
-    private class ChosenStreamWriter {
-        StreamWriter<?> innerStreamWriter;
+    private class ChosenStreamWriter <F> extends FormatHolder<F> {
+        StreamWriter<F> innerStreamWriter;
 
-        public ChosenStreamWriter(StreamWriter<?> streamWriter) {
+        public ChosenStreamWriter(StreamWriter<F> streamWriter) {
+            super(streamWriter);
             innerStreamWriter = streamWriter;
         }
 
-        @SuppressWarnings("unchecked")
-        public <F> void addTo(OutputStream stream, F contents) throws IOException, RuntimeException {
-            Class<F> typeReference = TypeReference.<F>instantiate().getContainedClass();
-            StreamWriter<F> streamWriter;
-
-            try {
-                streamWriter = (StreamWriter<F>)innerStreamWriter;
-            } catch (ClassCastException e) {
-                throw new RuntimeException("The type " + typeReference.getName() + " could not be used by the file writer or formatter. Please check you are using the correct storage component and expecting the correct storage value type.");
-            }
-
-            streamWriter.addTo(stream, contents);
+        public void addTo(OutputStream stream, Object contents) throws IOException, RuntimeException {
+            innerStreamWriter.addTo(stream, format.cast(contents));
         }
+    }
+
+    private class ChosenStreamReader <F> extends FormatHolder<F> {
+        StreamReader<F> innerStreamReader;
+
+        public ChosenStreamReader(StreamReader<F> streamReader) {
+            super(streamReader);
+            innerStreamReader = streamReader;
+        }
+
+        public F readFrom(InputStream stream) throws IOException {
+            return innerStreamReader.readFrom(stream);
+        }
+    }
+
+    //#endregion
+
+    //#region Helpers
+
+    private abstract class FormatHolder <F> {
+        public Class<F> format;
+
+        @SuppressWarnings("unchecked")
+        public FormatHolder(Object genericTarget) {
+            ParameterizedType targetType = (ParameterizedType)(genericTarget.getClass().getGenericInterfaces()[0]);
+            format = (Class<F>)targetType.getActualTypeArguments()[0];
+        }
+    }
+
+    private <T1, T2> void checkForFormatMismatch(FormatHolder<T1> holder1, FormatHolder<T2> holder2) throws StorageFormatMismatchException {
+        if (holder1.format.equals(holder2.format)) return;
+        
+        throw new StorageFormatMismatchException(
+            holder1.format.getSimpleName(), 
+            holder2.format.getSimpleName()
+        );
     }
 
     //#endregion

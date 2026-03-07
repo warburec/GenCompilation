@@ -8,8 +8,10 @@ import java.nio.file.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.io.TempDir;
+
+import storage.exceptions.*;
 import storage.storage_values.*;
-import storage.value_formatters.ValueFormatter;
+import storage.value_formatters.*;
 import test_aids.test_storage.*;
 
 @ExtendWith(StorageTests.UseTestFileExtension.class)
@@ -123,6 +125,20 @@ public class StorageTests {
 
 
         assertEquals(expectedInt, actualString);
+    }
+
+    @Test
+    @UseTestFile
+    public void storeString_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+
+        assertThrows(StorageFormatMismatchException.class, () -> storage.store(storageValue));
     }
 
     @Test
@@ -600,7 +616,6 @@ public class StorageTests {
     }
 
     //TODO: Consider edge cases for all tests
-        //Include formatter and FileEditor which implement multiple interfaces/input-types
         //Include mismatched component types. e.g. Read file as integer and attempt formatting of string input.
         //Ensure descriptive exceptions for this case.
 }
