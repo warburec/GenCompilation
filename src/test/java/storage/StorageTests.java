@@ -12,6 +12,7 @@ import org.junit.jupiter.api.io.TempDir;
 import storage.exceptions.*;
 import storage.storage_values.*;
 import storage.value_formatters.*;
+import test_aids.exceptions.ExampleException;
 import test_aids.test_storage.*;
 
 @ExtendWith(StorageTests.UseTestFileExtension.class)
@@ -139,6 +140,42 @@ public class StorageTests {
 
 
         assertThrows(StorageFormatMismatchException.class, () -> storage.store(storageValue));
+    }
+
+    @Test
+    @UseTestFile
+    public void storeString_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+        
+        StoreFailureException exception = assertThrows(
+            StoreFailureException.class,
+            () -> storage.store(storageValue)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void storeString_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+
+        FormatterException exception = assertThrows(
+            FormatterException.class,
+            () -> storage.store(storageValue)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
     }
 
     @Test

@@ -187,7 +187,7 @@ public class Storage {
         }
     }
 
-    public <T> void store(StorageValue<T> storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException, StorageFormatMismatchException {
+    public <T> void store(StorageValue<T> storageObject) throws FormatterException, StoreFailureException, StorageFormatMismatchException {
         checkForFormatMismatch(formatter, streamWriter);
         
         Object formattedObject;
@@ -204,8 +204,8 @@ public class Storage {
                 outputStream, 
                 formattedObject
             );
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        } catch (Exception e) {
+            throw new StoreFailureException(e);
         }
     }
 
