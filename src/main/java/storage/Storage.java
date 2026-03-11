@@ -187,7 +187,7 @@ public class Storage {
         }
     }
 
-    public <T> void store(StorageValue<T> storageObject) throws FormatterException, StoreFailureException, StorageFormatMismatchException {
+    public <T> void store(StorageValue<T> storageObject) throws FormattingException, StoreFailureException, StorageFormatMismatchException {
         checkForFormatMismatch(formatter, streamWriter);
         
         Object formattedObject;
@@ -196,7 +196,7 @@ public class Storage {
             formattedObject = formatter.format(storageObject);
         }
         catch (Exception e) {
-            throw new FormatterException(e);
+            throw new FormattingException(e);
         }
 
         try (FileOutputStream outputStream = new FileOutputStream(targetFilepath.toFile())) {
@@ -213,12 +213,22 @@ public class Storage {
        targetObject.load(load());
     }
 
-    public StorageValue<?> load() throws UnsupportedValueException, UncheckedIOException {
+    public StorageValue<?> load() throws FormattingException, StoreFailureException, StorageFormatMismatchException {
+        checkForFormatMismatch(formatter, streamWriter);
+
+        Object data;
+
         try (FileInputStream inputStream = new FileInputStream(targetFilepath.toFile())) {
-            Object data = streamReader.readFrom(inputStream);
+            data = streamReader.readFrom(inputStream);
+        } catch (Exception e) {
+            throw new LoadFailureException(e);
+        }
+
+        try {
             return formatter.parse(data);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        }
+        catch (Exception e) {
+            throw new FormatParseException(e);
         }
     }
 

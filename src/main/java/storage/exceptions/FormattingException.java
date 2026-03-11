@@ -1,8 +1,8 @@
 package storage.exceptions;
 
-public class FormatterException extends RuntimeException {
+public class FormattingException extends RuntimeException {
     
-    public FormatterException(Exception cause) {
+    public FormattingException(Exception cause) {
         super("An error occurred when attempting to format data for storage.", cause);
     }
     
