@@ -121,13 +121,21 @@ public class Storage {
      * @throws RuntimeException
      */
     public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
+        checkForFormatMismatch(new ChosenFormatter<F>(formatter), streamWriter);
+        
+        F format;
+        
         try {
-            streamWriter.addTo(
-                outputStream, 
-                formatter.format(storageObject.getStorageRepresentation())
-            );
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            format = formatter.format(storageObject.getStorageRepresentation());
+        }
+        catch (Exception e) {
+            throw new FormattingException(e);
+        }
+
+        try {
+            streamWriter.addTo(outputStream, format);
+        } catch (Exception e) {
+            throw new StoreFailureException(e);
         }
     }
 

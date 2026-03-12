@@ -348,6 +348,68 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void convertAndStoreString_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+
+        Storable storable = new TestStorable(expectedString);
+        ValueFormatter<Integer> formatter = new TestIntegerValueFormatter();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor());
+
+        OutputStream outputStream = new FileOutputStream(testFile.toFile());
+
+        try (outputStream) {
+            assertThrows(StorageFormatMismatchException.class, () -> storage.convertAndStore(storable, formatter, outputStream));
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void convertAndStoreString_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+
+        Storable storable = new TestStorable(expectedString);
+        ValueFormatter<String> formatter = new TestStringValueFormatter();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor());
+
+        OutputStream outputStream = new FileOutputStream(testFile.toFile());
+
+        try (outputStream) {
+            StoreFailureException exception = assertThrows(
+                StoreFailureException.class,
+                () -> storage.convertAndStore(storable, formatter, outputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void convertAndStoreString_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+
+        Storable storable = new TestStorable(expectedString);
+        ValueFormatter<String> formatter = new TestStringErrorValueFormatter();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor());
+
+        OutputStream outputStream = new FileOutputStream(testFile.toFile());
+
+        try (outputStream) {
+            FormattingException exception = assertThrows(
+                FormattingException.class,
+                () -> storage.convertAndStore(storable, formatter, outputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
     void convertAndLoadStringInto(Path testFile)  throws IOException {
         String expectedString = "testString";
 
