@@ -120,13 +120,90 @@ public class Storage {
      * @throws UncheckedIOException
      * @throws RuntimeException
      */
-    public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
-        checkForFormatMismatch(new ChosenFormatter<F>(formatter), streamWriter);
-        
-        F format;
-        
+    public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
+        convertAndStore_Inner(storageObject.getStorageRepresentation(), new ChosenFormatter<F>(formatter), streamWriter, outputStream);
+    }
+
+    public void store(Storable storageObject, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
+        convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream);
+    }
+
+    public void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+        objectToLoad.load(load_Inner(inputStream, formatter, streamReader));
+    }
+
+    public <F> void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+        objectToLoad.load(load_Inner(inputStream, new ChosenFormatter<F>(formatter), streamReader));
+    }
+
+    public <F> StorageValue<?> load(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+        return load_Inner(inputStream, formatter, streamReader);
+    }
+
+    //#endregion
+
+    //#region FileStorage
+    
+    public void store(Storable storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException {
+        usingTargetFileOutputStream(
+            (outputStream) -> convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream)
+        );
+    }
+
+    public void store(Storable storageObject, String filePath) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException {
+        usingFileOutputStream(
+            new File(filePath),
+            (outputStream) -> convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream)
+        );
+    }
+
+    public <T> void store(StorageValue<T> storageObject) throws StoreFailureException, FormattingException, StorageFormatMismatchException, UncheckedIOException {
+        usingTargetFileOutputStream(
+            (outputStream) -> convertAndStore_Inner(storageObject, formatter, streamWriter, outputStream)
+        );
+    }
+
+    public StorageValue<?> load() throws LoadFailureException, FormatParseException, StorageFormatMismatchException, UncheckedIOException {
+        return usingTargetFileInputStream(
+            (inputStream) -> load(inputStream)
+        );
+    }
+
+    public void loadInto(Loadable targetObject) throws LoadFailureException, FormatParseException, StorageFormatMismatchException, UncheckedIOException {
+        targetObject.load(load());
+    }
+
+    //#endregion
+
+    //#region StorageOperations
+
+    private StorageValue<?> load_Inner(InputStream inputStream, ChosenFormatter<?> formatter, ChosenStreamReader<?> streamReader) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+        checkForFormatMismatch(formatter, streamReader);
+
+        Object format;
+
         try {
-            format = formatter.format(storageObject.getStorageRepresentation());
+            format = streamReader.readFrom(inputStream);
+        }
+        catch (Exception e) {
+            throw new LoadFailureException(e);
+        }
+
+        try {
+            return formatter.parse(format);
+        }
+        catch (Exception e) {
+            throw new FormatParseException(e);
+        }
+    }
+
+    private void convertAndStore_Inner(StorageValue<?> storageObject, ChosenFormatter<?> formatter, ChosenStreamWriter<?> streamWriter, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
+        checkForFormatMismatch(formatter, streamWriter);
+        
+        Object format;
+
+        try {
+            format = formatter.format(storageObject);
         }
         catch (Exception e) {
             throw new FormattingException(e);
@@ -139,110 +216,19 @@ public class Storage {
         }
     }
 
-    public void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws UncheckedIOException {
-        convertAndLoadInto(objectToLoad, formatter, inputStream);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <F> void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws UncheckedIOException, RuntimeException {
-        try (inputStream) {
-            F value = (F)streamReader.readFrom(inputStream);
-            
-            objectToLoad.load(
-                formatter.parse(value)
-            );
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } 
-        catch (UnsupportedValueException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void store(Storable storageObject, OutputStream outputStream) throws UncheckedIOException, RuntimeException {
-        convertAndStore(storageObject, formatter, outputStream);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <F> StorageValue<?> load(InputStream inputStream) throws UncheckedIOException, RuntimeException {
-        try {
-            F value = (F)streamReader.readFrom(inputStream);
-            return formatter.parse(value);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } 
-        catch (UnsupportedValueException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     //#endregion
-
-    //#region FileStorage
     
-    public void store(Storable storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
-        store(storageObject.getStorageRepresentation());
-    }
-
-    public void store(Storable storageObject, String filePath) throws UncheckedIOException, RuntimeException {
-        try (FileOutputStream fileStream = new FileOutputStream(filePath)) {
-            convertAndStore(storageObject, formatter, fileStream);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    public <T> void store(StorageValue<T> storageObject) throws FormattingException, StoreFailureException, StorageFormatMismatchException {
-        checkForFormatMismatch(formatter, streamWriter);
-        
-        Object formattedObject;
-
-        try {
-            formattedObject = formatter.format(storageObject);
-        }
-        catch (Exception e) {
-            throw new FormattingException(e);
-        }
-
-        try (FileOutputStream outputStream = new FileOutputStream(targetFilepath.toFile())) {
-            streamWriter.addTo(
-                outputStream, 
-                formattedObject
-            );
-        } catch (Exception e) {
-            throw new StoreFailureException(e);
-        }
-    }
-
-    public void loadInto(Loadable targetObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException {
-       targetObject.load(load());
-    }
-
-    public StorageValue<?> load() throws FormattingException, StoreFailureException, StorageFormatMismatchException {
-        checkForFormatMismatch(formatter, streamWriter);
-
-        Object data;
-
-        try (FileInputStream inputStream = new FileInputStream(targetFilepath.toFile())) {
-            data = streamReader.readFrom(inputStream);
-        } catch (Exception e) {
-            throw new LoadFailureException(e);
-        }
-
-        try {
-            return formatter.parse(data);
-        }
-        catch (Exception e) {
-            throw new FormatParseException(e);
-        }
-    }
-
-    //#endregion
-
     //#region ComponentWrappers
+
+    private abstract class FormatHolder <F> {
+        public Class<F> format;
+
+        @SuppressWarnings("unchecked")
+        public FormatHolder(Object genericTarget) {
+            ParameterizedType targetType = (ParameterizedType)(genericTarget.getClass().getGenericInterfaces()[0]);
+            format = (Class<F>)targetType.getActualTypeArguments()[0];
+        }
+    }
     
     private class ChosenFormatter <F> extends FormatHolder<F> implements ValueFormatter<Object> {
         ValueFormatter<F> innerFormatter;
@@ -294,17 +280,7 @@ public class Storage {
 
     //#region Helpers
 
-    private abstract class FormatHolder <F> {
-        public Class<F> format;
-
-        @SuppressWarnings("unchecked")
-        public FormatHolder(Object genericTarget) {
-            ParameterizedType targetType = (ParameterizedType)(genericTarget.getClass().getGenericInterfaces()[0]);
-            format = (Class<F>)targetType.getActualTypeArguments()[0];
-        }
-    }
-
-    private <T1, T2> void checkForFormatMismatch(FormatHolder<T1> holder1, FormatHolder<T2> holder2) throws StorageFormatMismatchException {
+    private void checkForFormatMismatch(FormatHolder<?> holder1, FormatHolder<?> holder2) throws StorageFormatMismatchException {
         if (holder1.format.equals(holder2.format)) return;
         
         throw new StorageFormatMismatchException(
@@ -313,5 +289,39 @@ public class Storage {
         );
     }
 
+    private interface OutputStreamReceiver {
+        void run(OutputStream outputStream);
+    }
+
+    private interface InputStreamReceiver <T> {
+        T run(InputStream inputStream);
+    }
+
+    private void usingFileOutputStream(File file, OutputStreamReceiver function) throws UncheckedIOException {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            function.run(outputStream);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private void usingTargetFileOutputStream(OutputStreamReceiver function) throws UncheckedIOException {
+        usingFileOutputStream(targetFilepath.toFile(), function);
+    }
+
+    private <T> T usingFileInputStream(File file, InputStreamReceiver<T> function) throws UncheckedIOException {
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return function.run(inputStream);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private <T> T usingTargetFileInputStream(InputStreamReceiver<T> function) throws UncheckedIOException {
+        return usingFileInputStream(targetFilepath.toFile(), function);
+    }
+    
     //#endregion
 }
