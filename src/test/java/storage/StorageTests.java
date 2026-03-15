@@ -984,6 +984,53 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void storeStorableOfStringAtFilepath_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+
+        assertThrows(StorageFormatMismatchException.class, () -> storage.store(storable, testFile.toString()));
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorableOfStringAtFilepath_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        StoreFailureException exception = assertThrows(
+            StoreFailureException.class,
+            () -> storage.store(storable, testFile.toString())
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorableOfStringAtFilepath_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+
+        FormattingException exception = assertThrows(
+            FormattingException.class,
+            () -> storage.store(storable, testFile.toString())
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
     public void storeStorageValueOfString(Path testFile) throws IOException {
         String expectedString = "testString";
         StorageValue<?> storageValue = new TestStorageValue(expectedString);
