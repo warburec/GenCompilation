@@ -1152,6 +1152,62 @@ public class StorageTests {
     
         assertEquals(expectedInteger, loadable.getValue());
     }
+
+    @Test
+    @UseTestFile
+    public void LoadStringInto_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestStringValueFormatter())
+            .setFileEditor(new TestIntegerStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+
+        assertThrows(StorageFormatMismatchException.class, () -> storage.loadInto(loadable));
+    }
+
+    @Test
+    @UseTestFile
+    public void LoadStringInto_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestStringValueFormatter())
+            .setFileEditor(new TestStringErrorStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+
+        LoadFailureException exception = assertThrows(
+            LoadFailureException.class,
+            () -> storage.loadInto(loadable)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void LoadStringInto_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        TestLoadable loadable = new TestLoadable();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFormatter(new TestStringErrorValueFormatter())
+            .setFileEditor(new TestStringStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+
+        FormatParseException exception = assertThrows(
+            FormatParseException.class,
+            () -> storage.loadInto(loadable)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
     
     @Test
     @UseTestFile
