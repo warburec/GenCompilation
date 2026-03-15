@@ -900,6 +900,56 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void storeStorableOfString_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+
+        assertThrows(StorageFormatMismatchException.class, () -> storage.store(storable));
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorableOfString_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        StoreFailureException exception = assertThrows(
+            StoreFailureException.class,
+            () -> storage.store(storable)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorableOfString_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        Storable storable = new TestStorable(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+
+        FormattingException exception = assertThrows(
+            FormattingException.class,
+            () -> storage.store(storable)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
     public void storeStorableOfStringAtFilepath(Path testFile) throws IOException {
         String expectedString = "testString";
         Storable storable = new TestStorable(expectedString);
