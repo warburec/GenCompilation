@@ -140,7 +140,6 @@ public class Storage {
         return load_Inner(inputStream, formatter, streamReader);
     }
 
-    //TODO: Test
     @SuppressWarnings("unchecked")
     public <F> StorageValue<F> loadWithType(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         try {

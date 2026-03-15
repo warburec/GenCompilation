@@ -864,6 +864,113 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void loadWithTypeString(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        StorageValue<String> actualStorageValue = storage.<String>loadWithType(inputStream);
+
+        
+        StorageValue<Object> expectedStorageValue = new TestStorageValue(testString);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    @Test
+    @UseTestFile
+    public void loadWithTypeInteger(Path testFile) throws IOException {
+        int testInteger = 10;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestIntegerStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        Files.writeString(testFile, Integer.toString(testInteger));
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        StorageValue<Integer> actualStorageValue = storage.<Integer>loadWithType(inputStream);
+
+        
+        StorageValue<Object> expectedStorageValue = new TestStorageValue(testInteger);
+        assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    @Test
+    @UseTestFile
+    public void loadWithTypeString_IncorrectFormatter(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            assertThrows(StorageFormatMismatchException.class, () -> storage.<String>loadWithType(inputStream));
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void loadWithTypeString_FileWriteError(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            LoadFailureException exception = assertThrows(
+                LoadFailureException.class,
+                () -> storage.<String>loadWithType(inputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void loadWithTypeString_FormatterError(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            FormatParseException exception = assertThrows(
+                FormatParseException.class,
+                () -> storage.<String>loadWithType(inputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
     public void storeStorableOfString(Path testFile) throws IOException {
         String expectedString = "testString";
         Storable storable = new TestStorable(expectedString);
@@ -1299,8 +1406,4 @@ public class StorageTests {
         );
         assertInstanceOf(ExampleException.class, exception.getCause());
     }
-
-    //TODO: Consider edge cases for all tests
-        //Include mismatched component types. e.g. Read file as integer and attempt formatting of string input.
-        //Ensure descriptive exceptions for this case.
 }
