@@ -1247,6 +1247,59 @@ public class StorageTests {
         assertEquals(expectedStorageValue, actualStorageValue);
     }
 
+    @Test
+    @UseTestFile
+    public void loadStringFromTargetPath_IncorrectFormatter(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+
+        assertThrows(StorageFormatMismatchException.class, () -> storage.load());
+    }
+
+    @Test
+    @UseTestFile
+    public void loadStringFromTargetPath_FileWriteError(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+
+        LoadFailureException exception = assertThrows(
+            LoadFailureException.class,
+            () -> storage.load()
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void loadStringFromTargetPath_FormatterError(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+
+        FormatParseException exception = assertThrows(
+            FormatParseException.class,
+            () -> storage.load()
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
     //TODO: Consider edge cases for all tests
         //Include mismatched component types. e.g. Read file as integer and attempt formatting of string input.
         //Ensure descriptive exceptions for this case.
