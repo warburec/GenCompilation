@@ -769,7 +769,7 @@ public class StorageTests {
         InputStream inputStream = new FileInputStream(testFile.toFile());
 
 
-        StorageValue<?> actualStorageValue = storage.<String>load(inputStream);
+        StorageValue<?> actualStorageValue = storage.load(inputStream);
 
         
         StorageValue<?> expectedStorageValue = new TestStorageValue(testString);
@@ -790,11 +790,76 @@ public class StorageTests {
         InputStream inputStream = new FileInputStream(testFile.toFile());
 
 
-        StorageValue<?> actualStorageValue = storage.<String>load(inputStream);
+        StorageValue<?> actualStorageValue = storage.load(inputStream);
 
         
         StorageValue<?> expectedStorageValue = new TestStorageValue(testInteger);
         assertEquals(expectedStorageValue, actualStorageValue);
+    }
+
+    @Test
+    @UseTestFile
+    public void loadStringFromInputStream_IncorrectFormatter(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            assertThrows(StorageFormatMismatchException.class, () -> storage.load(inputStream));
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void loadStringFromInputStream_FileWriteError(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            LoadFailureException exception = assertThrows(
+                LoadFailureException.class,
+                () -> storage.load(inputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void loadStringFromInputStream_FormatterError(Path testFile) throws IOException {
+        String testString = "testString";
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+        Files.writeString(testFile, testString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            FormatParseException exception = assertThrows(
+                FormatParseException.class,
+                () -> storage.load(inputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
     }
 
     @Test

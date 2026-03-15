@@ -136,8 +136,27 @@ public class Storage {
         objectToLoad.load(load_Inner(inputStream, new ChosenFormatter<F>(formatter), streamReader));
     }
 
-    public <F> StorageValue<?> load(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+    public StorageValue<?> load(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         return load_Inner(inputStream, formatter, streamReader);
+    }
+
+    //TODO: Test
+    @SuppressWarnings("unchecked")
+    public <F> StorageValue<F> loadWithType(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+        try {
+            return (StorageValue<F>)load(inputStream);
+        }
+        catch (ClassCastException e) {  
+            Class<F> chosenType = TypeReference.<F>instantiate().getContainedClass();
+
+            throw new ClassCastException(
+                "The format " 
+                + chosenType.getSimpleName() 
+                + " is inconsistant with the type " 
+                + formatter.format.getSimpleName()
+                + " produced by the chosen formatter."
+            );
+        }
     }
 
     //#endregion
