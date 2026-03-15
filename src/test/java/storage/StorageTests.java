@@ -577,6 +577,80 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void convertThenFormatAndLoadStringInto_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+
+        TestLoadable loadable = new TestLoadable();
+        ValueFormatter<?> formatter = new TestIntegerValueFormatter();
+        
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            assertThrows(StorageFormatMismatchException.class, () -> storage.convertAndLoadInto(loadable, formatter, inputStream));
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void convertThenFormatAndLoadStringInto_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+
+        TestLoadable loadable = new TestLoadable();
+        ValueFormatter<?> formatter = new TestStringValueFormatter();
+        
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            LoadFailureException exception = assertThrows(
+                LoadFailureException.class,
+                () -> storage.convertAndLoadInto(loadable, formatter, inputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
+    public void convertThenFormatAndLoadStringInto_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+
+        TestLoadable loadable = new TestLoadable();
+        ValueFormatter<?> formatter = new TestStringErrorValueFormatter();
+        
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor());
+
+        Files.writeString(testFile, expectedString);
+
+        InputStream inputStream = new FileInputStream(testFile.toFile());
+
+
+        try (inputStream) {
+            FormatParseException exception = assertThrows(
+                FormatParseException.class,
+                () -> storage.convertAndLoadInto(loadable, formatter, inputStream)
+            );
+            assertInstanceOf(ExampleException.class, exception.getCause());
+        }
+    }
+
+    @Test
+    @UseTestFile
     public void storeStringToStream(Path testFile) throws IOException {
         String expectedString = "testString";
         Storable storable = new TestStorable(expectedString);
