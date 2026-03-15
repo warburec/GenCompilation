@@ -1067,6 +1067,56 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void storeStorageValueOfString_IncorrectFormatter(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestIntegerValueFormatter());
+
+
+        assertThrows(StorageFormatMismatchException.class, () -> storage.store(storageValue));
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorageValueOfString_FileWriteError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringErrorStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        StoreFailureException exception = assertThrows(
+            StoreFailureException.class,
+            () -> storage.store(storageValue)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorageValueOfString_FormatterError(Path testFile) throws IOException {
+        String expectedString = "testString";
+        StorageValue<?> storageValue = new TestStorageValue(expectedString);
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringErrorValueFormatter());
+
+
+        FormattingException exception = assertThrows(
+            FormattingException.class,
+            () -> storage.store(storageValue)
+        );
+        assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
     void LoadStringInto(Path testFile)  throws IOException {
         String expectedString = "testString";
         TestLoadable loadable = new TestLoadable();
