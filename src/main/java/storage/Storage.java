@@ -28,6 +28,10 @@ public class Storage {
 
     //#region Getters
 
+    /**
+     * Gets the currently tagetted filepath being used for storage
+     * @return The targeted filepath
+     */
     public Path getTargetFilepath() {
         return targetFilepath;
     }
@@ -36,21 +40,42 @@ public class Storage {
 
     //#region Configuration
 
+    /**
+     * Sets the target filepath the be use for storage
+     * @param filepath The filepath to target
+     * @return This Storage object for method chaining
+     */
     public Storage setTargetPath(Path filepath) {
         targetFilepath = filepath;
         return this;
     }
 
+    /**
+     * Sets the target filepath the be use for storage
+     * @param filepath The absolute filepath to be targeted
+     * @return This Storage object for method chaining
+     */
     public Storage setAbsoluteTargetPath(String filepath) {
         targetFilepath = Path.of(filepath);
         return this;
     }
 
+    /**
+     * Sets the target filepath the be use for storage
+     * @param filepath The relative filepath to be targeted
+     * @return This Storage object for method chaining
+     */
     public Storage setRelativeTargetPath(String filepath) {
         targetFilepath = Path.of("." + File.separator + filepath);
         return this;
     }
 
+    /**
+     * Sets the formatter to be used for converting StorageValues into storage representations
+     * @param <F> The target format to convert values to/from
+     * @param formatter The formatter to be used
+     * @return This Storage object for method chaining
+     */
     public <F> Storage setFormatter(ValueFormatter<F> formatter) {
         this.formatter = new ChosenFormatter<F>(formatter);
         return this;
