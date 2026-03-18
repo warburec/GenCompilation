@@ -81,16 +81,34 @@ public class Storage {
         return this;
     }
 
+    /**
+     * Sets the stream writer to be used for storing storage values
+     * @param <W> The data format expected to be writen
+     * @param streamWriter The stream writer to be selected
+     * @return This Storage object for method chaining
+     */
     public <W> Storage setStreamWriter(StreamWriter<W> streamWriter) {
         this.streamWriter = new ChosenStreamWriter<>(streamWriter);
         return this;
     }
 
+    /**
+     * Sets the stream reader to be used for reading values from storage
+     * @param <R> The data format expected to be output when read
+     * @param streamReader The stream reader to be selected
+     * @return This Storage object for method chaining
+     */
     public <R> Storage setStreamReader(StreamReader<R> streamReader) {
         this.streamReader = new ChosenStreamReader<>(streamReader);
         return this;
     }
 
+    /**
+     * Sets the stream reader to be used for reading and storing values in storage
+     * @param <E> The data format expected to be read or stored
+     * @param streamEditor The stream editor to be selected
+     * @return This Storage object for method chaining
+     */
     public <E> Storage setStreamEditor(StreamEditor<E> streamEditor) {
         this.streamWriter = new ChosenStreamWriter<>(streamEditor);
         this.streamReader = new ChosenStreamReader<>(streamEditor);
@@ -102,30 +120,33 @@ public class Storage {
     //#region ConvenienceMethods
 
     /**
+     * Sets the file reader to be used for reading and storing values in storage.
      * An equvalent method to setStreamWriter(StreamWriter<W> streamWriter)
-     * @param <W>
-     * @param fileWriter
-     * @return
+     * @param <W> The data format expected to be writen
+     * @param fileWriter The file writer to be selected
+     * @return This Storage object for method chaining
      */
     public <W> Storage setFileWriter(StreamWriter<W> fileWriter) {
         return setStreamWriter(fileWriter);
     }
 
     /**
+     * Sets the file reader to be used for reading values from storage.
      * An equvalent method to setStreamReader(StreamReader<R> streamReader)
-     * @param <W>
-     * @param fileWriter
-     * @return
+     * @param <R> The data format expected to be writen
+     * @param fileReader The file reader to be selected
+     * @return This Storage object for method chaining
      */
     public <R> Storage setFileReader(StreamReader<R> fileReader) {
         return setStreamReader(fileReader);
     }
 
     /**
+     * Sets the stream reader to be used for reading and storing values in storage.
      * An equvalent method to setStreamEditor(StreamEditor<E> streamEditor)
-     * @param <W>
-     * @param fileWriter
-     * @return
+     * @param <E> The data format expected to be read or stored
+     * @param fileEditor The stream editor to be selected
+     * @return This Storage object for method chaining
      */
     public <E> Storage setFileEditor(StreamEditor<E> fileEditor) {
         return setStreamEditor(fileEditor);
