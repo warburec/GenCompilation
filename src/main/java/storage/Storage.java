@@ -157,35 +157,78 @@ public class Storage {
     //#region StreamStorage
 
     /**
-     * 
-     * @param <F>
-     * @param storageObject
-     * @param formatter Only set for execution of this function. Use setFormatter to use this for multiple executions.
-     * @param outputStream
-     * @throws UnsupportedValueException
-     * @throws UncheckedIOException
-     * @throws RuntimeException
+     * Stores the given object to the given output stream, converting the object using the specified formatter to produce a storable data format
+     * @param <F> The data format to be used for storage
+     * @param storageObject The object to be stored
+     * @param formatter The formatter to be used to convert values for storage. Only set for execution of this function. Use setFormatter to use this for multiple executions.
+     * @param outputStream The stream to be used
+     * @throws StoreFailureException
+     * @throws FormattingException
+     * @throws StorageFormatMismatchException
      */
     public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
         convertAndStore_Inner(storageObject.getStorageRepresentation(), new ChosenFormatter<F>(formatter), streamWriter, outputStream);
     }
 
+    /**
+     * Stores the given object in the given output stream
+     * @param storageObject The object to be stored
+     * @param outputStream The stream to be used
+     * @throws StoreFailureException
+     * @throws FormattingException
+     * @throws StorageFormatMismatchException
+     */
     public void store(Storable storageObject, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
         convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream);
     }
 
+    /**
+     * Reads a value from the given input stream, converts the value using the chosen formatter and loads it into the given object
+     * @param objectToLoad The object to load the value into
+     * @param inputStream The input stream to be read
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     */
     public void convertAndLoadInto(Loadable objectToLoad, InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         objectToLoad.load(load_Inner(inputStream, formatter, streamReader));
     }
 
+    /**
+     * Reads a value from the given input stream, converts the value using the provided formatter and loads it into the given object
+     * @param <F> The expected value format to be read and provided to the formatter
+     * @param objectToLoad The object to load the value into 
+     * @param formatter The formatter to be used to convert data from the stream
+     * @param inputStream The input stream to be read
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     */
     public <F> void convertAndLoadInto(Loadable objectToLoad, ValueFormatter<F> formatter, InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         objectToLoad.load(load_Inner(inputStream, new ChosenFormatter<F>(formatter), streamReader));
     }
 
+    /**
+     * Loads a value from the given input stream
+     * @param inputStream The input stream to read from
+     * @return The value read from the stream, once formatted by the chosen formatter
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     */
     public StorageValue<?> load(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         return load_Inner(inputStream, formatter, streamReader);
     }
 
+    /**
+     * Loads a value from the given input stream and specifies the expected type
+     * @param <F> The expected inner type of the returned storage value
+     * @param inputStream The input stream to be read
+     * @return The value read from the stream, once formatted by the chosen formatter
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     */
     @SuppressWarnings("unchecked")
     public <F> StorageValue<F> loadWithType(InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         try {
