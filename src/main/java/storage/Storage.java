@@ -251,12 +251,29 @@ public class Storage {
 
     //#region FileStorage
     
+    /**
+     * Stores the given object in the targetted file
+     * @param storageObject The object to be stored
+     * @throws UnsupportedValueException
+     * @throws UncheckedIOException
+     * @throws RuntimeException
+     * @throws UncheckedIOException
+     */
     public void store(Storable storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException {
         usingTargetFileOutputStream(
             (outputStream) -> convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream)
         );
     }
 
+    /**
+     * Stores the given object in the given file
+     * @param storageObject The object to be stored
+     * @param filePath The target file to use for storage
+     * @throws UnsupportedValueException
+     * @throws UncheckedIOException
+     * @throws RuntimeException
+     * @throws UncheckedIOException
+     */
     public void store(Storable storageObject, String filePath) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException {
         usingFileOutputStream(
             new File(filePath),
@@ -264,18 +281,43 @@ public class Storage {
         );
     }
 
+    /**
+     * Stores the given object in the targetted file
+     * @param <T> The type of storage value to be stored
+     * @param storageObject The object to be stored
+     * @throws StoreFailureException
+     * @throws FormattingException
+     * @throws StorageFormatMismatchException
+     * @throws UncheckedIOException
+     */
     public <T> void store(StorageValue<T> storageObject) throws StoreFailureException, FormattingException, StorageFormatMismatchException, UncheckedIOException {
         usingTargetFileOutputStream(
             (outputStream) -> convertAndStore_Inner(storageObject, formatter, streamWriter, outputStream)
         );
     }
 
+    /**
+     * Loads a value from the chosen file
+     * @return The loaded value
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     * @throws UncheckedIOException
+     */
     public StorageValue<?> load() throws LoadFailureException, FormatParseException, StorageFormatMismatchException, UncheckedIOException {
         return usingTargetFileInputStream(
             (inputStream) -> load(inputStream)
         );
     }
 
+    /**
+     * Loads a value from the chosen file into the given object
+     * @param targetObject The object to load stored values into
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     * @throws UncheckedIOException
+     */
     public void loadInto(Loadable targetObject) throws LoadFailureException, FormatParseException, StorageFormatMismatchException, UncheckedIOException {
         targetObject.load(load());
     }
