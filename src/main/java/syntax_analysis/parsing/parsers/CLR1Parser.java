@@ -1,4 +1,4 @@
-package syntax_analysis;
+package syntax_analysis.parsing.parsers;
 
 import java.util.*;
 

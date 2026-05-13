@@ -1,50 +1,56 @@
-package syntax_analysis;
+package syntax_analysis.parsing.parsers;
 
 import java.util.*;
 
 import grammar_objects.*;
-import helper_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 
-public class SLR1Parser extends LR0Parser {
+public class LR0Parser extends Parser {
 
-    protected HashMap<NonTerminal, Set<Token>> firstSets;  //A map containing the first sets for all non-terminals
-    protected HashMap<NonTerminal, Set<Token>> followSets;   //A map containing the follow sets for all non-terminals
+    protected Map<NonTerminal, Set<ProductionRule>> productionMap;
+    protected Set<State> states;
+    protected State rootState;
+    protected Map<State, Map<Token, Action>> actionTable;
+    protected Map<State, Map<NonTerminal, State>> gotoTable;
+    protected ProductionRule acceptRule;
+
+    public static final Token EOF = new EOF();
 
     private int currentParseToken = -1;
 
-    public SLR1Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
+    public LR0Parser(Set<Token> tokens, Set<NonTerminal> nonTerminals, Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
+        setUp();
     }
 
-    public SLR1Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
+    public LR0Parser(Token[] tokens, NonTerminal[] nonTerminals, ProductionRule[] productionRules, NonTerminal sentinel) {
         super(tokens, nonTerminals, productionRules, sentinel);
+        setUp();
     }
 
-    public SLR1Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
+    public LR0Parser(Set<ProductionRule> productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
+        setUp();
     }
 
-    public SLR1Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
+    public LR0Parser(ProductionRule[] productionRules, NonTerminal sentinel) {
         super(productionRules, sentinel);
+        setUp();
     }
 
-    @Override
-    protected void initialise() {
-        generateFirstSets();
-        generateFollowSets();
+    private void setUp() {
+        checkForInvalidNonTerminals();
+        generateProductionMap();
+
+        initialise();
+
+        generateStates();
+        generateActionAndGotoTables();
     }
 
-    private void generateFirstSets() {
-        firstSets = FirstSetGenerator.generate(productionRules, nonTerminals);
-    }
+    protected void initialise() {}
 
-    private void generateFollowSets() {
-        followSets = FollowSetGenerator.generate(productionRules, nonTerminals, sentinel, firstSets);
-    }
-
-    @Override
     protected void checkForInvalidNonTerminals() {
         for (NonTerminal nonTerminal : nonTerminals) {
             if(nonTerminal.getName().equals(null)) {
@@ -53,7 +59,6 @@ public class SLR1Parser extends LR0Parser {
         }
     }
 
-    @Override
     protected void generateProductionMap() {
         productionMap = new HashMap<>();
 
@@ -74,7 +79,7 @@ public class SLR1Parser extends LR0Parser {
         }
     }
 
-    @Override
+
     protected void generateStates() {
         states = new HashSet<>();
 
@@ -87,7 +92,7 @@ public class SLR1Parser extends LR0Parser {
         rootState = createState(null, List.of(new GrammarPosition[] {startPosition}), null);
     }
 
-    protected State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
+    private State createState(State parentState, List<GrammarPosition> startPositions, LexicalElement elemantTraversed) {
         List<GrammarPosition> currentPositions = startPositions;
 
         if(elemantTraversed != null) {
@@ -142,11 +147,8 @@ public class SLR1Parser extends LR0Parser {
         return nextPositions;
     }
 
-    protected List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
-        State foundLink = null;
-
-        GrammarPosition position = currentPositions.get(0);
-        State stateFound = getStateContainingPosition(position);
+    private List<GrammarPosition> createParentGraphBranches(State parentState, LexicalElement elementTraversed, List<GrammarPosition> currentPositions) {
+        State stateFound = getStateContainingPositions(currentPositions);
 
         if(stateFound != null) {
             Route newRoute = new Route(stateFound, elementTraversed);
@@ -155,31 +157,17 @@ public class SLR1Parser extends LR0Parser {
             currentPositions.remove(currentPositions.size() - 1);
         }
 
-        if(currentPositions.size() == 0) { return currentPositions; }
-
-        foundLink = stateFound;
-
-        for(int i = 0; i < currentPositions.size(); i++) {
-            position = currentPositions.get(i);
-
-            stateFound = getStateContainingPosition(position);
-
-            if(stateFound != foundLink) {
-                throw new NonDeterminismException(elementTraversed, currentPositions, parentState);
-            }
-        }
-
         return currentPositions;
     }
 
     /**
-     * Finds the state containing the given position
+     * Finds the state containing all of the given positions
      * @param position The position to be found
      * @return The state containing the position, or null if no state is found
      */
-    private State getStateContainingPosition(GrammarPosition position) {
+    private State getStateContainingPositions(List<GrammarPosition> positions) {
         for (State state : states) {
-            if(state.getPositions().contains(position)) {
+            if(state.getPositions().containsAll(positions)) {
                 return state;
             }
         }
@@ -225,7 +213,7 @@ public class SLR1Parser extends LR0Parser {
         return states;
     }
 
-    @Override
+
     protected void generateActionAndGotoTables() {
         actionTable = new HashMap<>();
         gotoTable = new HashMap<>();
@@ -244,9 +232,6 @@ public class SLR1Parser extends LR0Parser {
             for(GrammarPosition position : state.getPositions()) {
                 if(!position.isClosed()) { continue; }
 
-                NonTerminal nonTerminal = position.getRule().nonTerminal();
-                Set<Token> followingTokens = followSets.get(nonTerminal);
-                
                 if(position.equals(new GrammarPosition(acceptRule, 1))) { //Full accept Position
                     actionTable.get(state).put(EOF, new Accept());
                     continue;
@@ -254,21 +239,19 @@ public class SLR1Parser extends LR0Parser {
 
                 Reduction reductionAction = new Reduction(position.getRule());
 
-                Map<Token, Action> stateActions = actionTable.get(state);
+                if(!actionTable.get(state).isEmpty()) {
+                    List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
 
-                for(Token token : followingTokens) {
-                    if(stateActions.get(token) == null) {
-                        stateActions.put(token, reductionAction);
-                    }
-                    else {
-                        List<ProductionRule> conflicts = new ArrayList<ProductionRule>();
+                    Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
+                    conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
+                    conflicts.add(reductionAction.reductionRule());
 
-                        Token storedReductionToken = actionTable.get(state).keySet().iterator().next();
-                        conflicts.add(((Reduction)actionTable.get(state).get(storedReductionToken)).reductionRule());
-                        conflicts.add(reductionAction.reductionRule());
+                    throw new NonDeterminismException(conflicts, state);
+                }
 
-                        throw new NonDeterminismException(conflicts, state);
-                    }
+                //Add reduction for all tokens (inc. EOF)
+                for (Token token : allTokens) {
+                    actionTable.get(state).put(token, reductionAction);
                 }
             }
 

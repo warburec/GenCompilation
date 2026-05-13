@@ -1,4 +1,4 @@
-package storage;
+package storage.external_interfaces;
 
 import storage.storage_values.StorageValue;
 

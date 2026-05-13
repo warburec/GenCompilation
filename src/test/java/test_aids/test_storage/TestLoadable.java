@@ -1,6 +1,6 @@
 package test_aids.test_storage;
 
-import storage.Loadable;
+import storage.external_interfaces.Loadable;
 import storage.storage_values.StorageValue;
 
 public class TestLoadable implements Loadable {

@@ -6,9 +6,14 @@ import grammar_objects.*;
 import lexical_analysis.*;
 import syntax_analysis.SyntaxAnalyser;
 import code_generation.CodeGenerator;
-import component_construction.Compiler;
 import component_construction.ParameterError;
 import component_construction.bundles.GrammarBundle;
+import component_construction.custom_components.CustomCodeGenerator;
+import component_construction.custom_components.CustomCompiler;
+import component_construction.custom_components.CustomCompilerFactory;
+import component_construction.custom_components.CustomLexicalAnalyser;
+import component_construction.custom_components.CustomSyntaxAnalyser;
+import component_construction.custom_components.StorableCustomCompiler;
 import component_construction.factories.code_generation.CodeGeneratorFactory;
 import component_construction.factories.lexical_analysis.LexicalAnalyserFactory;
 import component_construction.factories.syntax_analysis.SyntaxAnalyserFactory;
@@ -137,7 +142,23 @@ public class CompilerBuilder {
     }
 
 
-    public Compiler createCompiler() {
+    public CustomCompiler createCompiler() {
+        checkForCompleteBuild();
+
+        return new CustomCompilerFactory().produce(
+            lexicalAnalyserFactory, 
+            syntaxAnalyserFactory, 
+            codeGeneratorFactory, 
+            grammar, 
+            whitespaceDelimiters, 
+            stronglyReservedWords, 
+            weaklyReservedWords, 
+            dynamicTokenRegex,
+            ruleConvertor
+        );
+    }
+
+    public StorableCustomCompiler createStorableCompiler() {
         checkForCompleteBuild();
 
         if(whitespaceDelimiters == null) whitespaceDelimiters = new String[]{};
@@ -156,10 +177,14 @@ public class CompilerBuilder {
         SyntaxAnalyser syntaxAnalyser = syntaxAnalyserFactory.produceAnalyser(parts);
         CodeGenerator codeGenerator = codeGeneratorFactory.produceGenerator(ruleConvertor);
 
-        return new Compiler(
-            lexicalAnalyser,
-            syntaxAnalyser,
-            codeGenerator
+        if(!(lexicalAnalyser instanceof CustomLexicalAnalyser)) throw new RuntimeException("TODO"); //TODO
+        if(!(syntaxAnalyser instanceof CustomSyntaxAnalyser)) throw new RuntimeException("TODO"); //TODO
+        if(!(codeGenerator instanceof CustomCodeGenerator)) throw new RuntimeException("TODO"); //TODO
+
+        return new StorableCustomCompiler(
+            (CustomLexicalAnalyser)lexicalAnalyser,
+            (CustomSyntaxAnalyser)syntaxAnalyser,
+            (CustomCodeGenerator)codeGenerator
         );
     }
 

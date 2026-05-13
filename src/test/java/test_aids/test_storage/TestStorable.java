@@ -1,6 +1,6 @@
 package test_aids.test_storage;
 
-import storage.Storable;
+import storage.external_interfaces.Storable;
 
 public class TestStorable implements Storable {
     private Object value;

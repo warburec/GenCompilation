@@ -2,6 +2,7 @@ package component_construction.factories.syntax_analysis;
 
 import grammar_objects.GrammarParts;
 import syntax_analysis.*;
+import syntax_analysis.parsing.parsers.CLR1Parser;
 
 public class CLR1ParserFactory implements SyntaxAnalyserFactory {
 
