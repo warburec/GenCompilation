@@ -20,6 +20,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
     public String format(StorageValue<?> value) throws UnsupportedValueException {
         if (value instanceof StringStorageValue) return formatValue((StringStorageValue)value);
         if (value instanceof IntegerStorageValue) return formatValue((IntegerStorageValue)value);
+        if (value instanceof ListStorageValue) return formatValue((ListStorageValue)value);
         if (value instanceof MapStorageValue) return formatValue((MapStorageValue)value);
 
         //TODO: Add more value types and ensure types are differentiable from their stored formats
@@ -36,6 +37,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
     public StorageValue<?> parse(String formattedData) throws UnsupportedValueException {
         if (formattedData.startsWith("\"")) return parseStringFormat(formattedData);
         if (formattedData.matches("[0-9]+.*")) return parseIntegerFormat(formattedData);
+        if (formattedData.startsWith("[")) return parseListFormat(formattedData);
         if (formattedData.startsWith("{")) return parseMapFormat(formattedData);
 
         //TODO: Add more value types
@@ -65,7 +67,44 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
     private IntegerStorageValue parseIntegerFormat(String formattedData) {
         return new IntegerStorageValue(Integer.parseInt(formattedData));
     }
-    
+
+    private String formatValue(ListStorageValue value) {
+        String out = "";
+        List<StorageValue<?>> entries = value.getValue();
+
+        if (entries.isEmpty()) return "[]";
+
+        for (StorageValue<?> entry : entries) {
+            out += format(entry) + ",\n";
+        }
+
+        out = out.substring(0, out.length() - 2); //Remove trailing ",\n"
+
+        return "[\n" + indent(out) + "\n]";
+    }
+
+    private ListStorageValue parseListFormat(String formattedData) {
+        if (!formattedData.endsWith("]")) throw new RuntimeException("The list " + formattedData + " must end with ]");
+        if (formattedData.matches("\\[" + ANY_WHITESPACE + "\\]")) return new ListStorageValue(List.of());
+
+        formattedData = formattedData.substring(1, formattedData.length() - 1);
+        formattedData = formattedData.strip();
+
+        List<StorageValue<?>> list = new LinkedList<>();
+
+        Matcher entryMatcher  = Pattern.compile(
+                "(?<value>\\{.*\\}|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
+                Pattern.DOTALL | Pattern.MULTILINE
+            )
+            .matcher(formattedData);
+
+        while (entryMatcher.find()) {
+            list.add(parse(entryMatcher.group("value")));
+        }
+
+        return new ListStorageValue(list);
+    }
+
     private String formatValue(MapStorageValue value) {
         String out = "";
         Set<Entry<String, StorageValue<?>>> mapEntries = value.getValue().entrySet();
