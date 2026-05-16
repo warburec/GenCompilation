@@ -5,10 +5,8 @@ import component_construction.factories.code_generation.CodeGeneratorFactory;
 import component_construction.factories.lexical_analysis.LexicalAnalyserFactory;
 import component_construction.factories.syntax_analysis.SyntaxAnalyserFactory;
 import grammar_objects.Grammar;
-import grammar_objects.GrammarParts;
 import grammar_objects.RuleConvertor;
-import lexical_analysis.DynamicTokenRegex;
-import lexical_analysis.LexicalAnalyser;
+import lexical_analysis.*;
 import syntax_analysis.SyntaxAnalyser;
 
 public class CustomCompilerFactory {
