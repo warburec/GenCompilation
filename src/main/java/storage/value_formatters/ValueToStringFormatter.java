@@ -18,10 +18,10 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
 
     @Override
     public String format(StorageValue<?> value) throws UnsupportedValueException {
-        if (value instanceof StringStorageValue) return formatValue((StringStorageValue)value);
-        if (value instanceof IntegerStorageValue) return formatValue((IntegerStorageValue)value);
         if (value instanceof ListStorageValue) return formatValue((ListStorageValue)value);
         if (value instanceof MapStorageValue) return formatValue((MapStorageValue)value);
+        if (value instanceof StringStorageValue) return formatValue((StringStorageValue)value);
+        if (value instanceof IntegerStorageValue) return formatValue((IntegerStorageValue)value);
 
         //TODO: Add more value types and ensure types are differentiable from their stored formats
         throw new UnsupportedValueException(value);
@@ -35,11 +35,11 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
      */
     @Override
     public StorageValue<?> parse(String formattedData) throws UnsupportedValueException {
-        if (formattedData.startsWith("\"")) return parseStringFormat(formattedData);
-        if (formattedData.matches("[0-9]+.*")) return parseIntegerFormat(formattedData);
         if (formattedData.startsWith("[")) return parseListFormat(formattedData);
         if (formattedData.startsWith("{")) return parseMapFormat(formattedData);
-
+        if (formattedData.startsWith("\"")) return parseStringFormat(formattedData);
+        if (formattedData.matches("[0-9]+.*")) return parseIntegerFormat(formattedData);
+        
         //TODO: Add more value types
         throw new UnsupportedValueException();
     }
