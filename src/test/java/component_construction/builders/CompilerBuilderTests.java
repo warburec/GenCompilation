@@ -1,6 +1,6 @@
 package component_construction.builders;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import component_construction.ParameterError;
@@ -15,7 +15,7 @@ public class CompilerBuilderTests {
     
     @Test
     public void basicCompilerBuilder() {
-        CompilerBuilder builder = new CompilerBuilder();
+        CustomCompilerBuilder builder = new CustomCompilerBuilder();
         builder.setComponents(
             new GeneralLexicalAnalyserFactory(),
             new CLR1ParserFactory(), 
@@ -37,11 +37,11 @@ public class CompilerBuilderTests {
 
     @Test
     public void nullComponentInputs() {
-        CompilerBuilder builder1 = new CompilerBuilder();
-        CompilerBuilder builder2 = new CompilerBuilder();
-        CompilerBuilder builder3 = new CompilerBuilder();
-        CompilerBuilder builder4 = new CompilerBuilder();
-        CompilerBuilder builder5 = new CompilerBuilder();
+        CustomCompilerBuilder builder1 = new CustomCompilerBuilder();
+        CustomCompilerBuilder builder2 = new CustomCompilerBuilder();
+        CustomCompilerBuilder builder3 = new CustomCompilerBuilder();
+        CustomCompilerBuilder builder4 = new CustomCompilerBuilder();
+        CustomCompilerBuilder builder5 = new CustomCompilerBuilder();
 
         builder1.setComponents(
             null,
@@ -124,7 +124,7 @@ public class CompilerBuilderTests {
 
     @Test
     public void nullLexicalInputs() {
-        CompilerBuilder builder = new CompilerBuilder();
+        CustomCompilerBuilder builder = new CustomCompilerBuilder();
         builder.setComponents(
             new GeneralLexicalAnalyserFactory(),
             new CLR1ParserFactory(), 

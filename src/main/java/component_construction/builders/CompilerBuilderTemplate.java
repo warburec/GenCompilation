@@ -4,8 +4,6 @@ import java.util.*;
 
 import grammar_objects.*;
 import lexical_analysis.*;
-import syntax_analysis.SyntaxAnalyser;
-import code_generation.CodeGenerator;
 import component_construction.ParameterError;
 import component_construction.bundles.GrammarBundle;
 import component_construction.custom_components.*;
@@ -13,7 +11,12 @@ import component_construction.factories.code_generation.CodeGeneratorFactory;
 import component_construction.factories.lexical_analysis.LexicalAnalyserFactory;
 import component_construction.factories.syntax_analysis.SyntaxAnalyserFactory;
 
-public class CompilerBuilder {
+/**
+ * An template for builders of CustomCompilers
+ * @param <B> The type of the current implementing subclass of this template
+ * @param <C> The type of CustomCompiler that will be built by the implemented builder
+ */
+public abstract class CompilerBuilderTemplate <B extends CompilerBuilderTemplate<B, C>, C extends CustomCompiler> {
     protected LexicalAnalyserFactory lexicalAnalyserFactory;
     protected SyntaxAnalyserFactory syntaxAnalyserFactory;
     protected CodeGeneratorFactory codeGeneratorFactory;
@@ -33,7 +36,7 @@ public class CompilerBuilder {
      * @param codeGeneratorFactory
      * @param grammarBundle
      */
-    public CompilerBuilder setComponents(
+    public B setComponents(
         LexicalAnalyserFactory lexicalAnalyserFactory,
         SyntaxAnalyserFactory syntaxAnalyserFactory,
         CodeGeneratorFactory codeGeneratorFactory,
@@ -64,7 +67,7 @@ public class CompilerBuilder {
      * @param weaklyReservedWords May be null
      * @param dynamicTokenRegex May be null
      */
-    public CompilerBuilder setComponents(
+    public B setComponents(
         LexicalAnalyserFactory lexicalAnalyserFactory,
         SyntaxAnalyserFactory syntaxAnalyserFactory,
         CodeGeneratorFactory codeGeneratorFactory,
@@ -85,105 +88,68 @@ public class CompilerBuilder {
         setWeaklyReservedWords(weaklyReservedWords);
         setDynamicTokenRegex(dynamicTokenRegex);
 
-        return this;
+        return getThis();
     }
     
 
-    public CompilerBuilder setLexicalAnalyser(LexicalAnalyserFactory factory) {
+    public B setLexicalAnalyser(LexicalAnalyserFactory factory) {
         this.lexicalAnalyserFactory = factory;
-        return this;
+        return getThis();
     }
 
-    public CompilerBuilder setSyntaxAnalyser(SyntaxAnalyserFactory factory) {
+    public B setSyntaxAnalyser(SyntaxAnalyserFactory factory) {
         this.syntaxAnalyserFactory = factory;
-        return this;
+        return getThis();
     }
 
-    public CompilerBuilder setCodeGenerator(CodeGeneratorFactory factory) {
+    public B setCodeGenerator(CodeGeneratorFactory factory) {
         this.codeGeneratorFactory = factory;
-        return this;
+        return getThis();
     }
 
 
-    public CompilerBuilder setGrammar(Grammar grammar) {
+    public B setGrammar(Grammar grammar) {
         this.grammar = grammar;
-        return this;
+        return getThis();
     }
 
-    public CompilerBuilder setRuleConvertor(RuleConvertor ruleConvertor) {
+    public B setRuleConvertor(RuleConvertor ruleConvertor) {
         this.ruleConvertor = ruleConvertor;
-        return this;
+        return getThis();
     }
 
     
-    public CompilerBuilder setWhitespaceDelimiters(String[] whitespaceDelimiters) {
+    public B setWhitespaceDelimiters(String[] whitespaceDelimiters) {
         this.whitespaceDelimiters = whitespaceDelimiters;
-        return this;
+        return getThis();
     }
 
-    public CompilerBuilder setStronglyReservedWords(String[] stronglyReservedWords) {
+    public B setStronglyReservedWords(String[] stronglyReservedWords) {
         this.stronglyReservedWords = stronglyReservedWords;
-        return this;
+        return getThis();
     }
 
-    public CompilerBuilder setWeaklyReservedWords(String[] weaklyReservedWords) {
+    public B setWeaklyReservedWords(String[] weaklyReservedWords) {
         this.weaklyReservedWords = weaklyReservedWords;
-        return this;
+        return getThis();
     }
 
-    public CompilerBuilder setDynamicTokenRegex(DynamicTokenRegex[] dynamicTokenRegex) {
+    public B setDynamicTokenRegex(DynamicTokenRegex[] dynamicTokenRegex) {
         this.dynamicTokenRegex = dynamicTokenRegex;
-        return this;
+        return getThis();
     }
 
+    
+    public abstract C createCompiler();
 
-    public CustomCompiler createCompiler() {
-        checkForCompleteBuild();
 
-        return new CustomCompilerFactory().produce(
-            lexicalAnalyserFactory, 
-            syntaxAnalyserFactory, 
-            codeGeneratorFactory, 
-            grammar, 
-            whitespaceDelimiters, 
-            stronglyReservedWords, 
-            weaklyReservedWords, 
-            dynamicTokenRegex,
-            ruleConvertor
-        );
-    }
+    /**
+     * A simple helper method to be filled with "return this;" by subclasses of this builder
+     * @return The current builder object "this"
+     */
+    protected abstract B getThis();
 
-    public StorableCustomCompiler createStorableCompiler() {
-        checkForCompleteBuild();
-
-        if(whitespaceDelimiters == null) whitespaceDelimiters = new String[]{};
-        if(stronglyReservedWords == null) stronglyReservedWords = new String[]{};
-        if(weaklyReservedWords == null) weaklyReservedWords = new String[]{};
-        if(dynamicTokenRegex == null) dynamicTokenRegex = new DynamicTokenRegex[]{};
-
-        GrammarParts parts = grammar.getParts();
-
-        LexicalAnalyser lexicalAnalyser = lexicalAnalyserFactory.produceAnalyser(
-            whitespaceDelimiters,
-            stronglyReservedWords,
-            weaklyReservedWords,
-            dynamicTokenRegex
-        );
-        SyntaxAnalyser syntaxAnalyser = syntaxAnalyserFactory.produceAnalyser(parts);
-        CodeGenerator codeGenerator = codeGeneratorFactory.produceGenerator(ruleConvertor);
-
-        if(!(lexicalAnalyser instanceof CustomLexicalAnalyser)) throw new RuntimeException("TODO"); //TODO
-        if(!(syntaxAnalyser instanceof CustomSyntaxAnalyser)) throw new RuntimeException("TODO"); //TODO
-        if(!(codeGenerator instanceof CustomCodeGenerator)) throw new RuntimeException("TODO"); //TODO
-
-        return new StorableCustomCompiler(
-            (CustomLexicalAnalyser)lexicalAnalyser,
-            (CustomSyntaxAnalyser)syntaxAnalyser,
-            (CustomCodeGenerator)codeGenerator
-        );
-    }
-
-    private void checkForCompleteBuild() {
+    protected void checkForCompleteBuild() {
         List<String> msgParts = new ArrayList<>();
 
         if(lexicalAnalyserFactory == null) msgParts.add("lexical analyser factory");
@@ -191,9 +157,9 @@ public class CompilerBuilder {
         if(codeGeneratorFactory == null) msgParts.add("code generator factory");
         if(grammar == null) msgParts.add("grammar");
         if(ruleConvertor == null) msgParts.add("rule convertor");
-        //Note: Allowing null lexical components
+        // Note: Allowing null lexical components
         
-        if(msgParts.size() == 0) return; //No error
+        if(msgParts.size() == 0) return; // No error
         if(msgParts.size() == 1) throw new ParameterError(msgParts.get(0) + " not provided");
 
         String msg = msgParts.get(0);
