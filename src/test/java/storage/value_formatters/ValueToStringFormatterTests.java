@@ -1,18 +1,18 @@
 package storage.value_formatters;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.jupiter.api.Test;
 
-import helper_objects.NotEmptyTuple;
-import helper_objects.Tuple;
+import helper_objects.*;
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.*;
 
 public class ValueToStringFormatterTests {
 
     //NOTE: No exceptions for incorrectly formatted data were made. This will be left to more sophisticated ValueFormatters
+
+    //#region parsing
 
     @Test
     public void parseFormattedString() {
@@ -105,7 +105,81 @@ public class ValueToStringFormatterTests {
         assertEquals(expectedValue, actualValue1);
     }
 
-    //TODO: Fomatting of StorageValues
+    @Test
+    public void parseFormattedEmptyList() {
+        String formattedString1 = "[]";
+        String formattedString2 = "[\n]";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+        StorageValue<?> actualValue2 = valueFormatter.parse(formattedString2);
+
+        ListStorageValue expectedValue = new ListStorageValue(List.of());
+        assertEquals(expectedValue, actualValue1);
+        assertEquals(expectedValue, actualValue2);
+    }
+
+    @Test
+    public void parseFormattedSimpleList() {
+        String testString1 = "testString1";
+        String testString2 = "testString2";
+        Integer testInt = 30;
+        String formattedString1 = "[\n" + 
+        "    \"" + testString1 + "\",\n" +
+        "    \"" + testString2 + "\",\n" +
+        "    " + testInt + "\n" +
+        "]";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+
+        ListStorageValue expectedValue = new ListStorageValue(List.of(
+            new StringStorageValue(testString1), 
+            new StringStorageValue(testString2),
+            new IntegerStorageValue(testInt)
+        ));
+        assertEquals(expectedValue, actualValue1);
+    }
+
+    @Test
+    public void parseFormattedNestedList() {
+        String testString1 = "testString1";
+        String testString2 = "testString2";
+        Integer testInt = 30;
+        String formattedString1 = "[\n" + 
+        "    [\n" +
+        "    \"" + testString1 + "\",\n" +
+        "    \"" + testString2 + "\"\n" +
+        "    ],\n" +
+        "    " + testInt + "\n" +
+        "]";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+
+        ListStorageValue expectedValue = new ListStorageValue(List.of(
+            new ListStorageValue(List.of(
+                new StringStorageValue(testString1), 
+                new StringStorageValue(testString2)
+            )),
+            new IntegerStorageValue(testInt)
+        ));
+        assertEquals(expectedValue, actualValue1);
+    }
+
+    @Test
+    public void parseFormattedNestedMapAndList() {
+        // TODO
+    }
+
+    @Test
+    public void parseFormattedNestedListAndMap() {
+        // TODO
+    }
+
+    //#endregion
+
+    //#region formatting
 
     @Test
     public void formatString() {
@@ -222,5 +296,207 @@ public class ValueToStringFormatterTests {
         );
     }
 
-    // TODO: List tests
+    @Test
+    public void formatEmptyList() {
+        MapStorageValue mapValue = new MapStorageValue(Map.of());
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        String actualValue = valueFormatter.format(mapValue);
+
+        String expectedValue = "{}";
+        assertEquals(expectedValue, actualValue);
+        // TODO
+    }
+
+    @Test
+    public void formatSimpleList() {
+        Tuple<String, String> testString = new NotEmptyTuple<>("testStringKey", "testString");
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        MapStorageValue mapValue = new MapStorageValue(Map.ofEntries(
+            Map.entry(testString.value1(), new StringStorageValue(testString.value2())),
+            Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+        ));
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        String actualValue = valueFormatter.format(mapValue);
+
+        assertTrue(List.of(
+                "{\n" +
+                "    \"" + testString.value1() + "\":\"" + testString.value2() + "\",\n" +
+                "    \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "}",
+
+                "{\n" +
+                "    \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "    \"" + testString.value1() + "\":\"" + testString.value2() + "\"\n" +
+                "}"
+            )
+            .contains(actualValue)
+        );
+        // TODO
+    }
+
+    @Test
+    public void formatNestedList() {
+        Tuple<String, String> testString1 = new NotEmptyTuple<>("testStringKey1", "testString1");
+        Tuple<String, String> testString2 = new NotEmptyTuple<>("testStringKey2", "testString2");
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        MapStorageValue mapValue = new MapStorageValue(Map.ofEntries(
+            Map.entry("innerMap", new MapStorageValue(Map.ofEntries(
+                Map.entry(testString1.value1(), new StringStorageValue(testString1.value2())),
+                Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+            ))),
+            Map.entry(testString2.value1(), new StringStorageValue(testString2.value2()))
+        ));
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        String actualValue = valueFormatter.format(mapValue);
+
+        assertTrue(List.of(
+                "{\n" + 
+                "    \"innerMap\":{\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "    },\n" +
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+                "}",
+
+                "{\n" + 
+                "    \"innerMap\":{\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\"\n" +
+                "    },\n" +
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+                "}",
+
+                "{\n" + 
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\",\n" +
+                "    \"innerMap\":{\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "    }\n" +
+                "}",
+
+                "{\n" + 
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\",\n" +
+                "    \"innerMap\":{\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\"\n" +
+                "    }\n" +
+                "}"
+            )
+            .contains(actualValue)
+        );
+        // TODO
+    }
+
+    @Test
+    public void formatNestedMapAndList() {
+        Tuple<String, String> testString1 = new NotEmptyTuple<>("testStringKey1", "testString1");
+        Tuple<String, String> testString2 = new NotEmptyTuple<>("testStringKey2", "testString2");
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        MapStorageValue mapValue = new MapStorageValue(Map.ofEntries(
+            Map.entry("innerMap", new MapStorageValue(Map.ofEntries(
+                Map.entry(testString1.value1(), new StringStorageValue(testString1.value2())),
+                Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+            ))),
+            Map.entry(testString2.value1(), new StringStorageValue(testString2.value2()))
+        ));
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        String actualValue = valueFormatter.format(mapValue);
+
+        assertTrue(List.of(
+                "{\n" + 
+                "    \"innerMap\":{\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "    },\n" +
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+                "}",
+
+                "{\n" + 
+                "    \"innerMap\":{\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\"\n" +
+                "    },\n" +
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+                "}",
+
+                "{\n" + 
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\",\n" +
+                "    \"innerMap\":{\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "    }\n" +
+                "}",
+
+                "{\n" + 
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\",\n" +
+                "    \"innerMap\":{\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\"\n" +
+                "    }\n" +
+                "}"
+            )
+            .contains(actualValue)
+        );
+        // TODO
+    }
+
+    @Test
+    public void formatNestedListAndMap() {
+        Tuple<String, String> testString1 = new NotEmptyTuple<>("testStringKey1", "testString1");
+        Tuple<String, String> testString2 = new NotEmptyTuple<>("testStringKey2", "testString2");
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        MapStorageValue mapValue = new MapStorageValue(Map.ofEntries(
+            Map.entry("innerMap", new MapStorageValue(Map.ofEntries(
+                Map.entry(testString1.value1(), new StringStorageValue(testString1.value2())),
+                Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+            ))),
+            Map.entry(testString2.value1(), new StringStorageValue(testString2.value2()))
+        ));
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        String actualValue = valueFormatter.format(mapValue);
+
+        assertTrue(List.of(
+                "{\n" + 
+                "    \"innerMap\":{\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "    },\n" +
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+                "}",
+
+                "{\n" + 
+                "    \"innerMap\":{\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\"\n" +
+                "    },\n" +
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\"\n" +
+                "}",
+
+                "{\n" + 
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\",\n" +
+                "    \"innerMap\":{\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
+                "    }\n" +
+                "}",
+
+                "{\n" + 
+                "    \"" + testString2.value1() + "\":\"" + testString2.value2() + "\",\n" +
+                "    \"innerMap\":{\n" +
+                "        \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
+                "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\"\n" +
+                "    }\n" +
+                "}"
+            )
+            .contains(actualValue)
+        );
+        // TODO
+    }
+
+    //#endregion
 }
