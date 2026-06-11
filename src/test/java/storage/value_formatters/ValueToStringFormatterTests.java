@@ -169,12 +169,59 @@ public class ValueToStringFormatterTests {
 
     @Test
     public void parseFormattedNestedMapAndList() {
-        // TODO
+        Tuple<String, List<String>> testList = new NotEmptyTuple<>(
+            "testStringKey1", 
+            List.of(
+                "testString2",
+                "testString3"
+            )
+        );
+        Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
+        String formattedString1 = "{\n" + 
+        "    \"" + testList.value1() + "\":[\n" +
+        "        \"" + testList.value2().get(0) + "\",\n" +
+        "        \"" + testList.value2().get(1)+ "\",\n" +
+        "    ],\n" +
+        "    \"" + testInt.value1() + "\":\"" + testInt.value2() + "\"\n" +
+        "}";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+
+        MapStorageValue expectedValue = new MapStorageValue(Map.ofEntries(
+            Map.entry(testList.value1(), new ListStorageValue(List.of(
+                new StringStorageValue(testList.value2().get(0)),
+                new StringStorageValue(testList.value2().get(1))
+            ))),
+            Map.entry(testInt.value1(), new IntegerStorageValue(testInt.value2()))
+        ));
+        assertEquals(expectedValue, actualValue1);
     }
 
     @Test
     public void parseFormattedNestedListAndMap() {
-        // TODO
+        Tuple<String, String> testString1 = new NotEmptyTuple<>("testStringKey1", "testString1");
+        Tuple<String, Integer> testInt1 = new NotEmptyTuple<>("testStringKey2", 50);
+        Integer testInt2 = 30;
+        String formattedString1 = "[\n" + 
+        "    {\n" +
+        "        \"" + testString1.value1() + "\":\"" + testString1.value2() + "\",\n" +
+        "        \"" + testInt1.value1() + "\":" + testInt1.value2() + "\n" +
+        "    },\n" +
+        "    " + testInt2 + "\n" +
+        "]";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString1);
+
+        ListStorageValue expectedValue = new ListStorageValue(List.of(
+            new MapStorageValue(Map.ofEntries(
+                Map.entry(testString1.value1(), new StringStorageValue(testString1.value2())),
+                Map.entry(testInt1.value1(), new IntegerStorageValue(testInt1.value2()))
+            )),
+            new IntegerStorageValue(testInt2)
+        ));
+        assertEquals(expectedValue, actualValue1);
     }
 
     //#endregion
