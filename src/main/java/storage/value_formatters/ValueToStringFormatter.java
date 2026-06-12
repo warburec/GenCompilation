@@ -93,7 +93,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
         List<StorageValue<?>> list = new LinkedList<>();
 
         Matcher entryMatcher  = Pattern.compile(
-                "(?<value>\\{.*\\}|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
+                "(?<value>\\{.*\\}|\\[.*\\]|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
                 Pattern.DOTALL | Pattern.MULTILINE
             )
             .matcher(formattedData);
@@ -130,7 +130,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
         Map<String, StorageValue<?>> map = new HashMap<>();
 
         Matcher entryMatcher  = Pattern.compile(
-                "\\\"(?<key>[a-zA-Z0-9_\\-]*?)\\\"" + ANY_WHITESPACE + ":" + ANY_WHITESPACE + "(?<value>\\{.*\\}|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
+                "\\\"(?<key>[a-zA-Z0-9_\\-]*?)\\\"" + ANY_WHITESPACE + ":" + ANY_WHITESPACE + "(?<value>\\{.*\\}|\\[.*\\]|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
                 Pattern.DOTALL | Pattern.MULTILINE
             )
             .matcher(formattedData);

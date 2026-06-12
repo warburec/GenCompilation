@@ -170,10 +170,10 @@ public class ValueToStringFormatterTests {
     @Test
     public void parseFormattedNestedMapAndList() {
         Tuple<String, List<String>> testList = new NotEmptyTuple<>(
-            "testStringKey1", 
+            "testListKey1", 
             List.of(
-                "testString2",
-                "testString3"
+                "testString1",
+                "testString2"
             )
         );
         Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
@@ -182,7 +182,7 @@ public class ValueToStringFormatterTests {
         "        \"" + testList.value2().get(0) + "\",\n" +
         "        \"" + testList.value2().get(1)+ "\",\n" +
         "    ],\n" +
-        "    \"" + testInt.value1() + "\":\"" + testInt.value2() + "\"\n" +
+        "    \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
         "}";
         ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
 
@@ -394,8 +394,8 @@ public class ValueToStringFormatterTests {
 
         String expectedValue = "[\n" + 
         "    [\n" +
-        "    \"" + testString1 + "\",\n" +
-        "    \"" + testString2 + "\"\n" +
+        "        \"" + testString1 + "\",\n" +
+        "        \"" + testString2 + "\"\n" +
         "    ],\n" +
         "    " + testInt + "\n" +
         "]";
@@ -405,10 +405,10 @@ public class ValueToStringFormatterTests {
     @Test
     public void formatNestedMapAndList() {
         Tuple<String, List<String>> testList = new NotEmptyTuple<>(
-            "testStringKey1", 
+            "testListKey", 
             List.of(
-                "testString2",
-                "testString3"
+                "testString1",
+                "testString2"
             )
         );
         Tuple<String, Integer> testInt = new NotEmptyTuple<>("testIntKey", 30);
@@ -427,16 +427,16 @@ public class ValueToStringFormatterTests {
                 "{\n" + 
                 "    \"" + testList.value1() + "\":[\n" +
                 "        \"" + testList.value2().get(0) + "\",\n" +
-                "        \"" + testList.value2().get(1)+ "\",\n" +
+                "        \"" + testList.value2().get(1)+ "\"\n" +
                 "    ],\n" +
-                "    \"" + testInt.value1() + "\":\"" + testInt.value2() + "\"\n" +
+                "    \"" + testInt.value1() + "\":" + testInt.value2() + "\n" +
                 "}",
 
                 "{\n" + 
-                "    \"" + testInt.value1() + "\":\"" + testInt.value2() + "\",\n" +
+                "    \"" + testInt.value1() + "\":" + testInt.value2() + ",\n" +
                 "    \"" + testList.value1() + "\":[\n" +
                 "        \"" + testList.value2().get(0) + "\",\n" +
-                "        \"" + testList.value2().get(1)+ "\",\n" +
+                "        \"" + testList.value2().get(1)+ "\"\n" +
                 "    ]\n" +
                 "}"
             )
