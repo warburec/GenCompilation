@@ -84,22 +84,14 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
     }
 
     private ListStorageValue parseListFormat(String formattedData) {
-        if (!formattedData.endsWith("]")) throw new RuntimeException("The list " + formattedData + " must end with ]");
-        if (formattedData.matches("\\[" + ANY_WHITESPACE + "\\]")) return new ListStorageValue(List.of());
+        formattedData = formattedData.substring(1, formattedData.length() - 1).trim();
+        List<StorageValue<?>> list = new ArrayList<>();
+        int i = 0;
 
-        formattedData = formattedData.substring(1, formattedData.length() - 1);
-        formattedData = formattedData.strip();
-
-        List<StorageValue<?>> list = new LinkedList<>();
-
-        Matcher entryMatcher  = Pattern.compile(
-                "(?<value>\\{.*\\}|\\[.*\\]|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
-                Pattern.DOTALL | Pattern.MULTILINE
-            )
-            .matcher(formattedData);
-
-        while (entryMatcher.find()) {
-            list.add(parse(entryMatcher.group("value")));
+        while (i < formattedData.length()) {
+            int endOfValue = findNextElementBoundary(formattedData, i);
+            list.add(parse(formattedData.substring(i, endOfValue).trim()));
+            i = endOfValue + 1; // Skip the comma
         }
 
         return new ListStorageValue(list);
@@ -124,25 +116,40 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
         if (!formattedData.endsWith("}")) throw new RuntimeException("The map " + formattedData + " must end with }");
         if (formattedData.matches("\\{" + ANY_WHITESPACE + "\\}")) return new MapStorageValue(Map.of());
 
-        formattedData = formattedData.substring(1, formattedData.length() - 1);
-        formattedData = formattedData.strip();
-
+        formattedData = formattedData.substring(1, formattedData.length() - 1).trim();
         Map<String, StorageValue<?>> map = new HashMap<>();
+        int i = 0;
 
-        Matcher entryMatcher  = Pattern.compile(
-                "\\\"(?<key>[a-zA-Z0-9_\\-]*?)\\\"" + ANY_WHITESPACE + ":" + ANY_WHITESPACE + "(?<value>\\{.*\\}|\\[.*\\]|\\\".*?[^\\\\]\\\"|[0-9]+)(?=" + ANY_WHITESPACE + "(?:,|$))", 
-                Pattern.DOTALL | Pattern.MULTILINE
-            )
-            .matcher(formattedData);
-
-        while (entryMatcher.find()) {
-            map.put(
-                entryMatcher.group("key"), 
-                parse(entryMatcher.group("value"))
-            );
+        while (i < formattedData.length()) {
+            int colonIndex = formattedData.indexOf(':', i);
+            String key = formattedData.substring(i, colonIndex).trim().replace("\"", "");
+            
+            int startOfValue = colonIndex + 1;
+            int endOfValue = findNextElementBoundary(formattedData, startOfValue);
+            
+            map.put(key, parse(formattedData.substring(startOfValue, endOfValue).trim()));
+            i = endOfValue + 1; // Skip the comma
         }
 
         return new MapStorageValue(map);
+    }
+
+    private int findNextElementBoundary(String formattedData, int start) {
+        int depth = 0;
+        boolean inQuotes = false;
+
+        for (int i = start; i < formattedData.length(); i++) {
+            char c = formattedData.charAt(i);
+
+            if (c == '"' && (i == 0 || formattedData.charAt(i - 1) != '\\')) inQuotes = !inQuotes;
+            if (inQuotes) continue;
+
+            if (c == '{' || c == '[') depth++;
+            else if (c == '}' || c == ']') depth--;
+            else if (c == ',' && depth == 0) return i;
+        }
+
+        return formattedData.length();
     }
 
     private String indent(String string) {

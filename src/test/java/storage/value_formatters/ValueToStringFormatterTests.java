@@ -224,6 +224,61 @@ public class ValueToStringFormatterTests {
         assertEquals(expectedValue, actualValue1);
     }
 
+    @Test
+    public void parseFormattedComplexObjectCombination() {
+        String formattedString = "{\n" +
+        "    \"key1\":[" +
+        "        \"string1\"," +
+        "        [" +
+        "            0," +
+        "            \"string2\"" +
+        "        ]" +
+        "    ]," +
+        "    \"key2\":[" +
+        "        \"string3\"," +
+        "        [" +
+        "            1," +
+        "            \"string4\"" +
+        "        ]" +
+        "    ]," +
+        "    \"key3\":[" +
+        "        \"string5\"," +
+        "        [" +
+        "            0," +
+        "            \"\"" +
+        "        ]" +
+        "    ]" +
+        "}";
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        StorageValue<?> actualValue1 = valueFormatter.parse(formattedString);
+
+        MapStorageValue expectedValue = new MapStorageValue(Map.ofEntries(
+            Map.entry("key1", new ListStorageValue(List.of(
+                new StringStorageValue("string1"),
+                new ListStorageValue(List.of(
+                    new IntegerStorageValue(0),
+                    new StringStorageValue("string2")
+                ))
+            ))),
+            Map.entry("key2", new ListStorageValue(List.of(
+                new StringStorageValue("string3"),
+                new ListStorageValue(List.of(
+                    new IntegerStorageValue(1),
+                    new StringStorageValue("string4")
+                ))
+            ))),
+            Map.entry("key3", new ListStorageValue(List.of(
+                new StringStorageValue("string5"),
+                new ListStorageValue(List.of(
+                    new IntegerStorageValue(0),
+                    new StringStorageValue("")
+                ))
+            )))
+        ));
+        assertEquals(expectedValue, actualValue1);
+    }
+
     //#endregion
 
     //#region formatting
@@ -476,6 +531,184 @@ public class ValueToStringFormatterTests {
                 "    },\n" +
                 "    " + testInt2 + "\n" +
                 "]"
+            )
+            .contains(actualValue)
+        );
+    }
+
+    @Test
+    public void formatComplexObjectCombination() {
+        MapStorageValue mapValue = new MapStorageValue(Map.ofEntries(
+            Map.entry("key1", new ListStorageValue(List.of(
+                new StringStorageValue("string1"),
+                new ListStorageValue(List.of(
+                    new IntegerStorageValue(0),
+                    new StringStorageValue("string2")
+                ))
+            ))),
+            Map.entry("key2", new ListStorageValue(List.of(
+                new StringStorageValue("string3"),
+                new ListStorageValue(List.of(
+                    new IntegerStorageValue(1),
+                    new StringStorageValue("string4")
+                ))
+            ))),
+            Map.entry("key3", new ListStorageValue(List.of(
+                new StringStorageValue("string5"),
+                new ListStorageValue(List.of(
+                    new IntegerStorageValue(0),
+                    new StringStorageValue("")
+                ))
+            )))
+        ));
+        ValueFormatter<String> valueFormatter = new ValueToStringFormatter();
+
+        String actualValue = valueFormatter.format(mapValue);
+
+        assertTrue(List.of(
+                "{\n" +
+                "    \"key1\":[\n" +
+                "        \"string1\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"string2\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key2\":[\n" +
+                "        \"string3\",\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            \"string4\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key3\":[\n" +
+                "        \"string5\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"\"\n" +
+                "        ]\n" +
+                "    ]\n" +
+                "}",
+
+                "{\n" +
+                "    \"key2\":[\n" +
+                "        \"string3\",\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            \"string4\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key1\":[\n" +
+                "        \"string1\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"string2\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key3\":[\n" +
+                "        \"string5\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"\"\n" +
+                "        ]\n" +
+                "    ]\n" +
+                "}",
+
+                "{\n" +
+                "    \"key3\":[\n" +
+                "        \"string5\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key1\":[\n" +
+                "        \"string1\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"string2\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key2\":[\n" +
+                "        \"string3\",\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            \"string4\"\n" +
+                "        ]\n" +
+                "    ]\n" +
+                "}",
+                
+                "{\n" +
+                "    \"key1\":[\n" +
+                "        \"string1\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"string2\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key3\":[\n" +
+                "        \"string5\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key2\":[\n" +
+                "        \"string3\",\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            \"string4\"\n" +
+                "        ]\n" +
+                "    ]\n" +
+                "}",
+
+                "{\n" +
+                "    \"key2\":[\n" +
+                "        \"string3\",\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            \"string4\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key3\":[\n" +
+                "        \"string5\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key1\":[\n" +
+                "        \"string1\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"string2\"\n" +
+                "        ]\n" +
+                "    ]\n" +
+                "}",
+                
+                "{\n" +
+                "    \"key3\":[\n" +
+                "        \"string5\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key2\":[\n" +
+                "        \"string3\",\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            \"string4\"\n" +
+                "        ]\n" +
+                "    ],\n" +
+                "    \"key1\":[\n" +
+                "        \"string1\",\n" +
+                "        [\n" +
+                "            0,\n" +
+                "            \"string2\"\n" +
+                "        ]\n" +
+                "    ]\n" +
+                "}"
             )
             .contains(actualValue)
         );
