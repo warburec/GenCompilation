@@ -2,7 +2,6 @@ package storage.value_formatters;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.regex.*;
 
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.*;

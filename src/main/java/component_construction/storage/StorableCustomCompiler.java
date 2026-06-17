@@ -20,15 +20,15 @@ public class StorableCustomCompiler extends CustomCompiler implements Storable, 
     public MapStorageValue getStorageRepresentation() {
         return new MapStorageValue(Map.of(
             "lexicalAnalyser", new ListStorageValue(
-                new StringStorageValue(lexicalAnalyser.getClass().getSimpleName()),
+                new StringStorageValue(lexicalAnalyser.getClass().getName()),
                 ((CustomLexicalAnalyser)lexicalAnalyser).getStorageRepresentation()
             ),
             "syntaxAnalyser", new ListStorageValue(
-                new StringStorageValue(syntaxAnalyser.getClass().getSimpleName()),
+                new StringStorageValue(syntaxAnalyser.getClass().getName()),
                 ((CustomSyntaxAnalyser)syntaxAnalyser).getStorageRepresentation()
             ),
             "codeGenerator", new ListStorageValue(
-                new StringStorageValue(codeGenerator.getClass().getSimpleName()),
+                new StringStorageValue(codeGenerator.getClass().getName()),
                 ((CustomCodeGenerator)codeGenerator).getStorageRepresentation()
             )
         ));

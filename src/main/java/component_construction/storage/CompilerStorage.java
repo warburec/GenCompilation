@@ -14,7 +14,7 @@ public class CompilerStorage {
     }
 
     public StorableCustomCompiler load() {
-        //TODO: Store using Loadable or LoadableBy<> if defined
+        //TODO: Load using Loadable or LoadableBy<> if defined
         StorageValue<?> storageValue = storage.load();
         return storableCustomCompilerFactory.produce(storageValue);
     }

@@ -1,16 +1,18 @@
 package component_construction.storage.Factories;
 
-import java.util.Map;
+import java.util.*;
+
 import component_construction.storage.*;
 import storage.storage_values.*;
 import component_construction.custom_components.*;
 
 public class StorableCustomCompilerFactory implements Factory<StorableCustomCompiler> {
-    ReflectiveFactoryRepository<CustomLexicalAnalyser> lexicalAnalyserFactoryRepository = new ReflectiveFactoryRepository<>();
-    ReflectiveFactoryRepository<CustomSyntaxAnalyser> syntaxAnalyserFactoryRepository = new ReflectiveFactoryRepository<>();
-    ReflectiveFactoryRepository<CustomCodeGenerator> codeGeneratorFactoryRepository = new ReflectiveFactoryRepository<>();
+    ReflectiveFactoryRepository<CustomLexicalAnalyser> lexicalAnalyserFactoryRepository = new ReflectiveFactoryRepository<>(CustomLexicalAnalyser.class);
+    ReflectiveFactoryRepository<CustomSyntaxAnalyser> syntaxAnalyserFactoryRepository = new ReflectiveFactoryRepository<>(CustomSyntaxAnalyser.class);;
+    ReflectiveFactoryRepository<CustomCodeGenerator> codeGeneratorFactoryRepository = new ReflectiveFactoryRepository<>(CustomCodeGenerator.class);;
 
     @Override
+    // TODO: Explain requirements for storage/loading
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
         MapStorageValue map = (MapStorageValue) loadValue;
         Map<String, StorageValue<?>> mapValue = map.getValue();
@@ -20,9 +22,11 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
         CustomCodeGenerator customCodeGenerator;
 
         try {
+            ComponentDescription lexicalAnalyserDescription = getComponentDescription(mapValue.get("lexicalAnalyser"));
+
             customLexicalAnalyser = lexicalAnalyserFactoryRepository.instantiate(
-                "lexicalAnalyser", 
-                mapValue.get("lexicalAnalyser")
+                lexicalAnalyserDescription.name,
+                lexicalAnalyserDescription.description
             );
         }
         catch (ClassNotFoundException e) {
@@ -30,9 +34,11 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
         }
 
         try {
+            ComponentDescription syntaxAnalyserDescription = getComponentDescription(mapValue.get("syntaxAnalyser"));
+
             customSyntaxAnalyser = syntaxAnalyserFactoryRepository.instantiate(
-                "syntaxAnalyser", 
-                mapValue.get("syntaxAnalyser")
+                syntaxAnalyserDescription.name,
+                syntaxAnalyserDescription.description
             );
         }
         catch (ClassNotFoundException e) {
@@ -40,9 +46,11 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
         }
 
         try {
+            ComponentDescription codeGeneratorDescription = getComponentDescription(mapValue.get("syntaxAnalyser"));
+
             customCodeGenerator = codeGeneratorFactoryRepository.instantiate(
-                "codeGenerator", 
-                mapValue.get("codeGenerator")
+                codeGeneratorDescription.name,
+                codeGeneratorDescription.description
             );
         }
         catch (ClassNotFoundException e) {
@@ -55,5 +63,16 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
             customCodeGenerator
         );
     }
+
+    // TODO: Handle errors
+    private ComponentDescription getComponentDescription(StorageValue<?> description) {
+        List<StorageValue<?>> entry = ((ListStorageValue)description).getValue();
+
+        return new ComponentDescription(
+            ((StringStorageValue)entry.get(0)).getValue(),
+            (ListStorageValue)entry.get(1)
+        );
+    }
     
+    private record ComponentDescription(String name, ListStorageValue description) {}
 }
