@@ -1407,4 +1407,6 @@ public class StorageTests {
         );
         assertInstanceOf(ExampleException.class, exception.getCause());
     }
+
+    // TODO: Test LoadableBy<T>
 }

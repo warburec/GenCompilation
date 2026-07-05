@@ -1,16 +1,18 @@
 package component_construction.storage.Factories;
 
 import java.util.*;
-
-import component_construction.storage.*;
-import storage.storage_values.*;
 import component_construction.custom_components.*;
+import component_construction.storage.*;
+import storage.external_interfaces.Loadable;
+import storage.storage_values.*;
 
-public class StorableCustomCompilerFactory implements Factory<StorableCustomCompiler> {
-    ReflectiveFactoryRepository<CustomLexicalAnalyser> lexicalAnalyserFactoryRepository = new ReflectiveFactoryRepository<>(CustomLexicalAnalyser.class);
-    ReflectiveFactoryRepository<CustomSyntaxAnalyser> syntaxAnalyserFactoryRepository = new ReflectiveFactoryRepository<>(CustomSyntaxAnalyser.class);;
-    ReflectiveFactoryRepository<CustomCodeGenerator> codeGeneratorFactoryRepository = new ReflectiveFactoryRepository<>(CustomCodeGenerator.class);;
+public class StorableCustomCompilerFactory implements Loader<StorableCustomCompiler> {
+    protected ReflectiveClassConstructor reflectiveClassLoader = new ReflectiveClassConstructor();
+    protected FactoryRepository<CustomLexicalAnalyser> lexicalAnalyserFactoryRepository = new FactoryRepository<>();
+    protected FactoryRepository<CustomSyntaxAnalyser> syntaxAnalyserFactoryRepository = new FactoryRepository<>();
+    protected FactoryRepository<CustomCodeGenerator> codeGeneratorFactoryRepository = new FactoryRepository<>();
 
+    @SuppressWarnings("unchecked")
     @Override
     // TODO: Explain requirements for storage/loading
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
@@ -21,15 +23,47 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
         CustomSyntaxAnalyser customSyntaxAnalyser;
         CustomCodeGenerator customCodeGenerator;
 
+        //TODO: Abstract common code into easy to use method
         try {
             ComponentDescription lexicalAnalyserDescription = getComponentDescription(mapValue.get("lexicalAnalyser"));
 
-            customLexicalAnalyser = lexicalAnalyserFactoryRepository.instantiate(
-                lexicalAnalyserDescription.name,
-                lexicalAnalyserDescription.description
-            );
+            if (lexicalAnalyserFactoryRepository.containsKey(lexicalAnalyserDescription.name())) {
+                customLexicalAnalyser = lexicalAnalyserFactoryRepository.instantiate(
+                    lexicalAnalyserDescription.name(),
+                    lexicalAnalyserDescription.description()
+                );
+            }
+
+            Class<CustomLexicalAnalyser> clazz = (Class<CustomLexicalAnalyser>) Class
+                .forName(lexicalAnalyserDescription.name())
+                .asSubclass(CustomLexicalAnalyser.class);
+
+            if (LoadableBy.class.isAssignableFrom(clazz)) {
+                Class<LoadableBy<Loader<CustomLexicalAnalyser>>> loadableBy = (Class<LoadableBy<Loader<CustomLexicalAnalyser>>>) clazz.asSubclass(LoadableBy.class);
+                Class<Loader<CustomLexicalAnalyser>> targetLoader = LoadableBy.getTargetLoader(loadableBy);
+                Loader<CustomLexicalAnalyser> loader = Loader.construct(targetLoader);
+                customLexicalAnalyser = loader.produce(lexicalAnalyserDescription.description());
+            }
+            else if (Loadable.class.isAssignableFrom(clazz)) {
+                customLexicalAnalyser = reflectiveClassLoader.construct(
+                    lexicalAnalyserDescription.name(),
+                    CustomLexicalAnalyser.class
+                );
+
+                ((Loadable)customLexicalAnalyser)
+                    .load(lexicalAnalyserDescription.description());
+            }
+            // Use constructor
+            else {
+                customLexicalAnalyser = reflectiveClassLoader.construct(
+                    lexicalAnalyserDescription.name(),
+                    CustomLexicalAnalyser.class,
+                    StorageValue.class,
+                    lexicalAnalyserDescription.description()
+                );
+            }
         }
-        catch (ClassNotFoundException e) {
+        catch (ClassNotFoundException e) { //TODO: Check for other exceptions
             throw new RuntimeException(e); // TODO: Create custom exception
         }
 
@@ -37,8 +71,8 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
             ComponentDescription syntaxAnalyserDescription = getComponentDescription(mapValue.get("syntaxAnalyser"));
 
             customSyntaxAnalyser = syntaxAnalyserFactoryRepository.instantiate(
-                syntaxAnalyserDescription.name,
-                syntaxAnalyserDescription.description
+                syntaxAnalyserDescription.name(),
+                syntaxAnalyserDescription.description()
             );
         }
         catch (ClassNotFoundException e) {
@@ -49,8 +83,8 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
             ComponentDescription codeGeneratorDescription = getComponentDescription(mapValue.get("syntaxAnalyser"));
 
             customCodeGenerator = codeGeneratorFactoryRepository.instantiate(
-                codeGeneratorDescription.name,
-                codeGeneratorDescription.description
+                codeGeneratorDescription.name(),
+                codeGeneratorDescription.description()
             );
         }
         catch (ClassNotFoundException e) {
@@ -65,7 +99,7 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
     }
 
     // TODO: Handle errors
-    private ComponentDescription getComponentDescription(StorageValue<?> description) {
+    protected ComponentDescription getComponentDescription(StorageValue<?> description) {
         List<StorageValue<?>> entry = ((ListStorageValue)description).getValue();
 
         return new ComponentDescription(
@@ -74,5 +108,5 @@ public class StorableCustomCompilerFactory implements Factory<StorableCustomComp
         );
     }
     
-    private record ComponentDescription(String name, ListStorageValue description) {}
+    protected record ComponentDescription(String name, ListStorageValue description) {}
 }
