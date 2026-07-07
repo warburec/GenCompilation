@@ -1,7 +1,7 @@
-package component_construction.storage;
+package component_construction.storage.dynamic_loading;
 
 import java.lang.reflect.InvocationTargetException;
-import component_construction.storage.Factories.Factory;
+import component_construction.storage.factories.Factory;
 
 public interface Loader<T> extends Factory<T> {
 

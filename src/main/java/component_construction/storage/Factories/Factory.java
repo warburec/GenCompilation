@@ -1,4 +1,4 @@
-package component_construction.storage.Factories;
+package component_construction.storage.factories;
 
 import storage.storage_values.StorageValue;
 

@@ -1,8 +1,9 @@
-package component_construction.storage;
+package component_construction.storage.builders;
 
 import code_generation.CodeGenerator;
 import component_construction.builders.CompilerBuilderTemplate;
 import component_construction.custom_components.*;
+import component_construction.storage.StorableCustomCompiler;
 import grammar_objects.GrammarParts;
 import lexical_analysis.LexicalAnalyser;
 import syntax_analysis.SyntaxAnalyser;

@@ -1,8 +1,9 @@
-package component_construction.storage.Factories;
+package component_construction.storage.factories;
 
 import java.util.*;
 import component_construction.custom_components.*;
 import component_construction.storage.*;
+import component_construction.storage.dynamic_loading.*;
 import storage.external_interfaces.Loadable;
 import storage.storage_values.*;
 

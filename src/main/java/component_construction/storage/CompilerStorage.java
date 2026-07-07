@@ -1,6 +1,6 @@
 package component_construction.storage;
 
-import component_construction.storage.Factories.StorableCustomCompilerFactory;
+import component_construction.storage.factories.StorableCustomCompilerFactory;
 import storage.Storage;
 import storage.storage_values.StorageValue;
 

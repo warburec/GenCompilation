@@ -2,7 +2,8 @@ package component_construction.storage;
 
 import java.util.Map;
 import component_construction.custom_components.*;
-import component_construction.storage.Factories.StorableCustomCompilerFactory;
+import component_construction.storage.dynamic_loading.LoadableBy;
+import component_construction.storage.factories.StorableCustomCompilerFactory;
 import storage.external_interfaces.Storable;
 import storage.storage_values.*;
 

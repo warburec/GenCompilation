@@ -1,9 +1,7 @@
-package component_construction.storage;
+package component_construction.storage.factories;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-import component_construction.storage.Factories.Factory;
 import storage.storage_values.StorageValue;
 
 public class FactoryRepository <T> {
