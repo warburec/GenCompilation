@@ -48,11 +48,117 @@ public class ReflectiveClassConstructorTests {
     }
 
     @Test
-    public void construct_oneParameter() {
-        //TODO
+    public void construct_oneParameter_class_intParam() throws ClassNotFoundException {
+        TestDynamicObject expectedObject = new TestDynamicObject();
+        expectedObject.a = 1;
+
+        TestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                TestDynamicObject.class.getName(),
+                TestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {expectedObject.a}
+            );
+
+        assertEquals(expectedObject, actualObject);
     }
 
-    //TODO: static and regular inner classes
+    @Test
+    public void construct_oneParameter_staticInnerClass_intParam() throws ClassNotFoundException {      
+        StaticInnerTestDynamicObject expectedObject = new StaticInnerTestDynamicObject();
+        expectedObject.e = 1;
+
+        StaticInnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                StaticInnerTestDynamicObject.class.getName(),
+                StaticInnerTestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {expectedObject.e}
+            );
+
+        assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    public void construct_oneParameter_innerClass_intParam() throws ClassNotFoundException {        
+        TestDynamicObject parentObject = new TestDynamicObject();
+        InnerTestDynamicObject expectedObject = parentObject.new InnerTestDynamicObject();
+        expectedObject.c = 1;
+        
+        InnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                InnerTestDynamicObject.class.getName(),
+                InnerTestDynamicObject.class,
+                new Class<?>[] {
+                    parentObject.getClass(),
+                    int.class
+                },
+                new Object[] {
+                    parentObject,
+                    expectedObject.c
+                }
+            );
+
+        assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    public void construct_oneParameter_class_stringParam() throws ClassNotFoundException {
+        TestDynamicObject expectedObject = new TestDynamicObject();
+        expectedObject.b = "Test";
+
+        TestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                TestDynamicObject.class.getName(),
+                TestDynamicObject.class,
+                new Class<?>[] {String.class},
+                new Object[] {expectedObject.b}
+            );
+
+        assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    public void construct_oneParameter_staticInnerClass_stringParam() throws ClassNotFoundException {        
+        StaticInnerTestDynamicObject expectedObject = new StaticInnerTestDynamicObject();
+        expectedObject.f = "Test";
+
+        StaticInnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                StaticInnerTestDynamicObject.class.getName(),
+                StaticInnerTestDynamicObject.class,
+                new Class<?>[] {String.class},
+                new Object[] {expectedObject.f}
+            );
+
+        assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    public void construct_oneParameter_innerClass_stringParam() throws ClassNotFoundException {        
+        TestDynamicObject parentObject = new TestDynamicObject();
+        InnerTestDynamicObject expectedObject = parentObject.new InnerTestDynamicObject();
+        expectedObject.d = "Test";
+        
+        InnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                InnerTestDynamicObject.class.getName(),
+                InnerTestDynamicObject.class,
+                new Class<?>[] {
+                    parentObject.getClass(),
+                    String.class
+                },
+                new Object[] {
+                    parentObject,
+                    expectedObject.d
+                }
+            );
+
+        assertEquals(expectedObject, actualObject);
+    }
+
+    // Incorrect Type
+    // Incorrect Paramter
 
     @Test
     public void construct_manyParameters() {
