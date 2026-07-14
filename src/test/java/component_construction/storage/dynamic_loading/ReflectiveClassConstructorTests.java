@@ -1,6 +1,8 @@
 package component_construction.storage.dynamic_loading;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import test_aids.storage_entities.TestDynamicObject;
 import test_aids.storage_entities.TestDynamicObject.*;
@@ -157,8 +159,109 @@ public class ReflectiveClassConstructorTests {
         assertEquals(expectedObject, actualObject);
     }
 
-    // Incorrect Type
-    // Incorrect Paramter
+    @Test
+    public void construct_oneParameter_class_falseBooleanType() throws ClassNotFoundException {
+        TestDynamicObject expectedObject = new TestDynamicObject();
+        expectedObject.a = 1;
+
+        assertThrows(IllegalArgumentException.class, () ->
+            new ReflectiveClassConstructor()
+            .construct(
+                TestDynamicObject.class.getName(),
+                TestDynamicObject.class,
+                new Class<?>[] {boolean.class},
+                new Object[] {expectedObject.a}
+            )
+        );
+    }
+
+    @Test
+    public void construct_oneParameter_staticInnerClass_falseBooleanType() throws ClassNotFoundException {      
+        StaticInnerTestDynamicObject expectedObject = new StaticInnerTestDynamicObject();
+        expectedObject.e = 1;
+
+        assertThrows(IllegalArgumentException.class, () ->
+            new ReflectiveClassConstructor()
+            .construct(
+                StaticInnerTestDynamicObject.class.getName(),
+                StaticInnerTestDynamicObject.class,
+                new Class<?>[] {boolean.class},
+                new Object[] {expectedObject.e}
+            )
+        );
+    }
+
+    @Test
+    public void construct_oneParameter_innerClass_falseBooleanType() throws ClassNotFoundException {        
+        TestDynamicObject parentObject = new TestDynamicObject();
+        InnerTestDynamicObject expectedObject = parentObject.new InnerTestDynamicObject();
+        expectedObject.c = 1;
+        
+        assertThrows(IllegalArgumentException.class, () ->
+            new ReflectiveClassConstructor()
+            .construct(
+                InnerTestDynamicObject.class.getName(),
+                InnerTestDynamicObject.class,
+                new Class<?>[] {
+                    parentObject.getClass(),
+                    boolean.class
+                },
+                new Object[] {
+                    parentObject,
+                    expectedObject.c
+                }
+            )
+        );
+    }
+
+    @Test
+    public void construct_oneParameter_class_falseBooleanParam() throws ClassNotFoundException {
+        TestDynamicObject expectedObject = new TestDynamicObject();
+        expectedObject.a = 1;
+
+        TestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                TestDynamicObject.class.getName(),
+                TestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {false}
+            );
+    }
+
+    @Test
+    public void construct_oneParameter_staticInnerClass_falseBooleanParam() throws ClassNotFoundException {      
+        StaticInnerTestDynamicObject expectedObject = new StaticInnerTestDynamicObject();
+        expectedObject.e = 1;
+
+        StaticInnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                StaticInnerTestDynamicObject.class.getName(),
+                StaticInnerTestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {false}
+            );
+    }
+
+    @Test
+    public void construct_oneParameter_innerClass_falseBooleanParam() throws ClassNotFoundException {        
+        TestDynamicObject parentObject = new TestDynamicObject();
+        InnerTestDynamicObject expectedObject = parentObject.new InnerTestDynamicObject();
+        expectedObject.c = 1;
+        
+        InnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+            .construct(
+                InnerTestDynamicObject.class.getName(),
+                InnerTestDynamicObject.class,
+                new Class<?>[] {
+                    parentObject.getClass(),
+                    int.class
+                },
+                new Object[] {
+                    parentObject,
+                    false
+                }
+            );
+    }
 
     @Test
     public void construct_manyParameters() {
