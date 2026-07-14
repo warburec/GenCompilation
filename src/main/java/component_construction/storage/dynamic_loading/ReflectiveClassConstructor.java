@@ -39,12 +39,15 @@ public class ReflectiveClassConstructor {
             throw new ClassNotFoundException("Target class footprint not found: " + className, e);
         }
         catch (NoSuchMethodException e) {
-            String typesString = Arrays.stream(parameterTypes)
-                .map(Class::getSimpleName)
-                .collect(Collectors.joining(", "));
-
             throw new IllegalArgumentException(
-                "No constructor found in " + className + " matching types: [" + typesString + "]", e
+                "No constructor found in " + className + " matching types: [" + getTypesString(parameterTypes) + "]",
+                e
+            );
+        }
+        catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                "Type mismatch between declared types [" + getTypesString(parameterTypes) + "] and parameter types [" + getParameterTypesString(parameters) + "]",
+                e
             );
         }
         catch (IllegalAccessException e) {
@@ -56,9 +59,20 @@ public class ReflectiveClassConstructor {
         catch (InvocationTargetException e) {
             throw new RuntimeException("The constructor for " + className + " threw an exception", e.getCause());
         }
-        catch (IllegalArgumentException | SecurityException e) {
+        catch (SecurityException e) {
             throw new RuntimeException("Reflection configuration error for class: " + className, e);
         }
     }
 
+    protected String getTypesString(Class<?>[] parameterTypes) {
+        return Arrays.stream(parameterTypes)
+            .map(Class::getSimpleName)
+            .collect(Collectors.joining(", "));
+    }
+
+    protected String getParameterTypesString(Object[] parameters) {
+        return Arrays.stream(parameters)
+            .map(parameter -> parameter.getClass().getSimpleName())
+            .collect(Collectors.joining(", "));
+    }
 }

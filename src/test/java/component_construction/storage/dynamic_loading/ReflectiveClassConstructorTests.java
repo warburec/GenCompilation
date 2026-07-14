@@ -219,13 +219,15 @@ public class ReflectiveClassConstructorTests {
         TestDynamicObject expectedObject = new TestDynamicObject();
         expectedObject.a = 1;
 
-        TestDynamicObject actualObject = new ReflectiveClassConstructor()
+        assertThrows(IllegalArgumentException.class, () ->
+            new ReflectiveClassConstructor()
             .construct(
                 TestDynamicObject.class.getName(),
                 TestDynamicObject.class,
                 new Class<?>[] {int.class},
                 new Object[] {false}
-            );
+            )
+        );
     }
 
     @Test
@@ -233,13 +235,15 @@ public class ReflectiveClassConstructorTests {
         StaticInnerTestDynamicObject expectedObject = new StaticInnerTestDynamicObject();
         expectedObject.e = 1;
 
-        StaticInnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+        assertThrows(IllegalArgumentException.class, () ->
+            new ReflectiveClassConstructor()
             .construct(
                 StaticInnerTestDynamicObject.class.getName(),
                 StaticInnerTestDynamicObject.class,
                 new Class<?>[] {int.class},
                 new Object[] {false}
-            );
+            )
+        );
     }
 
     @Test
@@ -248,7 +252,8 @@ public class ReflectiveClassConstructorTests {
         InnerTestDynamicObject expectedObject = parentObject.new InnerTestDynamicObject();
         expectedObject.c = 1;
         
-        InnerTestDynamicObject actualObject = new ReflectiveClassConstructor()
+        assertThrows(IllegalArgumentException.class, () ->
+            new ReflectiveClassConstructor()
             .construct(
                 InnerTestDynamicObject.class.getName(),
                 InnerTestDynamicObject.class,
@@ -260,7 +265,8 @@ public class ReflectiveClassConstructorTests {
                     parentObject,
                     false
                 }
-            );
+            )
+        );
     }
 
     @Test
@@ -268,8 +274,8 @@ public class ReflectiveClassConstructorTests {
         //TODO
     }
 
-    //TODO: static and regular inner classes
+    //TODO: Static and regular inner classes
 
-    //TODO: non existant class attempts
-    //TODO: load as subclass type
+    //TODO: Non existant class attempts
+    //TODO: Load as subclass type
 }
