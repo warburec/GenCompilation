@@ -307,6 +307,45 @@ public class ReflectiveClassConstructorTests {
     }
 
     @Test
+    public void construct_oneParameter_nonExistantClass() throws ClassNotFoundException {
+        assertThrows(ClassNotFoundException.class, () -> 
+            new ReflectiveClassConstructor()
+            .construct(
+                nonExistantTestDynamicObjectPath,
+                TestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {1}
+            )
+        );
+    }
+
+    @Test
+    public void construct_oneParameter_nonExistantStaticInnerClass() throws ClassNotFoundException {
+        assertThrows(ClassNotFoundException.class, () -> 
+            new ReflectiveClassConstructor()
+            .construct(
+                nonExistantStaticInnerTestDynamicObjectPath,
+                TestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {1}
+            )
+        );
+    }
+
+    @Test
+    public void construct_oneParameter_nonExistantInnerClass() throws ClassNotFoundException {
+        assertThrows(ClassNotFoundException.class, () -> 
+            new ReflectiveClassConstructor()
+            .construct(
+                nonExistantInnerTestDynamicObjectPath,
+                TestDynamicObject.class,
+                new Class<?>[] {int.class},
+                new Object[] {1}
+            )
+        );
+    }
+
+    @Test
     public void construct_manyParameters() {
         //TODO
     }
