@@ -1,13 +1,17 @@
 package component_construction.storage.dynamic_loading;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import test_aids.storage_entities.TestDynamicObject;
 import test_aids.storage_entities.TestDynamicObject.*;
 
 public class ReflectiveClassConstructorTests {
+
+    protected String TestDynamicObjectNamespace = TestDynamicObject.class.getPackageName();
+    protected String nonExistantTestDynamicObjectPath = TestDynamicObjectNamespace + ".NonExistantTestDynamicObject";
+    protected String nonExistantStaticInnerTestDynamicObjectPath = TestDynamicObjectNamespace + ".NonExistantTestDynamicObject$StaticInnerTestDynamicObject";
+    protected String nonExistantInnerTestDynamicObjectPath = TestDynamicObjectNamespace + ".NonExistantTestDynamicObject$InnerTestDynamicObject";
 
     @Test
     public void construct_noParameters_class() throws ClassNotFoundException {
@@ -47,6 +51,39 @@ public class ReflectiveClassConstructorTests {
         InnerTestDynamicObject expectedObject = parentObject.new InnerTestDynamicObject();
 
         assertEquals(expectedObject, actualObject);
+    }
+
+    @Test
+    public void construct_noParameters_nonExistantClass() throws ClassNotFoundException {
+        assertThrows(ClassNotFoundException.class, () -> 
+            new ReflectiveClassConstructor()
+            .construct(
+                nonExistantTestDynamicObjectPath,
+                TestDynamicObject.class
+            )
+        );
+    }
+
+    @Test
+    public void construct_noParameters_nonExistantStaticInnerClass() throws ClassNotFoundException {
+        assertThrows(ClassNotFoundException.class, () -> 
+            new ReflectiveClassConstructor()
+            .construct(
+                nonExistantStaticInnerTestDynamicObjectPath,
+                TestDynamicObject.class
+            )
+        );
+    }
+
+    @Test
+    public void construct_noParameters_nonExistantInnerClass() throws ClassNotFoundException {
+        assertThrows(ClassNotFoundException.class, () -> 
+            new ReflectiveClassConstructor()
+            .construct(
+                nonExistantInnerTestDynamicObjectPath,
+                TestDynamicObject.class
+            )
+        );
     }
 
     @Test

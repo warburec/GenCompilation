@@ -36,7 +36,7 @@ public class ReflectiveClassConstructor {
                 .newInstance(parameters);
         } 
         catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Target class footprint not found: " + className, e);
+            throw new ClassNotFoundException("Target class not found: " + className, e);
         }
         catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(
