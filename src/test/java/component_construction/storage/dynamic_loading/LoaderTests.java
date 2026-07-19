@@ -23,4 +23,5 @@ public class LoaderTests {
 
         assertThrows(MissingEmptyConstructorException.class, () -> Loader.construct(loaderClass));
     }
+    
 }

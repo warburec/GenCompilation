@@ -7,7 +7,7 @@ import component_construction.storage.factories.Factory;
 
 public interface Loader<T> extends Factory<T> {
 
-    public static <T> Loader<T> construct(Class<Loader<T>> loaderClass) {
+    public static <T> Loader<T> construct(Class<Loader<T>> loaderClass) throws MissingEmptyConstructorException, IllegalArgumentException {
         try {
             return loaderClass
                 .getConstructor()
@@ -23,7 +23,7 @@ public interface Loader<T> extends Factory<T> {
             | InvocationTargetException
             e
         ) {
-            throw new RuntimeException(); //TODO: Custom error
+            throw new IllegalArgumentException(e);
         }
     }
 
