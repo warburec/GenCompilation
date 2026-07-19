@@ -1,14 +1,11 @@
 package component_construction.storage.dynamic_loading;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 import test_aids.storage_entities.TestDynamicObject;
-import test_aids.storage_entities.TestDynamicObject.InnerTestDynamicObject;
-import test_aids.storage_entities.TestDynamicObject.StaticInnerTestDynamicObject;
+import test_aids.storage_entities.TestDynamicObject.*;
 import test_aids.storage_entities.TestDynamicObjectSubclass;
 
 public class ReflectiveClassConstructorTests {
