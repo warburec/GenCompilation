@@ -5,7 +5,7 @@ import storage.storage_values.StorageValue;
 
 public class IncorrectlyFormedLoader implements Loader<Boolean> {
     
-    public IncorrectlyFormedLoader(int a) {
+    private IncorrectlyFormedLoader() {
         // Exists only to prevent empty constructor call
     }
 
