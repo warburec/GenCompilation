@@ -24,9 +24,32 @@ public class LoadableByTests {
         assertThrows(IllegalArgumentException.class, () -> LoadableBy.getTargetLoader(loadableBy));
     }
 
-    // Additional interfaces of loadable class
-    //  Another interface without generics - implements Runnable, LoadablyBy<ThisClass>
-    //  Another interface with generics - implements AnotherInterface<String>, LoadablyBy<ThisClass>
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getTargetLoader_additionalInterface() {
+        Class<LoadableBy<Loader<TestLoadableObject>>> loadableBy = (Class<LoadableBy<Loader<TestLoadableObject>>>)(Class<?>)TestLoadableObject.class;
+        Class<Loader<TestLoadableObject>> actualLoader = LoadableBy.getTargetLoader(loadableBy);
+
+        assertEquals(StandardLoader.class, actualLoader);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getTargetLoader_additionalGenericInterface() {
+        Class<LoadableBy<Loader<GenericTestLoadableObject<?>>>> loadableBy = (Class<LoadableBy<Loader<GenericTestLoadableObject<?>>>>)(Class<?>)GenericTestLoadableObject.class;
+        Class<Loader<GenericTestLoadableObject<?>>> actualLoader = LoadableBy.getTargetLoader(loadableBy);
+
+        assertEquals(StandardLoader.class, actualLoader);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getTargetLoader_additionalConcretisedGenericInterface() {
+        Class<LoadableBy<Loader<ConcretisedGenericTestLoadableObject<?>>>> loadableBy = (Class<LoadableBy<Loader<ConcretisedGenericTestLoadableObject<?>>>>)(Class<?>)ConcretisedGenericTestLoadableObject.class;
+        Class<Loader<ConcretisedGenericTestLoadableObject<?>>> actualLoader = LoadableBy.getTargetLoader(loadableBy);
+
+        assertEquals(StandardLoader.class, actualLoader);
+    }
 
     // Nested Loaders?
 }
