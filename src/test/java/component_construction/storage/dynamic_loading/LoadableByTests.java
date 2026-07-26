@@ -3,6 +3,7 @@ package component_construction.storage.dynamic_loading;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import component_construction.storage.exceptions.IncorrectlyFormattedException;
 import test_aids.storage_entities.loadableby_entities.*;
 
 public class LoadableByTests {
@@ -18,10 +19,18 @@ public class LoadableByTests {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void getTargetLoader_GenericLoader() {
-        Class<LoadableBy<Loader<Object>>> loadableBy = (Class<LoadableBy<Loader<Object>>>)(Class<?>)GenericLoader.class;
+    public void getTargetLoader_genericLoader() {
+        Class<LoadableBy<Loader<GenericallyLoadableObject>>> loadableBy = (Class<LoadableBy<Loader<GenericallyLoadableObject>>>)(Class<?>)GenericallyLoadableObject.class;
         
-        assertThrows(IllegalArgumentException.class, () -> LoadableBy.getTargetLoader(loadableBy));
+        assertThrows(IncorrectlyFormattedException.class, () -> LoadableBy.getTargetLoader(loadableBy));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void getTargetLoader_wildcardLoader() {
+        Class<LoadableBy<Loader<WildcardLoadableObject>>> loadableBy = (Class<LoadableBy<Loader<WildcardLoadableObject>>>)(Class<?>)WildcardLoadableObject.class;
+        
+        assertThrows(IncorrectlyFormattedException.class, () -> LoadableBy.getTargetLoader(loadableBy));
     }
 
     @Test
@@ -51,5 +60,4 @@ public class LoadableByTests {
         assertEquals(StandardLoader.class, actualLoader);
     }
 
-    // Nested Loaders?
 }

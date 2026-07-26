@@ -12,7 +12,7 @@ public class GenericLoader <T> implements Loader<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T produce(StorageValue<?> loadValue) {
-        return (T)new NonLoadableObject((int)loadValue.getValue());
+        return (T)new GenericallyLoadableObject((int)loadValue.getValue());
     }
     
 }
