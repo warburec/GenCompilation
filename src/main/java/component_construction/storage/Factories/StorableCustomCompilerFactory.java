@@ -1,96 +1,40 @@
 package component_construction.storage.factories;
 
 import java.util.*;
+
 import component_construction.custom_components.*;
-import component_construction.storage.*;
+import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.dynamic_loading.*;
 import storage.external_interfaces.Loadable;
 import storage.storage_values.*;
 
 public class StorableCustomCompilerFactory implements Loader<StorableCustomCompiler> {
     protected ReflectiveClassConstructor reflectiveClassLoader = new ReflectiveClassConstructor();
-    protected FactoryRepository<CustomLexicalAnalyser> lexicalAnalyserFactoryRepository = new FactoryRepository<>();
-    protected FactoryRepository<CustomSyntaxAnalyser> syntaxAnalyserFactoryRepository = new FactoryRepository<>();
-    protected FactoryRepository<CustomCodeGenerator> codeGeneratorFactoryRepository = new FactoryRepository<>();
+    protected Map<String, Factory<CustomLexicalAnalyser>> lexicalAnalyserFactoryRepository = new HashMap<>();
+    protected Map<String, Factory<CustomSyntaxAnalyser>> syntaxAnalyserFactoryRepository = new HashMap<>();
+    protected Map<String, Factory<CustomCodeGenerator>> codeGeneratorFactoryRepository = new HashMap<>();
 
-    @SuppressWarnings("unchecked")
     @Override
     // TODO: Explain requirements for storage/loading
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
         MapStorageValue map = (MapStorageValue) loadValue;
         Map<String, StorageValue<?>> mapValue = map.getValue();
 
-        CustomLexicalAnalyser customLexicalAnalyser;
-        CustomSyntaxAnalyser customSyntaxAnalyser;
-        CustomCodeGenerator customCodeGenerator;
-
-        //TODO: Abstract common code into easy to use method
-        try {
-            ComponentDescription lexicalAnalyserDescription = getComponentDescription(mapValue.get("lexicalAnalyser"));
-
-            if (lexicalAnalyserFactoryRepository.containsKey(lexicalAnalyserDescription.name())) {
-                customLexicalAnalyser = lexicalAnalyserFactoryRepository.instantiate(
-                    lexicalAnalyserDescription.name(),
-                    lexicalAnalyserDescription.description()
-                );
-            }
-
-            Class<CustomLexicalAnalyser> clazz = (Class<CustomLexicalAnalyser>) Class
-                .forName(lexicalAnalyserDescription.name())
-                .asSubclass(CustomLexicalAnalyser.class);
-
-            if (LoadableBy.class.isAssignableFrom(clazz)) {
-                Class<LoadableBy<Loader<CustomLexicalAnalyser>>> loadableBy = (Class<LoadableBy<Loader<CustomLexicalAnalyser>>>) clazz.asSubclass(LoadableBy.class);
-                Class<Loader<CustomLexicalAnalyser>> targetLoader = LoadableBy.getTargetLoader(loadableBy);
-                Loader<CustomLexicalAnalyser> loader = Loader.construct(targetLoader);
-                customLexicalAnalyser = loader.produce(lexicalAnalyserDescription.description());
-            }
-            else if (Loadable.class.isAssignableFrom(clazz)) {
-                customLexicalAnalyser = reflectiveClassLoader.construct(
-                    lexicalAnalyserDescription.name(),
-                    CustomLexicalAnalyser.class
-                );
-
-                ((Loadable)customLexicalAnalyser)
-                    .load(lexicalAnalyserDescription.description());
-            }
-            // Use constructor
-            else {
-                customLexicalAnalyser = reflectiveClassLoader.construct(
-                    lexicalAnalyserDescription.name(),
-                    CustomLexicalAnalyser.class,
-                    StorageValue.class,
-                    lexicalAnalyserDescription.description()
-                );
-            }
-        }
-        catch (ClassNotFoundException e) { //TODO: Check for other exceptions
-            throw new RuntimeException(e); // TODO: Create custom exception
-        }
-
-        try {
-            ComponentDescription syntaxAnalyserDescription = getComponentDescription(mapValue.get("syntaxAnalyser"));
-
-            customSyntaxAnalyser = syntaxAnalyserFactoryRepository.instantiate(
-                syntaxAnalyserDescription.name(),
-                syntaxAnalyserDescription.description()
-            );
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeException(e); // TODO: Create custom exception
-        }
-
-        try {
-            ComponentDescription codeGeneratorDescription = getComponentDescription(mapValue.get("syntaxAnalyser"));
-
-            customCodeGenerator = codeGeneratorFactoryRepository.instantiate(
-                codeGeneratorDescription.name(),
-                codeGeneratorDescription.description()
-            );
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeException(e); // TODO: Create custom exception
-        }
+        CustomLexicalAnalyser customLexicalAnalyser = buildComponent(
+            lexicalAnalyserFactoryRepository, 
+            mapValue.get("lexicalAnalyser"),
+            CustomLexicalAnalyser.class
+        );
+        CustomSyntaxAnalyser customSyntaxAnalyser = buildComponent(
+            syntaxAnalyserFactoryRepository, 
+            mapValue.get("syntaxAnalyser"),
+            CustomSyntaxAnalyser.class
+        );
+        CustomCodeGenerator customCodeGenerator = buildComponent(
+            codeGeneratorFactoryRepository, 
+            mapValue.get("codeGenerator"),
+            CustomCodeGenerator.class
+        );
 
         return new StorableCustomCompiler(
             customLexicalAnalyser,
@@ -110,4 +54,69 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     }
     
     protected record ComponentDescription(String name, ListStorageValue description) {}
+    
+    @SuppressWarnings("unchecked")
+    protected <T extends Loadable> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
+        ComponentDescription componentDescription = getComponentDescription(description);
+
+        if (repository.containsKey(componentDescription.name())) {
+            return repository
+                .get(componentDescription.name())
+                .produce(componentDescription.description());
+        }
+
+        Class<T> clazz;
+        
+        try {
+            clazz = (Class<T>) Class
+                .forName(componentDescription.name())
+                .asSubclass(selectedType);
+        } 
+        catch (ClassNotFoundException e) {
+            //TODO
+            throw new RuntimeException();
+        }
+        catch (ClassCastException e) {
+            //TODO
+            throw new RuntimeException();
+        }
+
+        if (LoadableBy.class.isAssignableFrom(clazz)) {
+            Class<LoadableBy<Loader<T>>> loadableBy = (Class<LoadableBy<Loader<T>>>) clazz.asSubclass(LoadableBy.class);
+            Class<Loader<T>> targetLoader = LoadableBy.getTargetLoader(loadableBy);
+            Loader<T> loader = Loader.construct(targetLoader);
+            return loader.produce(componentDescription.description());
+        }
+
+        if (Loadable.class.isAssignableFrom(clazz)) {
+            T component;
+
+            try {
+                component = reflectiveClassLoader.construct(
+                    componentDescription.name(),
+                    selectedType
+                );
+            } catch (ClassNotFoundException | IllegalArgumentException e) {
+                //TODO
+                throw new RuntimeException();
+            }
+
+            component.load(componentDescription.description());
+
+            return component;
+        }
+
+        // Use constructor
+        try {
+            return reflectiveClassLoader.construct(
+                componentDescription.name(),
+                selectedType,
+                StorageValue.class,
+                componentDescription.description()
+            );
+        } catch (ClassNotFoundException | IllegalArgumentException e) {
+            //TODO
+            throw new RuntimeException();
+        }
+    }
 }
