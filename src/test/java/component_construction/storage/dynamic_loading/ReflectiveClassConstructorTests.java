@@ -1,12 +1,10 @@
 package component_construction.storage.dynamic_loading;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-import test_aids.storage_entities.TestDynamicObject;
+import test_aids.storage_entities.*;
 import test_aids.storage_entities.TestDynamicObject.*;
-import test_aids.storage_entities.TestDynamicObjectSubclass;
 
 public class ReflectiveClassConstructorTests {
 

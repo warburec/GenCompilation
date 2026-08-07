@@ -14,50 +14,61 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     protected Map<String, Factory<CustomSyntaxAnalyser>> syntaxAnalyserFactoryRepository = new HashMap<>();
     protected Map<String, Factory<CustomCodeGenerator>> codeGeneratorFactoryRepository = new HashMap<>();
 
+    public StorableCustomCompilerFactory addLexicalAnalyserFactory(String name, Factory<CustomLexicalAnalyser> factory) {
+        lexicalAnalyserFactoryRepository.put(name, factory);
+        return this;
+    }
+
+    public StorableCustomCompilerFactory addSyntaxAnalyserFactory(String name, Factory<CustomSyntaxAnalyser> factory) {
+        syntaxAnalyserFactoryRepository.put(name, factory);
+        return this;
+    }
+
+    public StorableCustomCompilerFactory addCodeGeneratorFactory(String name, Factory<CustomCodeGenerator> factory) {
+        codeGeneratorFactoryRepository.put(name, factory);
+        return this;
+    }
+
     @Override
     // TODO: Explain requirements for storage/loading
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
         MapStorageValue map = (MapStorageValue) loadValue;
         Map<String, StorageValue<?>> mapValue = map.getValue();
 
-        CustomLexicalAnalyser customLexicalAnalyser = buildComponent(
-            lexicalAnalyserFactoryRepository, 
-            mapValue.get("lexicalAnalyser"),
-            CustomLexicalAnalyser.class
-        );
-        CustomSyntaxAnalyser customSyntaxAnalyser = buildComponent(
-            syntaxAnalyserFactoryRepository, 
-            mapValue.get("syntaxAnalyser"),
-            CustomSyntaxAnalyser.class
-        );
-        CustomCodeGenerator customCodeGenerator = buildComponent(
-            codeGeneratorFactoryRepository, 
-            mapValue.get("codeGenerator"),
-            CustomCodeGenerator.class
-        );
-
         return new StorableCustomCompiler(
-            customLexicalAnalyser,
-            customSyntaxAnalyser,
-            customCodeGenerator
+            buildComponent(
+                lexicalAnalyserFactoryRepository, 
+                mapValue.get("lexicalAnalyser"),
+                CustomLexicalAnalyser.class
+            ),
+            buildComponent(
+                syntaxAnalyserFactoryRepository, 
+                mapValue.get("syntaxAnalyser"),
+                CustomSyntaxAnalyser.class
+            ),
+            buildComponent(
+                codeGeneratorFactoryRepository, 
+                mapValue.get("codeGenerator"),
+                CustomCodeGenerator.class
+            )
         );
     }
 
     // TODO: Handle errors
-    protected ComponentDescription getComponentDescription(StorageValue<?> description) {
+    protected ComponentInformation getComponentDescription(StorageValue<?> description) {
         List<StorageValue<?>> entry = ((ListStorageValue)description).getValue();
 
-        return new ComponentDescription(
+        return new ComponentInformation(
             ((StringStorageValue)entry.get(0)).getValue(),
             (ListStorageValue)entry.get(1)
         );
     }
     
-    protected record ComponentDescription(String name, ListStorageValue description) {}
+    protected record ComponentInformation(String name, ListStorageValue description) {}
     
     @SuppressWarnings("unchecked")
     protected <T extends Loadable> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
-        ComponentDescription componentDescription = getComponentDescription(description);
+        ComponentInformation componentDescription = getComponentDescription(description);
 
         if (repository.containsKey(componentDescription.name())) {
             return repository
