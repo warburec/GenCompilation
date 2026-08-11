@@ -13,14 +13,14 @@ public class StorableCustomCompilerFactoryTests {
     protected record TypedComponent<T>(String name, ListStorageValue description, Factory<T> factory) {}
 
     protected static final TypedComponent<CustomLexicalAnalyser> lexicalComponent = new TypedComponent<>(
-        "TestCustomLexicalAnalyser",
+        "TestLexicalAnalyser",
         new ListStorageValue(
-            new StringStorageValue("TestCustomLexicalAnalyser")
+            new StringStorageValue("TestLexicalAnalyser")
         ), 
         (description) -> {
             assertEquals(
                 new ListStorageValue(
-                    new StringStorageValue("TestCustomLexicalAnalyser")
+                    new StringStorageValue("TestLexicalAnalyser")
                 ), 
                 description
             );
@@ -30,14 +30,14 @@ public class StorableCustomCompilerFactoryTests {
     );
 
     protected static final TypedComponent<CustomSyntaxAnalyser> syntaxComponent = new TypedComponent<>(
-        "TestCustomSyntaxAnalyser",
+        "TestSyntaxAnalyser",
         new ListStorageValue(
-            new StringStorageValue("TestCustomSyntaxAnalyser")
+            new StringStorageValue("TestSyntaxAnalyser")
         ),
         (description) -> {
             assertEquals(
                 new ListStorageValue(
-                    new StringStorageValue("TestCustomSyntaxAnalyser")
+                    new StringStorageValue("TestSyntaxAnalyser")
                 ),
                 description
             );
@@ -47,14 +47,14 @@ public class StorableCustomCompilerFactoryTests {
     );
 
     protected static final TypedComponent<CustomCodeGenerator> codeGeneratorComponent = new TypedComponent<>(
-        "TestCustomCodeGenerator",
+        "TestCodeGenerator",
         new ListStorageValue(
-            new StringStorageValue("TestCustomCodeGenerator")
+            new StringStorageValue("TestCodeGenerator")
         ), 
         (description) -> {
             assertEquals(
                 new ListStorageValue(
-                    new StringStorageValue("TestCustomCodeGenerator")
+                    new StringStorageValue("TestCodeGenerator")
                 ), 
                 description
             );
@@ -82,6 +82,40 @@ public class StorableCustomCompilerFactoryTests {
         assertDoesNotThrow(() -> factory.produce(
             new MapStorageValue(Map.of(
                 "lexicalAnalyser", new ListStorageValue(
+                    new StringStorageValue(lexicalComponent.name()),
+                    lexicalComponent.description()
+                ),
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
+                )
+            ))
+        ));
+    }
+
+    @Test
+    public void produce_existingNamedClassComponents() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addLexicalAnalyserFactory(
+                "TestCustomLexicalAnalyser",
+                lexicalComponent.factory()
+            )
+            .addSyntaxAnalyserFactory(
+                "TestCustomSyntaxAnalyser",
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                "TestCustomCodeGenerator",
+                codeGeneratorComponent.factory()
+            );
+
+        assertDoesNotThrow(() -> factory.produce(
+            new MapStorageValue(Map.of(
+                "lexicalAnalyser", new ListStorageValue(
                     new StringStorageValue("TestCustomLexicalAnalyser"),
                     lexicalComponent.description()
                 ),
@@ -96,8 +130,7 @@ public class StorableCustomCompilerFactoryTests {
             ))
         ));
     }
-
-    //In repositories
+    
     //LoadableBy components
     //Loadable components
     //Default/Empty constructor without interfaces
