@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import component_construction.custom_components.*;
 import storage.storage_values.*;
 import test_aids.storage_entities.custom_components.*;
+import test_aids.storage_entities.custom_components.loadableBy.LoadableByCustomLexicalAnalyser;
 
 public class StorableCustomCompilerFactoryTests {
     
@@ -130,8 +131,37 @@ public class StorableCustomCompilerFactoryTests {
             ))
         ));
     }
+
+    @Test
+    public void produce_LoadableByLexicalAnalyser() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        factory.produce(
+            new MapStorageValue(Map.of(
+                "lexicalAnalyser", new ListStorageValue(
+                    new StringStorageValue(LoadableByCustomLexicalAnalyser.class.getName()),
+                    lexicalComponent.description()
+                ),
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
+                )
+            ))
+        );
+    }
     
-    //LoadableBy components
     //Loadable components
     //Default/Empty constructor without interfaces
     //Incorrect StorageValue type (i.e. not Map in produce())
