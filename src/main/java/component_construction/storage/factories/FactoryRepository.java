@@ -4,20 +4,26 @@ import java.util.*;
 
 import storage.storage_values.StorageValue;
 
+//TODO: Remove?
 public class FactoryRepository <T> {
     protected Map<String, Factory<T>> factories = new HashMap<>();
 
     /**
-     * 
-     * @param name
-     * @param generator
+     * Adds a factory to this repository
+     * @param name The name of the factory
+     * @param factory The factory
      * @return This object for method chaining
      */
-    public FactoryRepository<T> addFactory(String name, Factory<T> generator) {
-        factories.put(name, generator);
+    public FactoryRepository<T> addFactory(String name, Factory<T> factory) {
+        factories.put(name, factory);
         return this;
     }
 
+    /**
+     * Checks if this repository contains a factory for a given key
+     * @param name The name/key of the factory
+     * @return Whether or not this repository contains the specified key
+     */
     public boolean containsKey(String name) {
         return factories.containsKey(name);
     }
