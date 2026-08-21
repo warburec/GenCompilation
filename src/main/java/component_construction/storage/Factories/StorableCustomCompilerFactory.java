@@ -2,28 +2,30 @@ package component_construction.storage.factories;
 
 import java.util.*;
 
-import component_construction.custom_components.*;
+import code_generation.CodeGenerator;
 import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.dynamic_loading.*;
+import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
+import syntax_analysis.SyntaxAnalyser;
 
 public class StorableCustomCompilerFactory implements Loader<StorableCustomCompiler> {
     protected ReflectiveClassConstructor reflectiveClassLoader = new ReflectiveClassConstructor();
-    protected Map<String, Factory<CustomLexicalAnalyser>> lexicalAnalyserFactoryRepository = new HashMap<>();
-    protected Map<String, Factory<CustomSyntaxAnalyser>> syntaxAnalyserFactoryRepository = new HashMap<>();
-    protected Map<String, Factory<CustomCodeGenerator>> codeGeneratorFactoryRepository = new HashMap<>();
+    protected Map<String, Factory<LexicalAnalyser>> lexicalAnalyserFactoryRepository = new HashMap<>();
+    protected Map<String, Factory<SyntaxAnalyser>> syntaxAnalyserFactoryRepository = new HashMap<>();
+    protected Map<String, Factory<CodeGenerator>> codeGeneratorFactoryRepository = new HashMap<>();
 
-    public StorableCustomCompilerFactory addLexicalAnalyserFactory(String name, Factory<CustomLexicalAnalyser> factory) {
+    public StorableCustomCompilerFactory addLexicalAnalyserFactory(String name, Factory<LexicalAnalyser> factory) {
         lexicalAnalyserFactoryRepository.put(name, factory);
         return this;
     }
 
-    public StorableCustomCompilerFactory addSyntaxAnalyserFactory(String name, Factory<CustomSyntaxAnalyser> factory) {
+    public StorableCustomCompilerFactory addSyntaxAnalyserFactory(String name, Factory<SyntaxAnalyser> factory) {
         syntaxAnalyserFactoryRepository.put(name, factory);
         return this;
     }
 
-    public StorableCustomCompilerFactory addCodeGeneratorFactory(String name, Factory<CustomCodeGenerator> factory) {
+    public StorableCustomCompilerFactory addCodeGeneratorFactory(String name, Factory<CodeGenerator> factory) {
         codeGeneratorFactoryRepository.put(name, factory);
         return this;
     }
@@ -38,17 +40,17 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
             buildComponent(
                 lexicalAnalyserFactoryRepository, 
                 mapValue.get("lexicalAnalyser"),
-                CustomLexicalAnalyser.class
+                LexicalAnalyser.class
             ),
             buildComponent(
                 syntaxAnalyserFactoryRepository, 
                 mapValue.get("syntaxAnalyser"),
-                CustomSyntaxAnalyser.class
+                SyntaxAnalyser.class
             ),
             buildComponent(
                 codeGeneratorFactoryRepository, 
                 mapValue.get("codeGenerator"),
-                CustomCodeGenerator.class
+                CodeGenerator.class
             )
         );
     }

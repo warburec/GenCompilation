@@ -1,24 +1,13 @@
 package test_aids.storage_entities.custom_components;
 
-import component_construction.custom_components.CustomLexicalAnalyser;
 import grammar_objects.Token;
-import storage.storage_values.StorageValue;
+import lexical_analysis.LexicalAnalyser;
 
-public class TestCustomLexicalAnalyser implements CustomLexicalAnalyser {
+public class TestCustomLexicalAnalyser implements LexicalAnalyser {
 
     @Override
     public Token[] analyse(String sentence) {
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
-    }
-
-    @Override
-    public StorageValue<?> getStorageRepresentation() {
-        throw new UnsupportedOperationException("Unimplemented method 'getStorageRepresentation'");
-    }
-
-    @Override
-    public void load(StorageValue<?> data) {
-        throw new UnsupportedOperationException("Unimplemented method 'load'");
     }
     
 }

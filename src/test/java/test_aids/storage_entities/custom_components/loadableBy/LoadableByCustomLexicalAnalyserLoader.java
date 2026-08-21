@@ -8,8 +8,8 @@ public class LoadableByCustomLexicalAnalyserLoader implements Loader<LoadableByC
     @Override
     public LoadableByCustomLexicalAnalyser produce(StorageValue<?> loadValue) {
         LoadableByCustomLexicalAnalyser lex = new LoadableByCustomLexicalAnalyser();
-        lex.load(loadValue);
-
+        lex.loadInternals(loadValue);
+        
         return lex;
     }
     

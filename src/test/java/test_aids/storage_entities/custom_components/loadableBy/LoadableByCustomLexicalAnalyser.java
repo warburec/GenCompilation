@@ -1,11 +1,11 @@
 package test_aids.storage_entities.custom_components.loadableBy;
 
-import component_construction.custom_components.CustomLexicalAnalyser;
 import component_construction.storage.dynamic_loading.LoadableBy;
 import grammar_objects.Token;
+import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.StorageValue;
 
-public class LoadableByCustomLexicalAnalyser implements CustomLexicalAnalyser, LoadableBy<LoadableByCustomLexicalAnalyserLoader> {
+public class LoadableByCustomLexicalAnalyser implements LexicalAnalyser, LoadableBy<LoadableByCustomLexicalAnalyserLoader> {
 
     public StorageValue<?> loadedData;
 
@@ -14,13 +14,7 @@ public class LoadableByCustomLexicalAnalyser implements CustomLexicalAnalyser, L
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
 
-    @Override
-    public StorageValue<?> getStorageRepresentation() {
-        throw new UnsupportedOperationException("Unimplemented method 'getStorageRepresentation'");
-    }
-
-    @Override
-    public void load(StorageValue<?> data) {
+    public void loadInternals(StorageValue<?> data) {
         loadedData = data;
     }
     

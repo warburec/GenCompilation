@@ -21,23 +21,15 @@ public class StorableCustomCompilerBuilder extends CompilerBuilderTemplate<Stora
 
         GrammarParts parts = grammar.getParts();
 
-        LexicalAnalyser lexicalAnalyser = lexicalAnalyserFactory.produceAnalyser(
-            whitespaceDelimiters,
-            stronglyReservedWords,
-            weaklyReservedWords,
-            dynamicTokenRegex
-        );
-        SyntaxAnalyser syntaxAnalyser = syntaxAnalyserFactory.produceAnalyser(parts);
-        CodeGenerator codeGenerator = codeGeneratorFactory.produceGenerator(ruleConvertor);
-
-        if(!(lexicalAnalyser instanceof CustomLexicalAnalyser)) throw new RuntimeException("TODO"); //TODO
-        if(!(syntaxAnalyser instanceof CustomSyntaxAnalyser)) throw new RuntimeException("TODO"); //TODO
-        if(!(codeGenerator instanceof CustomCodeGenerator)) throw new RuntimeException("TODO"); //TODO
-
         return new StorableCustomCompiler(
-            (CustomLexicalAnalyser)lexicalAnalyser,
-            (CustomSyntaxAnalyser)syntaxAnalyser,
-            (CustomCodeGenerator)codeGenerator
+            lexicalAnalyserFactory.produceAnalyser(
+                whitespaceDelimiters,
+                stronglyReservedWords,
+                weaklyReservedWords,
+                dynamicTokenRegex
+            ),
+            syntaxAnalyserFactory.produceAnalyser(parts),
+            codeGeneratorFactory.produceGenerator(ruleConvertor)
         );
     }
 }
