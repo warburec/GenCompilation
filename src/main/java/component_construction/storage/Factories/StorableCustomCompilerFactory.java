@@ -5,7 +5,6 @@ import java.util.*;
 import component_construction.custom_components.*;
 import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.dynamic_loading.*;
-import storage.external_interfaces.Loadable;
 import storage.storage_values.*;
 
 public class StorableCustomCompilerFactory implements Loader<StorableCustomCompiler> {
@@ -65,9 +64,17 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     }
     
     protected record ComponentInformation(String name, ListStorageValue description) {}
-    
+
     @SuppressWarnings("unchecked")
-    protected <T extends Loadable> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
+    /**
+     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking the exact parameters provided.
+     * @param <T>
+     * @param repository
+     * @param description
+     * @param selectedType
+     * @return
+     */
+    protected <T> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
         ComponentInformation componentDescription = getComponentDescription(description);
 
         if (repository.containsKey(componentDescription.name())) {
@@ -99,7 +106,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
             return loader.produce(componentDescription.description());
         }
 
-        if (Loadable.class.isAssignableFrom(clazz)) {
+        if (ReflectivelyLoadable.class.isAssignableFrom(clazz)) {
             T component;
 
             try {
@@ -112,7 +119,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
                 throw new RuntimeException();
             }
 
-            component.load(componentDescription.description());
+            ((ReflectivelyLoadable)component).load(componentDescription.description());
 
             return component;
         }
