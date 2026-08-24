@@ -69,7 +69,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
 
     @SuppressWarnings("unchecked")
     /**
-     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking the exact parameters provided.
+     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking StorageValue<?>.
      * @param <T>
      * @param repository
      * @param description
