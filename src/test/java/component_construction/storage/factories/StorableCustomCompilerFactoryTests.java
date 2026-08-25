@@ -320,5 +320,26 @@ public class StorableCustomCompilerFactoryTests {
         ));
     }
 
+    @Test
+    public void produce_incorrectFormat_emptyMap() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addLexicalAnalyserFactory(
+                lexicalComponent.name(),
+                lexicalComponent.factory()
+            )
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(MissingKeyException.class, () -> factory.produce(
+            new MapStorageValue(Map.of())
+        ));
+    }
+
     //Check internal (loaded) values
 }
