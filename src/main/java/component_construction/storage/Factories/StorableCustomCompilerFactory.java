@@ -5,7 +5,7 @@ import java.util.*;
 import code_generation.CodeGenerator;
 import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.dynamic_loading.*;
-import component_construction.storage.exceptions.IncorrectLoadValueFormat;
+import component_construction.storage.exceptions.*;
 import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
@@ -15,6 +15,11 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     protected Map<String, Factory<LexicalAnalyser>> lexicalAnalyserFactoryRepository = new HashMap<>();
     protected Map<String, Factory<SyntaxAnalyser>> syntaxAnalyserFactoryRepository = new HashMap<>();
     protected Map<String, Factory<CodeGenerator>> codeGeneratorFactoryRepository = new HashMap<>();
+    protected final Set<String> expectedKeys = Set.of(
+        "lexicalAnalyser",
+        "syntaxAnalyser",
+        "codeGenerator"
+    );
 
     public StorableCustomCompilerFactory addLexicalAnalyserFactory(String name, Factory<LexicalAnalyser> factory) {
         lexicalAnalyserFactoryRepository.put(name, factory);
@@ -47,6 +52,13 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      */
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
         Map<String, StorageValue<?>> mapValue = tryGetMapValue(loadValue);
+        Set<String> keys = mapValue.keySet();
+
+        if (!keys.containsAll(expectedKeys)) {
+            Set<String> missingKeys = new HashSet<String>(expectedKeys);
+            missingKeys.removeAll(keys);
+            throw new MissingKeyException(missingKeys);
+        }
 
         return new StorableCustomCompiler(
             buildComponent(

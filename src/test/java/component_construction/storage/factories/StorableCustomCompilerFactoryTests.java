@@ -1,12 +1,11 @@
 package component_construction.storage.factories;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.*;
 import org.junit.jupiter.api.Test;
 
 import code_generation.CodeGenerator;
-import component_construction.storage.exceptions.IncorrectLoadValueFormat;
+import component_construction.storage.exceptions.*;
 import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
@@ -260,6 +259,36 @@ public class StorableCustomCompilerFactoryTests {
                         new StringStorageValue(codeGeneratorComponent.name()),
                         codeGeneratorComponent.description()
                     )
+                )
+            ))
+        ));
+    }
+
+    @Test
+    public void produce_incorrectFormat_missingKey() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addLexicalAnalyserFactory(
+                lexicalComponent.name(),
+                lexicalComponent.factory()
+            )
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(MissingKeyException.class, () -> factory.produce(
+            new MapStorageValue(Map.of(
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
                 )
             ))
         ));
