@@ -31,7 +31,19 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     }
 
     @Override
-    // TODO: Explain requirements for storage/loading
+    /**
+     * Builds a StorableCustomCompiler from a  map of specified StorageValues.
+     * 
+     * The format of the loadValue for loading StorableCustomCompiler components is a @{code MapStorageValue} containing the keys "lexicalAnalyser", "syntaxAnalyser", and "codeGenerator" mapped to their respective {@code StorageValue<?>} descriptions
+     * 
+     * In order to be loadable, components must be one of: 
+     *  - registered with a factory
+     *  - LoadableBy
+     *  - Loadable
+     *  - Have a constructor taking a single StorageValue<?> parameter
+     * @param loadValue The StorageValue to be used for building a StorableCustomCompiler
+     * @return The produced {@code StorableCustomCompiler}
+     */
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
         MapStorageValue map = (MapStorageValue) loadValue;
         Map<String, StorageValue<?>> mapValue = map.getValue();
@@ -69,12 +81,13 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
 
     @SuppressWarnings("unchecked")
     /**
-     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking StorageValue<?>.
-     * @param <T>
-     * @param repository
-     * @param description
-     * @param selectedType
-     * @return
+     * Builds a component with the provided description.
+     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking a single StorageValue<?> parameter.
+     * @param <T> The abstract type of the component
+     * @param repository The repository to query for registered factories for the specific component type
+     * @param description The description with which to load the component with
+     * @param selectedType The subclass with which to produce and use the component
+     * @return The built component
      */
     protected <T> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
         ComponentInformation componentDescription = getComponentDescription(description);
