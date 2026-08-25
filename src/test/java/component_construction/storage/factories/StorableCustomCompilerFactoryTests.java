@@ -6,6 +6,7 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 import code_generation.CodeGenerator;
+import component_construction.storage.exceptions.IncorrectLoadValueFormat;
 import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
@@ -225,7 +226,44 @@ public class StorableCustomCompilerFactoryTests {
         );
     }
 
-    //Incorrect StorageValue type (i.e. not Map in produce())
+    @Test
+    public void produce_incorrectFormat_noMap() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(IncorrectLoadValueFormat.class, () -> factory.produce(
+            new ListStorageValue(List.of(
+                new ListStorageValue(
+                    new StringStorageValue("lexicalAnalyser"), 
+                    new ListStorageValue(
+                        new StringStorageValue(lexicalComponent.name()),
+                        new ListStorageValue(List.of())
+                    )
+                ),
+                new ListStorageValue(
+                    new StringStorageValue("syntaxAnalyser"), 
+                    new ListStorageValue(
+                        new StringStorageValue(syntaxComponent.name()),
+                        syntaxComponent.description()
+                    )
+                ),
+                new ListStorageValue(
+                    new StringStorageValue("codeGenerator"), 
+                    new ListStorageValue(
+                        new StringStorageValue(codeGeneratorComponent.name()),
+                        codeGeneratorComponent.description()
+                    )
+                )
+            ))
+        ));
+    }
 
     //Check internal (loaded) values
 }

@@ -5,6 +5,7 @@ import java.util.*;
 import code_generation.CodeGenerator;
 import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.dynamic_loading.*;
+import component_construction.storage.exceptions.IncorrectLoadValueFormat;
 import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
@@ -45,8 +46,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @return The produced {@code StorableCustomCompiler}
      */
     public StorableCustomCompiler produce(StorageValue<?> loadValue) {
-        MapStorageValue map = (MapStorageValue) loadValue;
-        Map<String, StorageValue<?>> mapValue = map.getValue();
+        Map<String, StorageValue<?>> mapValue = tryGetMapValue(loadValue);
 
         return new StorableCustomCompiler(
             buildComponent(
@@ -65,6 +65,24 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
                 CodeGenerator.class
             )
         );
+    }
+
+    private Map<String, StorageValue<?>> tryGetMapValue(StorageValue<?> loadValue) {
+        MapStorageValue map;
+        Map<String, StorageValue<?>> mapValue;
+        
+        try {
+            map = (MapStorageValue) loadValue;
+        }
+        catch (ClassCastException e) {
+            throw new IncorrectLoadValueFormat(
+                "Map<String, StorageValue<?>>", 
+                loadValue.getClass().getSimpleName()
+            );
+        }
+
+        mapValue = map.getValue();
+        return mapValue;
     }
 
     // TODO: Handle errors
