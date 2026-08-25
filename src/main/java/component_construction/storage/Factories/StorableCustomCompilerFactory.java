@@ -10,6 +10,9 @@ import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
 
+/**
+ * A factory for producing StorableCustomCompilers.
+ */
 public class StorableCustomCompilerFactory implements Loader<StorableCustomCompiler> {
     protected ReflectiveClassConstructor reflectiveClassLoader = new ReflectiveClassConstructor();
     protected Map<String, Factory<LexicalAnalyser>> lexicalAnalyserFactoryRepository = new HashMap<>();
@@ -49,8 +52,10 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      *  - Have a constructor taking a single StorageValue<?> parameter
      * @param loadValue The StorageValue to be used for building a StorableCustomCompiler
      * @return The produced {@code StorableCustomCompiler}
+     * @throws IncorrectLoadValueFormat The provided load value was in an incorrect format
+     * @throws MissingKeyException The provided load value was missing one or more required keys
      */
-    public StorableCustomCompiler produce(StorageValue<?> loadValue) {
+    public StorableCustomCompiler produce(StorageValue<?> loadValue) throws IncorrectLoadValueFormat, MissingKeyException {
         Map<String, StorageValue<?>> mapValue = tryGetMapValue(loadValue);
         Set<String> keys = mapValue.keySet();
 
@@ -79,7 +84,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
         );
     }
 
-    private Map<String, StorageValue<?>> tryGetMapValue(StorageValue<?> loadValue) {
+    private Map<String, StorageValue<?>> tryGetMapValue(StorageValue<?> loadValue) throws IncorrectLoadValueFormat {
         MapStorageValue map;
         Map<String, StorageValue<?>> mapValue;
         
