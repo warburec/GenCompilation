@@ -294,5 +294,31 @@ public class StorableCustomCompilerFactoryTests {
         ));
     }
 
+    @Test
+    public void produce_incorrectFormat_multipleMissingKeys() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addLexicalAnalyserFactory(
+                lexicalComponent.name(),
+                lexicalComponent.factory()
+            )
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(MissingKeyException.class, () -> factory.produce(
+            new MapStorageValue(Map.of(
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                )
+            ))
+        ));
+    }
+
     //Check internal (loaded) values
 }
