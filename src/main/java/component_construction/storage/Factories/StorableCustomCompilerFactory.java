@@ -54,8 +54,15 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @return The produced {@code StorableCustomCompiler}
      * @throws IncorrectLoadValueFormat The provided load value was in an incorrect format
      * @throws MissingKeyException The provided load value was missing one or more required keys
+     * @throws NonExistentComponentException A specified component class does not exist
+     * @throws ComponentCastException A specified component class could not be cast to its intended type
      */
-    public StorableCustomCompiler produce(StorageValue<?> loadValue) throws IncorrectLoadValueFormat, MissingKeyException {
+    public StorableCustomCompiler produce(StorageValue<?> loadValue) throws 
+        IncorrectLoadValueFormat, 
+        MissingKeyException, 
+        NonExistentComponentException, 
+        ComponentCastException
+    {
         Map<String, StorageValue<?>> mapValue = tryGetMapValue(loadValue);
         Set<String> keys = mapValue.keySet();
 
@@ -123,8 +130,14 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @param description The description with which to load the component with
      * @param selectedType The subclass with which to produce and use the component
      * @return The built component
+     * @throws NonExistentComponentException The specified component class does not exist
+     * @throws ComponentCastException The specified component class could not be cast to the selectedType
      */
-    protected <T> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
+    protected <T> T buildComponent(
+        Map<String, Factory<T>> repository, 
+        StorageValue<?> description, 
+        Class<T> selectedType
+    ) throws NonExistentComponentException, ComponentCastException {
         ComponentInformation componentDescription = getComponentDescription(description);
 
         if (repository.containsKey(componentDescription.name()))
@@ -143,8 +156,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
             throw new NonExistentComponentException(componentDescription.name());
         }
         catch (ClassCastException e) {
-            //TODO
-            throw new RuntimeException();
+            throw new ComponentCastException(componentDescription.name(), selectedType.getName());
         }
 
         if (LoadableBy.class.isAssignableFrom(clazz)) {

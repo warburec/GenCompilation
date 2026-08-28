@@ -354,7 +354,7 @@ public class StorableCustomCompilerFactoryTests {
                 codeGeneratorComponent.factory()
             );
 
-        NonExistentComponentException a = assertThrows(NonExistentComponentException.class, () -> factory.produce(
+        assertThrows(NonExistentComponentException.class, () -> factory.produce(
             new MapStorageValue(Map.of(
                 "lexicalAnalyser", new ListStorageValue(
                     new StringStorageValue("NonExistantClass"),
@@ -371,4 +371,36 @@ public class StorableCustomCompilerFactoryTests {
             ))
         ));
     }
+
+    @Test
+    public void produce_nonComponentClass() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(ComponentCastException.class, () -> factory.produce(
+            new MapStorageValue(Map.of(
+                "lexicalAnalyser", new ListStorageValue(
+                    new StringStorageValue(TestCustomFalseLexicalAnalyser.class.getName()),
+                    new ListStorageValue(List.of())
+                ),
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
+                )
+            ))
+        ));
+    }
+
+    // TODO: Handle all exceptions
 }
