@@ -5,6 +5,7 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 import code_generation.CodeGenerator;
+import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.exceptions.*;
 import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
@@ -341,5 +342,33 @@ public class StorableCustomCompilerFactoryTests {
         ));
     }
 
-    //Check internal (loaded) values
+    @Test
+    public void produce_nonExistentComponentClass() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        NonExistentComponentException a = assertThrows(NonExistentComponentException.class, () -> factory.produce(
+            new MapStorageValue(Map.of(
+                "lexicalAnalyser", new ListStorageValue(
+                    new StringStorageValue("NonExistantClass"),
+                    new ListStorageValue(List.of())
+                ),
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
+                )
+            ))
+        ));
+    }
 }

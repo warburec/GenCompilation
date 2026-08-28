@@ -127,11 +127,10 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     protected <T> T buildComponent(Map<String, Factory<T>> repository, StorageValue<?> description, Class<T> selectedType) {
         ComponentInformation componentDescription = getComponentDescription(description);
 
-        if (repository.containsKey(componentDescription.name())) {
+        if (repository.containsKey(componentDescription.name()))
             return repository
                 .get(componentDescription.name())
                 .produce(componentDescription.description());
-        }
 
         Class<T> clazz;
         
@@ -141,8 +140,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
                 .asSubclass(selectedType);
         } 
         catch (ClassNotFoundException e) {
-            //TODO
-            throw new RuntimeException();
+            throw new NonExistentComponentException(componentDescription.name());
         }
         catch (ClassCastException e) {
             //TODO
