@@ -41,22 +41,23 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
 
     @Override
     /**
-     * Builds a StorableCustomCompiler from a  map of specified StorageValues.
+     * Builds a {@code StorableCustomCompiler} from a map of specified StorageValues.
      * 
-     * The format of the loadValue for loading StorableCustomCompiler components is a @{code MapStorageValue} containing the keys "lexicalAnalyser", "syntaxAnalyser", and "codeGenerator" mapped to their respective {@code StorageValue<?>} descriptions
+     * The format of the loadValue for loading {@code StorableCustomCompiler} components is a {@code MapStorageValue} containing the keys "lexicalAnalyser", "syntaxAnalyser", and "codeGenerator" mapped to their respective {@code StorageValue<?>} descriptions
      * 
      * In order to be loadable, components must be one of: 
      *  - registered with a factory
-     *  - LoadableBy
-     *  - Loadable
-     *  - Have a constructor taking a single StorageValue<?> parameter
-     * @param loadValue The StorageValue to be used for building a StorableCustomCompiler
+     *  - {@code LoadableBy}
+     *  - {@code Loadable}
+     *  - Have a constructor taking a single {@code StorageValue<?>} parameter
+     * @param loadValue The StorageValue to be used for building a {@code StorableCustomCompiler}
      * @return The produced {@code StorableCustomCompiler}
      * @throws IncorrectLoadValueFormat The provided load value was in an incorrect format
      * @throws MissingKeyException The provided load value was missing one or more required keys
      * @throws NonExistentComponentException A specified component class does not exist
      * @throws ComponentCastException A specified component class could not be cast to its intended type
      * @throws ReflectiveLoadFailure A specified component class does not contain a constructor taing a single {@code StorageValue<?>} parameter
+     * @throws IncorrectLoadValueFormat A provided component's description was not the expected type {@code ListStorageValue}
      */
     public StorableCustomCompiler produce(StorageValue<?> loadValue) throws 
         IncorrectLoadValueFormat, 
@@ -102,8 +103,9 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
         }
         catch (ClassCastException e) {
             throw new IncorrectLoadValueFormat(
-                "Map<String, StorageValue<?>>", 
-                loadValue.getClass().getSimpleName()
+                "MapStorageValue which maps String -> ListStorageValue", 
+                loadValue.getClass().getSimpleName(),
+                e
             );
         }
 
@@ -111,9 +113,25 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
         return mapValue;
     }
 
-    // TODO: Handle errors
-    protected ComponentInformation getComponentDescription(StorageValue<?> description) {
-        List<StorageValue<?>> entry = ((ListStorageValue)description).getValue();
+    /**
+     * Converts a given description into a {@code ComponentInformation} object
+     * @param description The component's description as a {@code ListStorageValue}
+     * @return The ComponentInformation representation of the description
+     * @throws IncorrectLoadValueFormat The provided component description was not the expected type {@code ListStorageValue}
+     */
+    protected ComponentInformation getComponentDescription(StorageValue<?> description) throws IncorrectLoadValueFormat {
+        List<StorageValue<?>> entry;
+
+        try {
+            entry = ((ListStorageValue)description).getValue();
+        }
+        catch (ClassCastException e) {
+            throw new IncorrectLoadValueFormat(
+                "MapStorageValue which maps String -> ListStorageValue",
+                "MapStorageValue which maps String -> " + description.getClass().getSimpleName(),
+                e
+            );
+        }
 
         return new ComponentInformation(
             ((StringStorageValue)entry.get(0)).getValue(),
@@ -126,7 +144,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     @SuppressWarnings("unchecked")
     /**
      * Builds a component with the provided description.
-     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking a single StorageValue<?> parameter.
+     * Components must be: registered with a factory; LoadableBy; Loadable; Or, have a constructor taking a single {@code StorageValue<?>} parameter.
      * @param <T> The abstract type of the component
      * @param repository The repository to query for registered factories for the specific component type
      * @param description The description with which to load the component with
@@ -135,6 +153,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @throws NonExistentComponentException The specified component class does not exist
      * @throws ComponentCastException The specified component class could not be cast to the selectedType
      * @throws ReflectiveLoadFailure The specified component class does not contain a constructor taing a single {@code StorageValue<?>} parameter
+     * @throws IncorrectLoadValueFormat The provided component description was not the expected type {@code ListStorageValue}
      */
     protected <T> T buildComponent(
         Map<String, Factory<T>> repository, 
@@ -143,7 +162,8 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
     ) throws 
         NonExistentComponentException, 
         ComponentCastException, 
-        ReflectiveLoadFailure 
+        ReflectiveLoadFailure,
+        IncorrectLoadValueFormat
     {
         ComponentInformation componentDescription = getComponentDescription(description);
 

@@ -343,6 +343,36 @@ public class StorableCustomCompilerFactoryTests {
     }
 
     @Test
+    public void produce_incorrectFormat_nonListComponentDescription() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(IncorrectLoadValueFormat.class, () -> factory.produce(
+            new MapStorageValue(Map.of(
+                "lexicalAnalyser", new MapStorageValue(Map.of(
+                    lexicalComponent.name(),
+                    lexicalComponent.description()
+                )),
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
+                )
+            ))
+        ));
+    }
+
+    @Test
     public void produce_nonExistentComponentClass() {
         StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
             .addSyntaxAnalyserFactory(
