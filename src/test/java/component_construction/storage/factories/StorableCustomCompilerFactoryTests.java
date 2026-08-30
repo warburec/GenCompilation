@@ -402,5 +402,33 @@ public class StorableCustomCompilerFactoryTests {
         ));
     }
 
-    // TODO: Handle all exceptions
+    @Test
+    public void produce_componentMissingCorrectConstructor() {
+        StorableCustomCompilerFactory factory = new StorableCustomCompilerFactory()
+            .addSyntaxAnalyserFactory(
+                syntaxComponent.name(),
+                syntaxComponent.factory()
+            )
+            .addCodeGeneratorFactory(
+                codeGeneratorComponent.name(),
+                codeGeneratorComponent.factory()
+            );
+
+        assertThrows(ReflectiveLoadFailure.class, () -> factory.produce(
+            new MapStorageValue(Map.of(
+                "lexicalAnalyser", new ListStorageValue(
+                    new StringStorageValue(NonConstructableLexicalAnalyser.class.getName()),
+                    new ListStorageValue(List.of())
+                ),
+                "syntaxAnalyser", new ListStorageValue(
+                    new StringStorageValue(syntaxComponent.name()),
+                    syntaxComponent.description()
+                ),
+                "codeGenerator", new ListStorageValue(
+                    new StringStorageValue(codeGeneratorComponent.name()),
+                    codeGeneratorComponent.description()
+                )
+            ))
+        ));
+    }
 }

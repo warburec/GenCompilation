@@ -56,12 +56,14 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @throws MissingKeyException The provided load value was missing one or more required keys
      * @throws NonExistentComponentException A specified component class does not exist
      * @throws ComponentCastException A specified component class could not be cast to its intended type
+     * @throws ReflectiveLoadFailure A specified component class does not contain a constructor taing a single {@code StorageValue<?>} parameter
      */
     public StorableCustomCompiler produce(StorageValue<?> loadValue) throws 
         IncorrectLoadValueFormat, 
         MissingKeyException, 
         NonExistentComponentException, 
-        ComponentCastException
+        ComponentCastException,
+        ReflectiveLoadFailure
     {
         Map<String, StorageValue<?>> mapValue = tryGetMapValue(loadValue);
         Set<String> keys = mapValue.keySet();
@@ -132,12 +134,17 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @return The built component
      * @throws NonExistentComponentException The specified component class does not exist
      * @throws ComponentCastException The specified component class could not be cast to the selectedType
+     * @throws ReflectiveLoadFailure The specified component class does not contain a constructor taing a single {@code StorageValue<?>} parameter
      */
     protected <T> T buildComponent(
         Map<String, Factory<T>> repository, 
         StorageValue<?> description, 
         Class<T> selectedType
-    ) throws NonExistentComponentException, ComponentCastException {
+    ) throws 
+        NonExistentComponentException, 
+        ComponentCastException, 
+        ReflectiveLoadFailure 
+    {
         ComponentInformation componentDescription = getComponentDescription(description);
 
         if (repository.containsKey(componentDescription.name()))
@@ -174,9 +181,11 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
                     componentDescription.name(),
                     selectedType
                 );
-            } catch (ClassNotFoundException | IllegalArgumentException e) {
-                //TODO
-                throw new RuntimeException();
+            } 
+            catch (ClassNotFoundException | IllegalArgumentException e) {
+                // ClassNotFoundException cannot occur as the cast succeeded earlier in this method 
+                // There are also no arguments to cause an IllegalArgumentException
+                return null;
             }
 
             ((ReflectivelyLoadable)component).load(componentDescription.description());
@@ -192,9 +201,13 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
                 StorageValue.class,
                 componentDescription.description()
             );
-        } catch (ClassNotFoundException | IllegalArgumentException e) {
-            //TODO
-            throw new RuntimeException();
+        } 
+        catch (ClassNotFoundException e) {
+            // ClassNotFoundException cannot occur as the cast succeeded earlier in this method
+            return null;
+        } 
+        catch (IllegalArgumentException e) {
+            throw new ReflectiveLoadFailure("Failed to construct an object of class \"" + componentDescription.name() + "\" as no constructor exists taking \"StorageValue<?>\" as its only parameter.", e);
         }
     }
 }
