@@ -180,10 +180,10 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
                 .asSubclass(selectedType);
         } 
         catch (ClassNotFoundException e) {
-            throw new NonExistentComponentException(componentDescription.name());
+            throw new NonExistentComponentException(componentDescription.name(), e);
         }
         catch (ClassCastException e) {
-            throw new ComponentCastException(componentDescription.name(), selectedType.getName());
+            throw new ComponentCastException(componentDescription.name(), selectedType.getName(), e);
         }
 
         if (LoadableBy.class.isAssignableFrom(clazz)) {
