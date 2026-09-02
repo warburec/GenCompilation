@@ -95,6 +95,19 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void storeNull(Path testFile) throws IOException {
+        StorageValue<?> storageValue = null;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        assertThrows(NullStorageObjectException.class, () -> storage.store(storageValue));
+    }
+
+    @Test
+    @UseTestFile
     public void storeString(Path testFile) throws IOException {
         String expectedString = "testString";
         StorageValue<?> storageValue = new TestStorageValue(expectedString);
@@ -303,7 +316,26 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertAndStoreString(Path testFile)  throws IOException {
+    void convertAndStoreNull(Path testFile) throws IOException {
+        Storable storable = null;
+        ValueFormatter<String> formatter = new TestStringValueFormatter();
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor());
+
+        OutputStream outputStream = new FileOutputStream(testFile.toFile());
+
+
+        assertThrows(NullStorageObjectException.class, () -> {
+            try (outputStream) {
+                storage.convertAndStore(storable, formatter, outputStream);
+            }
+        });
+    }
+
+    @Test
+    @UseTestFile
+    void convertAndStoreString(Path testFile) throws IOException {
         String expectedString = "testString";
 
         Storable storable = new TestStorable(expectedString);
@@ -326,7 +358,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertAndStoreInteger(Path testFile)  throws IOException {
+    void convertAndStoreInteger(Path testFile) throws IOException {
         int expectedInteger = 10;
 
         Storable storable = new TestStorable(expectedInteger);
@@ -411,7 +443,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertAndLoadStringInto(Path testFile)  throws IOException {
+    void convertAndLoadStringInto(Path testFile) throws IOException {
         String expectedString = "testString";
 
         TestLoadable loadable = new TestLoadable();
@@ -435,7 +467,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertAndLoadIntegerInto(Path testFile)  throws IOException {
+    void convertAndLoadIntegerInto(Path testFile) throws IOException {
         int expectedInteger= 10;
 
         TestLoadable loadable = new TestLoadable();
@@ -530,7 +562,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertThenFormatAndLoadStringInto(Path testFile)  throws IOException {
+    void convertThenFormatAndLoadStringInto(Path testFile) throws IOException {
         String expectedString = "testString";
 
         TestLoadable loadable = new TestLoadable();
@@ -554,7 +586,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void convertThenFormatAndLoadIntegerInto(Path testFile)  throws IOException {
+    void convertThenFormatAndLoadIntegerInto(Path testFile) throws IOException {
         int expectedInteger = 10;
 
         TestLoadable loadable = new TestLoadable();
@@ -648,6 +680,25 @@ public class StorageTests {
             );
             assertInstanceOf(ExampleException.class, exception.getCause());
         }
+    }
+
+    @Test
+    @UseTestFile
+    public void storeNullToStream(Path testFile) throws IOException {
+        Storable storable = null;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+        OutputStream outputStream = new FileOutputStream(testFile.toFile());
+
+
+        assertThrows(NullStorageObjectException.class, () -> {
+            try (outputStream) {
+                storage.store(storable, outputStream);
+            }
+        });
     }
 
     @Test
@@ -972,6 +1023,19 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void storeStorableOfNull(Path testFile) throws IOException {
+        Storable storable = null;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        assertThrows(NullStorageObjectException.class, () -> storage.store(storable));
+    }
+
+    @Test
+    @UseTestFile
     public void storeStorableOfString(Path testFile) throws IOException {
         String expectedString = "testString";
         Storable storable = new TestStorable(expectedString);
@@ -1058,6 +1122,18 @@ public class StorageTests {
 
     @Test
     @UseTestFile
+    public void storeStorableOfNullAtFilepath(Path testFile) throws IOException {
+        Storable storable = null;
+        Storage storage = new Storage()
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        assertThrows(NullStorageObjectException.class, () -> storage.store(storable, testFile.toString()));
+    }
+
+    @Test
+    @UseTestFile
     public void storeStorableOfStringAtFilepath(Path testFile) throws IOException {
         String expectedString = "testString";
         Storable storable = new TestStorable(expectedString);
@@ -1135,6 +1211,19 @@ public class StorageTests {
             () -> storage.store(storable, testFile.toString())
         );
         assertInstanceOf(ExampleException.class, exception.getCause());
+    }
+
+    @Test
+    @UseTestFile
+    public void storeStorageValueOfNull(Path testFile) throws IOException {
+        StorageValue<?> storageValue = null;
+        Storage storage = new Storage()
+            .setTargetPath(testFile)
+            .setFileEditor(new TestStringStreamEditor())
+            .setFormatter(new TestStringValueFormatter());
+
+
+        assertThrows(NullStorageObjectException.class, () -> storage.store(storageValue));
     }
 
     @Test
@@ -1225,7 +1314,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void LoadStringInto(Path testFile)  throws IOException {
+    void LoadStringInto(Path testFile) throws IOException {
         String expectedString = "testString";
         TestLoadable loadable = new TestLoadable();
         Storage storage = new Storage()
@@ -1244,7 +1333,7 @@ public class StorageTests {
 
     @Test
     @UseTestFile
-    void LoadIntegerInto(Path testFile)  throws IOException {
+    void LoadIntegerInto(Path testFile) throws IOException {
         int expectedInteger = 10;
         TestLoadable loadable = new TestLoadable();
         Storage storage = new Storage()

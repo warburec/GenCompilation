@@ -167,8 +167,11 @@ public class Storage {
      * @throws StoreFailureException
      * @throws FormattingException
      * @throws StorageFormatMismatchException
+     * @throws NullStorageObjectException
      */
-    public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
+    public <F> void convertAndStore(Storable storageObject, ValueFormatter<F> formatter, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException, NullStorageObjectException {
+        if(storageObject == null) throw new NullStorageObjectException();
+        
         convertAndStore_Inner(storageObject.getStorageRepresentation(), new ChosenFormatter<F>(formatter), streamWriter, outputStream);
     }
 
@@ -179,8 +182,11 @@ public class Storage {
      * @throws StoreFailureException
      * @throws FormattingException
      * @throws StorageFormatMismatchException
+     * @throws NullStorageObjectException
      */
-    public void store(Storable storageObject, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException {
+    public void store(Storable storageObject, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException, NullStorageObjectException {
+        if(storageObject == null) throw new NullStorageObjectException();
+        
         convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream);
     }
 
@@ -260,8 +266,11 @@ public class Storage {
      * @throws UncheckedIOException
      * @throws RuntimeException
      * @throws UncheckedIOException
+     * @throws NullStorageObjectException
      */
-    public void store(Storable storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException {
+    public void store(Storable storageObject) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException, NullStorageObjectException {
+        if(storageObject == null) throw new NullStorageObjectException();
+        
         usingTargetFileOutputStream(
             (outputStream) -> convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream)
         );
@@ -275,8 +284,11 @@ public class Storage {
      * @throws UncheckedIOException
      * @throws RuntimeException
      * @throws UncheckedIOException
+     * @throws NullStorageObjectException
      */
-    public void store(Storable storageObject, String filePath) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException {
+    public void store(Storable storageObject, String filePath) throws UnsupportedValueException, UncheckedIOException, RuntimeException, UncheckedIOException, NullStorageObjectException {
+        if(storageObject == null) throw new NullStorageObjectException();
+        
         usingFileOutputStream(
             new File(filePath),
             (outputStream) -> convertAndStore_Inner(storageObject.getStorageRepresentation(), formatter, streamWriter, outputStream)
@@ -291,8 +303,11 @@ public class Storage {
      * @throws FormattingException
      * @throws StorageFormatMismatchException
      * @throws UncheckedIOException
+     * @throws NullStorageObjectException
      */
-    public <T> void store(StorageValue<T> storageObject) throws StoreFailureException, FormattingException, StorageFormatMismatchException, UncheckedIOException {
+    public <T> void store(StorageValue<T> storageObject) throws StoreFailureException, FormattingException, StorageFormatMismatchException, UncheckedIOException, NullStorageObjectException {
+        if(storageObject == null) throw new NullStorageObjectException();
+        
         usingTargetFileOutputStream(
             (outputStream) -> convertAndStore_Inner(storageObject, formatter, streamWriter, outputStream)
         );
