@@ -5,7 +5,6 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 import code_generation.CodeGenerator;
-import component_construction.storage.StorableCustomCompiler;
 import component_construction.storage.exceptions.*;
 import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
