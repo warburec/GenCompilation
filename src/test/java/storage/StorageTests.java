@@ -1,57 +1,21 @@
 package storage;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.*;
-import java.lang.annotation.*;
 import java.nio.file.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.*;
-import org.junit.jupiter.api.io.TempDir;
 
 import storage.exceptions.*;
 import storage.external_interfaces.Storable;
 import storage.storage_values.*;
 import storage.value_formatters.*;
 import test_aids.exceptions.ExampleException;
+import test_aids.test_extensions.test_files.*;
 import test_aids.test_storage.*;
 
-@ExtendWith(StorageTests.UseTestFileExtension.class)
+@ExtendWith(UseTestFileExtension.class)
 public class StorageTests {
-
-    @TempDir
-    Path storageTestPath;
-
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    protected @interface UseTestFile {}
-
-    public static class UseTestFileExtension implements ParameterResolver {
-        @Override
-        public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) {
-            return ec
-                .getTestMethod()
-                .get()
-                .isAnnotationPresent(UseTestFile.class);
-        }
-
-        @Override
-        public Path resolveParameter(ParameterContext pc, ExtensionContext ec) {
-            try {
-                StorageTests testInstance = (StorageTests) ec.getRequiredTestInstance();
-                Path tempDir = testInstance.storageTestPath;
-                return createTestFile(tempDir);
-            } 
-            catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
-
-        protected Path createTestFile(Path tempDir) throws IOException {
-            String fileName = "testFile.txt";
-            return Files.createFile(tempDir.resolve(fileName));
-        }
-    }
 
     @Test
     public void setTargetPath() {
