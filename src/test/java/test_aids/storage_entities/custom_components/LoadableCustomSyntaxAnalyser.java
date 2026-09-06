@@ -1,19 +1,21 @@
 package test_aids.storage_entities.custom_components;
 
-import component_construction.storage.dynamic_loading.ReflectivelyLoadable;
 import grammar_objects.Token;
-import lexical_analysis.LexicalAnalyser;
+import storage.external_interfaces.Loadable;
 import storage.storage_values.StorageValue;
+import syntax_analysis.SyntaxAnalyser;
+import syntax_analysis.parsing.ParseFailedException;
+import syntax_analysis.parsing.ParseState;
 
-public class LoadableCustomLexicalAnalyser implements LexicalAnalyser, ReflectivelyLoadable {
-    
+public class LoadableCustomSyntaxAnalyser implements SyntaxAnalyser, Loadable {
+
     public StorageValue<?> loadedData;
 
     @Override
-    public Token[] analyse(String sentence) {
+    public ParseState analyse(Token[] inputTokens) throws ParseFailedException {
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
     }
-    
+
     @Override
     public void load(StorageValue<?> data) {
         loadedData = data;
