@@ -1,13 +1,13 @@
 package component_construction.storage;
 
 import java.io.*;
-import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
 import component_construction.storage.factories.StorableCustomCompilerFactory;
 import storage.Storage;
 import storage.exceptions.*;
 import storage.external_interfaces.Loadable;
+import storage.external_interfaces.Storable;
 import storage.file_editors.*;
 import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.StorageValue;
@@ -150,8 +150,23 @@ public class CompilerStorage {
     //#region StreamStorage
 
     /**
+     * Stores the given compiler to the given output stream, converting the compiler using the specified formatter to produce a storable data format
+     * @param <F> The data format to be used for storage
+     * @param compiler The compiler to be stored
+     * @param formatter The formatter to be used to convert values for storage. Only set for execution of this function. Use setFormatter to use this for multiple executions.
+     * @param outputStream The stream to be used
+     * @throws StoreFailureException
+     * @throws FormattingException
+     * @throws StorageFormatMismatchException
+     * @throws NullStorageObjectException
+     */
+    public <F> void convertAndStore(StorableCustomCompiler compiler, ValueFormatter<F> formatter, OutputStream outputStream) throws StoreFailureException, FormattingException, StorageFormatMismatchException, NullStorageObjectException {
+        storage.convertAndStore(compiler, formatter, outputStream);
+    }
+
+    /**
      * Stores a specified compiler in the given output stream
-     * @param compiler The object to be stored
+     * @param compiler The compiler to be stored
      * @param outputStream The stream to be used
      * @throws StoreFailureException
      * @throws FormattingException
@@ -172,6 +187,20 @@ public class CompilerStorage {
      */
     public void convertAndLoadInto(Loadable compiler, InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
         storage.convertAndLoadInto(compiler, inputStream);
+    }
+
+    /**
+     * Reads a value from the given input stream, converts the value using the provided formatter and loads it into the given compiler
+     * @param <F> The expected value format to be read and provided to the formatter
+     * @param compiler The compiler to load the value into 
+     * @param formatter The formatter to be used to convert data from the stream
+     * @param inputStream The input stream to be read
+     * @throws LoadFailureException
+     * @throws FormatParseException
+     * @throws StorageFormatMismatchException
+     */
+    public <F> void convertAndLoadInto(Loadable compiler, ValueFormatter<F> formatter, InputStream inputStream) throws LoadFailureException, FormatParseException, StorageFormatMismatchException {
+        storage.convertAndLoadInto(compiler, formatter, inputStream);
     }
 
     /**
@@ -245,5 +274,7 @@ public class CompilerStorage {
     }
 
     //#endregion
+
+    // TODO: Implement and test LoadableBy<T>
     
 }
