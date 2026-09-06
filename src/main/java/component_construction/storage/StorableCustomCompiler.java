@@ -44,4 +44,10 @@ public class StorableCustomCompiler extends CustomCompiler implements Storable, 
         ));
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof StorableCustomCompiler)) return false;
+        return super.equals(obj);
+    }
+    
 }

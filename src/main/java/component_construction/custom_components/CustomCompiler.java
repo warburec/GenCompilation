@@ -2,6 +2,7 @@ package component_construction.custom_components;
 
 import code_generation.CodeGenerator;
 import component_construction.Compiler;
+import component_construction.storage.StorableCustomCompiler;
 import grammar_objects.Token;
 import lexical_analysis.LexicalAnalyser;
 import syntax_analysis.SyntaxAnalyser;
@@ -26,5 +27,25 @@ public class CustomCompiler implements Compiler {
         Token[] tokens = lexicalAnalyser.analyse(input);
         ParseState parseRoot = syntaxAnalyser.analyse(tokens);
         return codeGenerator.generate(parseRoot);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CustomCompiler)) return false;
+
+        CustomCompiler other = (CustomCompiler)obj;
+        if (!this.lexicalAnalyser.equals(other.lexicalAnalyser)) return false;
+        if (!this.syntaxAnalyser.equals(other.syntaxAnalyser)) return false;
+        if (!this.codeGenerator.equals(other.codeGenerator)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 
+            * lexicalAnalyser.hashCode()
+            * syntaxAnalyser.hashCode()
+            * codeGenerator.hashCode();
     }
 }
