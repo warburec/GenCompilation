@@ -6,9 +6,9 @@ public class TestStorableCustomCompiler extends StorableCustomCompiler {
 
     public TestStorableCustomCompiler() {
         super(
-            new TestCustomLexicalAnalyser(), 
-            new TestCustomSyntaxAnalyser(), 
-            new TestCustomCodeGenerator()
+            new TestStorableCustomLexicalAnalyser(), 
+            new TestStorableCustomSyntaxAnalyser(), 
+            new TestStorableCustomCodeGenerator()
         );
     }
 

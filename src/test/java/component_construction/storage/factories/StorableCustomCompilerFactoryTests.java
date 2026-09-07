@@ -10,7 +10,7 @@ import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
 import test_aids.storage_entities.custom_components.*;
-import test_aids.storage_entities.custom_components.loadableBy.LoadableByCustomLexicalAnalyser;
+import test_aids.storage_entities.custom_components.loadableBy.LoadableByStorableCustomLexicalAnalyser;
 
 public class StorableCustomCompilerFactoryTests {
     
@@ -29,7 +29,7 @@ public class StorableCustomCompilerFactoryTests {
                 description
             );
 
-            return new TestCustomLexicalAnalyser();
+            return new TestStorableCustomLexicalAnalyser();
         }
     );
 
@@ -46,7 +46,7 @@ public class StorableCustomCompilerFactoryTests {
                 description
             );
 
-            return new TestCustomSyntaxAnalyser();
+            return new TestStorableCustomSyntaxAnalyser();
         }
     );
 
@@ -63,7 +63,7 @@ public class StorableCustomCompilerFactoryTests {
                 description
             );
 
-            return new TestCustomCodeGenerator();
+            return new TestStorableCustomCodeGenerator();
         }
     );
 
@@ -150,7 +150,7 @@ public class StorableCustomCompilerFactoryTests {
         factory.produce(
             new MapStorageValue(Map.of(
                 "lexicalAnalyser", new ListStorageValue(
-                    new StringStorageValue(LoadableByCustomLexicalAnalyser.class.getName()),
+                    new StringStorageValue(LoadableByStorableCustomLexicalAnalyser.class.getName()),
                     lexicalComponent.description()
                 ),
                 "syntaxAnalyser", new ListStorageValue(
@@ -180,7 +180,7 @@ public class StorableCustomCompilerFactoryTests {
         factory.produce(
             new MapStorageValue(Map.of(
                 "lexicalAnalyser", new ListStorageValue(
-                    new StringStorageValue(LoadableCustomLexicalAnalyser.class.getName()),
+                    new StringStorageValue(LoadableStorableCustomLexicalAnalyser.class.getName()),
                     lexicalComponent.description()
                 ),
                 "syntaxAnalyser", new ListStorageValue(
@@ -210,7 +210,7 @@ public class StorableCustomCompilerFactoryTests {
         factory.produce(
             new MapStorageValue(Map.of(
                 "lexicalAnalyser", new ListStorageValue(
-                    new StringStorageValue(ConstructableLexicalAnalyser.class.getName()),
+                    new StringStorageValue(ConstructableStorableLexicalAnalyser.class.getName()),
                     new ListStorageValue(List.of())
                 ),
                 "syntaxAnalyser", new ListStorageValue(

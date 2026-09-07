@@ -1,13 +1,12 @@
 package test_aids.storage_entities.custom_components;
 
 import grammar_objects.Token;
-import storage.external_interfaces.Loadable;
+import storage.external_interfaces.*;
 import storage.storage_values.StorageValue;
 import syntax_analysis.SyntaxAnalyser;
-import syntax_analysis.parsing.ParseFailedException;
-import syntax_analysis.parsing.ParseState;
+import syntax_analysis.parsing.*;
 
-public class LoadableCustomSyntaxAnalyser implements SyntaxAnalyser, Loadable {
+public class LoadableStorableCustomSyntaxAnalyser implements SyntaxAnalyser, Loadable, Storable {
 
     public StorageValue<?> loadedData;
 
@@ -19,6 +18,11 @@ public class LoadableCustomSyntaxAnalyser implements SyntaxAnalyser, Loadable {
     @Override
     public void load(StorageValue<?> data) {
         loadedData = data;
+    }
+
+    @Override
+    public StorageValue<?> getStorageRepresentation() {
+        return loadedData;
     }
     
 }

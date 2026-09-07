@@ -4,16 +4,15 @@ import java.util.Map;
 
 import component_construction.storage.StorableCustomCompiler;
 import storage.external_interfaces.Loadable;
-import storage.storage_values.MapStorageValue;
-import storage.storage_values.StorageValue;
+import storage.storage_values.*;
 
 public class LoadableTestStorableCustomCompiler extends StorableCustomCompiler implements Loadable {
 
     public LoadableTestStorableCustomCompiler() {
         super(
-            new LoadableCustomLexicalAnalyser(),
-            new LoadableCustomSyntaxAnalyser(),
-            new LoadableCustomCodeGenerator()
+            new LoadableStorableCustomLexicalAnalyser(),
+            new LoadableStorableCustomSyntaxAnalyser(),
+            new LoadableStorableCustomCodeGenerator()
         );
     }
 
@@ -21,13 +20,13 @@ public class LoadableTestStorableCustomCompiler extends StorableCustomCompiler i
     public void load(StorageValue<?> data) {
         Map<String, StorageValue<?>> description = ((MapStorageValue)data).getValue();
 
-        lexicalAnalyser = new LoadableCustomLexicalAnalyser();
-        syntaxAnalyser = new LoadableCustomSyntaxAnalyser();
-        codeGenerator = new LoadableCustomCodeGenerator();
+        lexicalAnalyser = new LoadableStorableCustomLexicalAnalyser();
+        syntaxAnalyser = new LoadableStorableCustomSyntaxAnalyser();
+        codeGenerator = new LoadableStorableCustomCodeGenerator();
 
-        ((LoadableCustomLexicalAnalyser)lexicalAnalyser).load(description.get("lexicalAnalyser"));
-        ((LoadableCustomSyntaxAnalyser)syntaxAnalyser).load(description.get("syntaxAnalyser"));
-        ((LoadableCustomCodeGenerator)codeGenerator).load(description.get("codeGenerator"));
+        ((LoadableStorableCustomLexicalAnalyser)lexicalAnalyser).load(description.get("lexicalAnalyser"));
+        ((LoadableStorableCustomSyntaxAnalyser)syntaxAnalyser).load(description.get("syntaxAnalyser"));
+        ((LoadableStorableCustomCodeGenerator)codeGenerator).load(description.get("codeGenerator"));
     }
     
 }
