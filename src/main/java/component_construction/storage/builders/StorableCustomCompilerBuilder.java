@@ -2,6 +2,7 @@ package component_construction.storage.builders;
 
 import component_construction.builders.CompilerBuilderTemplate;
 import component_construction.storage.StorableCustomCompiler;
+import component_construction.storage.exceptions.NonStorableComponentException;
 import grammar_objects.GrammarParts;
 
 public class StorableCustomCompilerBuilder extends CompilerBuilderTemplate<StorableCustomCompilerBuilder, StorableCustomCompiler> {
@@ -12,7 +13,7 @@ public class StorableCustomCompilerBuilder extends CompilerBuilderTemplate<Stora
     }
 
     @Override
-    public StorableCustomCompiler createCompiler() {
+    public StorableCustomCompiler createCompiler() throws NonStorableComponentException {
         checkForCompleteBuild();
 
         GrammarParts parts = grammar.getParts();

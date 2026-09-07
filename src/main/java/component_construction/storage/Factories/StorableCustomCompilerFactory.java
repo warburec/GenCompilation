@@ -58,13 +58,15 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
      * @throws ComponentCastException A specified component class could not be cast to its intended type
      * @throws ReflectiveLoadFailure A specified component class does not contain a constructor taing a single {@code StorageValue<?>} parameter
      * @throws IncorrectLoadValueFormat A provided component's description was not the expected type {@code ListStorageValue}
+     * @throws NonStorableComponentException A pecified component class does not implement Storable
      */
     public StorableCustomCompiler produce(StorageValue<?> loadValue) throws 
         IncorrectLoadValueFormat, 
         MissingKeyException, 
         NonExistentComponentException, 
         ComponentCastException,
-        ReflectiveLoadFailure
+        ReflectiveLoadFailure,
+        NonStorableComponentException
     {
         Map<String, StorageValue<?>> mapValue = tryGetMapValue(loadValue);
         Set<String> keys = mapValue.keySet();
