@@ -2,7 +2,6 @@ package component_construction.custom_components;
 
 import code_generation.CodeGenerator;
 import component_construction.Compiler;
-import component_construction.storage.StorableCustomCompiler;
 import grammar_objects.Token;
 import lexical_analysis.LexicalAnalyser;
 import syntax_analysis.SyntaxAnalyser;
