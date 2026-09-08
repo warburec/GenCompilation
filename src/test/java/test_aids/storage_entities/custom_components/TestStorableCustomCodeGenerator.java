@@ -14,7 +14,13 @@ public class TestStorableCustomCodeGenerator implements CodeGenerator, Storable 
 
     @Override
     public StorageValue<?> getStorageRepresentation() {
-        return new StringStorageValue("TestStorableCustomCodeGenerator");
+        return new StringStorageValue("TestStorableCustomCodeGenerator description");
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TestStorableCustomCodeGenerator)) return false;
+		return true;
+    }
+
 }

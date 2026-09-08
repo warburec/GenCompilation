@@ -14,7 +14,13 @@ public class TestStorableCustomLexicalAnalyser implements LexicalAnalyser, Stora
 
     @Override
     public StorageValue<?> getStorageRepresentation() {
-        return new StringStorageValue("TestStorableCustomLexicalAnalyser");
+        return new StringStorageValue("TestStorableCustomLexicalAnalyser description");
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TestStorableCustomCodeGenerator)) return false;
+		return true;
     }
     
 }

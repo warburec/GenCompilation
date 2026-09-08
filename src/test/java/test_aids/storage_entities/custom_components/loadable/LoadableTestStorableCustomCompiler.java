@@ -1,4 +1,4 @@
-package test_aids.storage_entities.custom_components;
+package test_aids.storage_entities.custom_components.loadable;
 
 import java.util.Map;
 

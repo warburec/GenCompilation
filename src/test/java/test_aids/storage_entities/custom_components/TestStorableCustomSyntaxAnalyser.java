@@ -15,7 +15,13 @@ public class TestStorableCustomSyntaxAnalyser implements SyntaxAnalyser, Storabl
 
     @Override
     public StorageValue<?> getStorageRepresentation() {
-        return new StringStorageValue("TestStorableCustomSyntaxAnalyser");
+        return new StringStorageValue("TestStorableCustomSyntaxAnalyser description");
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TestStorableCustomCodeGenerator)) return false;
+		return true;
     }
     
 }

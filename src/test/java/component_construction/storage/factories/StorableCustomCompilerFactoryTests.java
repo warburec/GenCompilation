@@ -10,6 +10,7 @@ import lexical_analysis.LexicalAnalyser;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
 import test_aids.storage_entities.custom_components.*;
+import test_aids.storage_entities.custom_components.loadable.LoadableStorableCustomLexicalAnalyser;
 import test_aids.storage_entities.custom_components.loadableBy.LoadableByStorableCustomLexicalAnalyser;
 
 public class StorableCustomCompilerFactoryTests {
