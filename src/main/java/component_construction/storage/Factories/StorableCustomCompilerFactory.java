@@ -105,7 +105,7 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
         }
         catch (ClassCastException e) {
             throw new IncorrectLoadValueFormat(
-                "MapStorageValue which maps String -> ListStorageValue", 
+                "MapStorageValue which maps String to ListStorageValue", 
                 loadValue.getClass().getSimpleName(),
                 e
             );
@@ -129,19 +129,19 @@ public class StorableCustomCompilerFactory implements Loader<StorableCustomCompi
         }
         catch (ClassCastException e) {
             throw new IncorrectLoadValueFormat(
-                "MapStorageValue which maps String -> ListStorageValue",
-                "MapStorageValue which maps String -> " + description.getClass().getSimpleName(),
+                "MapStorageValue which maps String to ListStorageValue",
+                "MapStorageValue which maps String to " + description.getClass().getSimpleName(),
                 e
             );
         }
 
         return new ComponentInformation(
             ((StringStorageValue)entry.get(0)).getValue(),
-            (ListStorageValue)entry.get(1)
+            entry.get(1)
         );
     }
     
-    protected record ComponentInformation(String name, ListStorageValue description) {}
+    protected record ComponentInformation(String name, StorageValue<?> description) {}
 
     @SuppressWarnings("unchecked")
     /**
