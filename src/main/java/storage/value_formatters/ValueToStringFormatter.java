@@ -17,6 +17,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
 
     @Override
     public String format(StorageValue<?> value) throws UnsupportedValueException {
+        if (value instanceof NullStorageValue) return "null";
         if (value instanceof ListStorageValue) return formatValue((ListStorageValue)value);
         if (value instanceof MapStorageValue) return formatValue((MapStorageValue)value);
         if (value instanceof StringStorageValue) return formatValue((StringStorageValue)value);
@@ -34,6 +35,7 @@ public class ValueToStringFormatter implements ValueFormatter<String> {
      */
     @Override
     public StorageValue<?> parse(String formattedData) throws UnsupportedValueException {
+        if (formattedData.startsWith("null")) return new NullStorageValue();
         if (formattedData.startsWith("[")) return parseListFormat(formattedData);
         if (formattedData.startsWith("{")) return parseMapFormat(formattedData);
         if (formattedData.startsWith("\"")) return parseStringFormat(formattedData);
