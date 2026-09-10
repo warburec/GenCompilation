@@ -19,14 +19,18 @@ public class LoadableTestStorableCustomCompiler extends StorableCustomCompiler i
     @Override
     public void load(StorageValue<?> data) {
         Map<String, StorageValue<?>> description = ((MapStorageValue)data).getValue();
-
+        
+        StorageValue<?> lexicalAnalyserDescription = ((ListStorageValue)description.get("lexicalAnalyser")).getValue().get(1);
+        StorageValue<?> syntaxAnalyserDescription = ((ListStorageValue)description.get("lexicalAnalyser")).getValue().get(1);
+        StorageValue<?> codeGeneratorDescription = ((ListStorageValue)description.get("lexicalAnalyser")).getValue().get(1);
+        
         lexicalAnalyser = new LoadableStorableCustomLexicalAnalyser();
         syntaxAnalyser = new LoadableStorableCustomSyntaxAnalyser();
         codeGenerator = new LoadableStorableCustomCodeGenerator();
 
-        ((LoadableStorableCustomLexicalAnalyser)lexicalAnalyser).load(description.get("lexicalAnalyser"));
-        ((LoadableStorableCustomSyntaxAnalyser)syntaxAnalyser).load(description.get("syntaxAnalyser"));
-        ((LoadableStorableCustomCodeGenerator)codeGenerator).load(description.get("codeGenerator"));
+        ((LoadableStorableCustomLexicalAnalyser)lexicalAnalyser).load(lexicalAnalyserDescription);
+        ((LoadableStorableCustomSyntaxAnalyser)syntaxAnalyser).load(syntaxAnalyserDescription);
+        ((LoadableStorableCustomCodeGenerator)codeGenerator).load(codeGeneratorDescription);
     }
     
 }
