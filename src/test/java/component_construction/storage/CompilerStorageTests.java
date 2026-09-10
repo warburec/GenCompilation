@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import storage.exceptions.*;
-import storage.value_formatters.ValueFormatter;
-import storage.value_formatters.ValueToStringFormatter;
+import storage.value_formatters.*;
 import test_aids.exceptions.ExampleException;
 import test_aids.storage_entities.custom_components.*;
 import test_aids.storage_entities.custom_components.loadable.LoadableTestStorableCustomCompiler;
@@ -92,7 +91,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeString_IncorrectFormatter(Path testFile) throws IOException {
+    public void store_IncorrectFormatter(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
@@ -105,7 +104,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeString_FileWriteError(Path testFile) throws IOException {
+    public void store_FileWriteError(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
@@ -122,7 +121,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeString_FormatterError(Path testFile) throws IOException {
+    public void store_FormatterError(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
@@ -159,15 +158,11 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadString_IncorrectFormatter(Path testFile) throws IOException {
-        StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
-        String testString = expectedCompiler.getStorageRepresentation().toString();
+    public void load_IncorrectFormatter(Path testFile) throws IOException {
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
             .setFileEditor(new TestStringStreamEditor())
             .setFormatter(new TestIntegerValueFormatter());
-
-        Files.writeString(testFile, testString);
 
 
         assertThrows(StorageFormatMismatchException.class, () -> storage.load());
@@ -175,7 +170,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadString_FileWriteError(Path testFile) throws IOException {
+    public void load_FileWriteError(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         String testString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
@@ -195,7 +190,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadString_FormatterError(Path testFile) throws IOException {
+    public void load_FormatterError(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         String testString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
@@ -257,7 +252,6 @@ public class CompilerStorageTests {
     @Test
     @UseTestFile
     public void convertAndStoreString_IncorrectFormatter(Path testFile) throws IOException {
-
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         ValueFormatter<Integer> formatter = new TestIntegerValueFormatter();
         CompilerStorage storage = new CompilerStorage()
@@ -274,7 +268,6 @@ public class CompilerStorageTests {
     @Test
     @UseTestFile
     public void convertAndStoreString_FileWriteError(Path testFile) throws IOException {
-
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         ValueFormatter<String> formatter = new TestStringValueFormatter();
         CompilerStorage storage = new CompilerStorage()
@@ -295,7 +288,6 @@ public class CompilerStorageTests {
     @Test
     @UseTestFile
     public void convertAndStoreString_FormatterError(Path testFile) throws IOException {
-
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         ValueFormatter<String> formatter = new TestStringErrorValueFormatter();
         CompilerStorage storage = new CompilerStorage()
@@ -341,15 +333,11 @@ public class CompilerStorageTests {
     @Test
     @UseTestFile
     public void convertAndLoadStringInto_IncorrectFormatter(Path testFile) throws IOException {
-        LoadableTestStorableCustomCompiler expectedCompiler = new LoadableTestStorableCustomCompiler();
         LoadableTestStorableCustomCompiler actualCompiler = new LoadableTestStorableCustomCompiler();
-        String expectedString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
             .setFormatter(new TestIntegerValueFormatter())
             .setFileEditor(new TestStringStreamEditor());
-
-        Files.writeString(testFile, expectedString);
 
         InputStream inputStream = new FileInputStream(testFile.toFile());
 
@@ -436,16 +424,12 @@ public class CompilerStorageTests {
     @Test
     @UseTestFile
     public void convertThenFormatAndLoadStringInto_IncorrectFormatter(Path testFile) throws IOException {
-        LoadableTestStorableCustomCompiler expectedCompiler = new LoadableTestStorableCustomCompiler();
         LoadableTestStorableCustomCompiler actualCompiler = new LoadableTestStorableCustomCompiler();
-        String expectedString = expectedCompiler.getStorageRepresentation().toString();
         ValueFormatter<?> formatter = new TestIntegerValueFormatter();
         
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
             .setFileEditor(new TestStringStreamEditor());
-
-        Files.writeString(testFile, expectedString);
 
         InputStream inputStream = new FileInputStream(testFile.toFile());
 
@@ -528,7 +512,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeStringToStream(Path testFile) throws IOException {
+    public void storeToStream(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         ValueFormatter<String> formatter = new ValueToStringFormatter();
         String expectedString = formatter.format(compiler.getStorageRepresentation());
@@ -551,7 +535,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeStringToStream_IncorrectFormatter(Path testFile) throws IOException {
+    public void storeToStream_IncorrectFormatter(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
@@ -568,7 +552,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeStringToStream_FileWriteError(Path testFile) throws IOException {
+    public void storeToStream_FileWriteError(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
@@ -589,7 +573,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void storeStringToStream_FormatterError(Path testFile) throws IOException {
+    public void storeToStream_FormatterError(Path testFile) throws IOException {
         StorableCustomCompiler compiler = new TestStorableCustomCompiler();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
@@ -610,7 +594,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromInputStream(Path testFile) throws IOException {
+    public void loadFromInputStream(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         ValueFormatter<String> formatter = new ValueToStringFormatter();
         String expectedString = formatter.format(expectedCompiler.getStorageRepresentation());
@@ -632,15 +616,11 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromInputStream_IncorrectFormatter(Path testFile) throws IOException {
-        StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
-        String testString = expectedCompiler.getStorageRepresentation().toString();
+    public void loadFromInputStream_IncorrectFormatter(Path testFile) throws IOException {
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
             .setFileEditor(new TestStringStreamEditor())
             .setFormatter(new TestIntegerValueFormatter());
-
-        Files.writeString(testFile, testString);
 
         InputStream inputStream = new FileInputStream(testFile.toFile());
 
@@ -652,7 +632,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromInputStream_FileWriteError(Path testFile) throws IOException {
+    public void loadFromInputStream_FileWriteError(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         String testString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
@@ -676,7 +656,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromInputStream_FormatterError(Path testFile) throws IOException {
+    public void loadFromInputStream_FormatterError(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         String testString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
@@ -954,15 +934,11 @@ public class CompilerStorageTests {
     @Test
     @UseTestFile
     public void LoadStringInto_IncorrectFormatter(Path testFile) throws IOException {
-        LoadableTestStorableCustomCompiler expectedCompiler = new LoadableTestStorableCustomCompiler();
         LoadableTestStorableCustomCompiler actualCompiler = new LoadableTestStorableCustomCompiler();
-        String expectedString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
             .setFormatter(new TestStringValueFormatter())
             .setFileEditor(new TestIntegerStreamEditor());
-
-        Files.writeString(testFile, expectedString);
 
 
         assertThrows(StorageFormatMismatchException.class, () -> storage.loadInto(actualCompiler));
@@ -1012,7 +988,7 @@ public class CompilerStorageTests {
     
     @Test
     @UseTestFile
-    public void loadStringFromTargetPath(Path testFile) throws IOException {
+    public void loadFromTargetPath(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         ValueFormatter<String> formatter = new ValueToStringFormatter();
         String expectedString = formatter.format(expectedCompiler.getStorageRepresentation());
@@ -1032,15 +1008,11 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromTargetPath_IncorrectFormatter(Path testFile) throws IOException {
-        StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
-        String testString = expectedCompiler.getStorageRepresentation().toString();
+    public void loadFromTargetPath_IncorrectFormatter(Path testFile) throws IOException {
         CompilerStorage storage = new CompilerStorage()
             .setTargetPath(testFile)
             .setFileEditor(new TestStringStreamEditor())
             .setFormatter(new TestIntegerValueFormatter());
-
-        Files.writeString(testFile, testString);
 
 
         assertThrows(StorageFormatMismatchException.class, () -> storage.load());
@@ -1048,7 +1020,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromTargetPath_FileWriteError(Path testFile) throws IOException {
+    public void loadFromTargetPath_FileWriteError(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         String testString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
@@ -1068,7 +1040,7 @@ public class CompilerStorageTests {
 
     @Test
     @UseTestFile
-    public void loadStringFromTargetPath_FormatterError(Path testFile) throws IOException {
+    public void loadFromTargetPath_FormatterError(Path testFile) throws IOException {
         StorableCustomCompiler expectedCompiler = new TestStorableCustomCompiler();
         String testString = expectedCompiler.getStorageRepresentation().toString();
         CompilerStorage storage = new CompilerStorage()
