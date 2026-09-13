@@ -32,7 +32,7 @@ public class CompilerBuilderTests {
         );
 
 
-        builder.createCompiler();
+        assertDoesNotThrow(() -> builder.createCompiler());
     }
 
     @Test
@@ -138,6 +138,6 @@ public class CompilerBuilderTests {
         );
 
 
-        builder.createCompiler();
+        assertDoesNotThrow(() -> builder.createCompiler());
     }
 }
