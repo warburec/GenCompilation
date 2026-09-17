@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import component_construction.ParameterError;
+import component_construction.storage.exceptions.NonStorableComponentException;
 import grammars.basic_identifier.BasicIdentifierGrammar;
 import grammars.basic_identifier.convertors.XToYToXSemantic;
 import lexical_analysis.DynamicTokenRegex;
@@ -33,7 +34,7 @@ public class StorableCustomCompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number") //TODO: Using [0-9]+(\\.[0-9]+)? for all tests would be better
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number") //TODO: Using [0-9]+(\\.[0-9]+)? for all tests would be better
             }
         );
 
@@ -60,7 +61,7 @@ public class StorableCustomCompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
             }
         );
         builder2.setComponents(
@@ -74,7 +75,7 @@ public class StorableCustomCompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
             }
         );
         builder3.setComponents(
@@ -88,7 +89,7 @@ public class StorableCustomCompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
             }
         );
         builder4.setComponents(
@@ -102,7 +103,7 @@ public class StorableCustomCompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
             }
         );
         builder5.setComponents(
@@ -116,7 +117,7 @@ public class StorableCustomCompilerBuilderTests {
             new String[] {}, 
             new DynamicTokenRegex[] {
                 new DynamicTokenRegex("[A-Za-z]+", "identifier"),
-                new DynamicTokenRegex("[0-9]+|[0-9]+.[0-9]+", "number")
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
             }
         );
 
@@ -147,6 +148,70 @@ public class StorableCustomCompilerBuilderTests {
         assertDoesNotThrow(() -> builder.createCompiler());
     }
 
-    // TODO: Catch NonStorableComponentException for non-storable analysers and code generator
+    @Test
+    public void setcomponents_nonStorableLexicalAnalyser() {
+        StorableCustomCompilerBuilder builder = new StorableCustomCompilerBuilder();
+        builder.setComponents(
+            new TestCustomLexicalAnalyserFactory(),
+            new TestStorableCustomSyntaxAnalyserFactory(), 
+            new TestStorableCustomCodeGeneratorFactory(), 
+            BasicIdentifierGrammar.produce(), 
+            XToYToXSemantic.produce(), 
+            new String[] {" "}, 
+            new String[] {"+", "=", ";"}, 
+            new String[] {}, 
+            new DynamicTokenRegex[] {
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
+            }
+        );
+
+
+        assertThrows(NonStorableComponentException.class, () -> builder.createCompiler());
+    }
+
+    @Test
+    public void setcomponents_nonStorableSyntaxAnalyser() {
+        StorableCustomCompilerBuilder builder = new StorableCustomCompilerBuilder();
+        builder.setComponents(
+            new TestStorableCustomLexicalAnalyserFactory(),
+            new TestCustomSyntaxAnalyserFactory(), 
+            new TestStorableCustomCodeGeneratorFactory(), 
+            BasicIdentifierGrammar.produce(), 
+            XToYToXSemantic.produce(), 
+            new String[] {" "}, 
+            new String[] {"+", "=", ";"}, 
+            new String[] {}, 
+            new DynamicTokenRegex[] {
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
+            }
+        );
+
+
+        assertThrows(NonStorableComponentException.class, () -> builder.createCompiler());
+    }
+
+    @Test
+    public void setcomponents_nonStorableCodeGenerator() {
+        StorableCustomCompilerBuilder builder = new StorableCustomCompilerBuilder();
+        builder.setComponents(
+            new TestStorableCustomLexicalAnalyserFactory(),
+            new TestStorableCustomSyntaxAnalyserFactory(), 
+            new TestCustomCodeGeneratorFactory(), 
+            BasicIdentifierGrammar.produce(), 
+            XToYToXSemantic.produce(), 
+            new String[] {" "}, 
+            new String[] {"+", "=", ";"}, 
+            new String[] {}, 
+            new DynamicTokenRegex[] {
+                new DynamicTokenRegex("[A-Za-z]+", "identifier"),
+                new DynamicTokenRegex("[0-9]+(\\.[0-9]+)?", "number")
+            }
+        );
+
+
+        assertThrows(NonStorableComponentException.class, () -> builder.createCompiler());
+    }
 
 }
