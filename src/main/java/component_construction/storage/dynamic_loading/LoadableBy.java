@@ -11,6 +11,15 @@ import component_construction.storage.exceptions.IncorrectlyFormattedException;
  */
 public interface LoadableBy<L extends Loader<?>> {
 
+    /**
+     * Gets the {@code Loader} referenced by a given {@code LoadableBy} object
+     * @param <T> The object type that may be loaded through the referenced {@code Loader} type
+     * @param <L> The type of {@code Loader} referenced by this {@code LoadableBy} object
+     * @param loadableByClass The class implementing {@code LoadableBy}
+     * @return The class of the referenced {@code Loader} type
+     * @throws IllegalArgumentException The provided class does not directly implement {@code LoadableBy}
+     * @throws IncorrectlyFormattedException The provided {@code Loader} type is not a constructable/concrete {@code Class} object
+     */
     @SuppressWarnings("unchecked")
     public static <T, L extends Loader<T>> Class<L> getTargetLoader(Class<? extends LoadableBy<L>> loadableByClass) throws IllegalArgumentException, IncorrectlyFormattedException {
         ParameterizedType loadableByInterface = null;

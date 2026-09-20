@@ -18,11 +18,11 @@ public class CustomCompilerBuilder extends CompilerBuilderTemplate<CustomCompile
             syntaxAnalyserFactory, 
             codeGeneratorFactory, 
             grammar, 
+            ruleConvertor,
             whitespaceDelimiters, 
             stronglyReservedWords, 
             weaklyReservedWords, 
-            dynamicTokenRegex,
-            ruleConvertor
+            dynamicTokenRegex
         );
     }
     

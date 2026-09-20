@@ -7,6 +7,9 @@ import lexical_analysis.LexicalAnalyser;
 import syntax_analysis.SyntaxAnalyser;
 import syntax_analysis.parsing.*;
 
+/**
+ * A compiler that can be built with user-definable inner components
+ */
 public class CustomCompiler implements Compiler {
     protected LexicalAnalyser lexicalAnalyser;
     protected SyntaxAnalyser syntaxAnalyser;
