@@ -7,7 +7,7 @@ import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.*;
 
 /**
- * A simple and limited ValueFormatter, not intended for storage of complex data
+ * A simple ValueFormatter
  * Parses and produces strings in the form { "entry1":value1, ..., "entryN":value }
  */
 public class ValueToStringFormatter implements ValueFormatter<String> {
