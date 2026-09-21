@@ -13,11 +13,11 @@ import storage.storage_values.StorageValue;
 import storage.value_formatters.*;
 
 /**
- * A utility class for storage of compiler components.
+ * A utility class for storage
  */
 public class Storage {
 
-    private Path targetFilepath = Path.of("." + File.separator + "compilerFile.txt");
+    private Path targetFilepath = Path.of("." + File.separator + "storageFile.txt");
     private ChosenFormatter<?> formatter = new ChosenFormatter<>(new ValueToStringFormatter());
     private ChosenStreamWriter<?> streamWriter = new ChosenStreamWriter<>(new DefaultUTF8StreamEditor());
     private ChosenStreamReader<?> streamReader = new ChosenStreamReader<>(new DefaultUTF8StreamEditor());
