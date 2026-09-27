@@ -7,6 +7,7 @@ import java.util.*;
 import grammar_objects.*;
 import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
+import syntax_analysis.parsing.parsers.SLR1Parser;
 import test_aids.*;
 import test_aids.test_grammars.BasicIdentifierTestGrammar;
 import test_aids.test_grammars.BasicSLR1TestGrammar;
