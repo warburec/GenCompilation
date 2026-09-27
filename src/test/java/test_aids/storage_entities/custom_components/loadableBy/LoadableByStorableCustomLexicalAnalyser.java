@@ -5,7 +5,6 @@ import grammar_objects.Token;
 import lexical_analysis.LexicalAnalyser;
 import storage.external_interfaces.Storable;
 import storage.storage_values.*;
-import test_aids.storage_entities.custom_components.loadable.LoadableStorableCustomSyntaxAnalyser;
 
 public class LoadableByStorableCustomLexicalAnalyser implements LexicalAnalyser, LoadableBy<LoadableByCustomLexicalAnalyserLoader>, Storable {
 

@@ -3,7 +3,6 @@ package component_construction;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import component_construction.builders.CompilerBuilderTemplate;
 import component_construction.builders.CustomCompilerBuilder;
 import component_construction.factories.code_generation.BasicCodeGenFactory;
 import component_construction.factories.lexical_analysis.GeneralLexicalAnalyserFactory;
