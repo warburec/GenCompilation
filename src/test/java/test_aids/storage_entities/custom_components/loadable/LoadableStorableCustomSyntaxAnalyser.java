@@ -1,6 +1,6 @@
 package test_aids.storage_entities.custom_components.loadable;
 
-import component_construction.storage.dynamic_loading.ReflectivelyLoadable;
+import component_construction.storable.dynamic_loading.ReflectivelyLoadable;
 import grammar_objects.Token;
 import storage.external_interfaces.*;
 import storage.storage_values.*;

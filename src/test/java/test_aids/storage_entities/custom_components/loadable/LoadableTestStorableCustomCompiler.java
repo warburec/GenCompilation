@@ -2,7 +2,7 @@ package test_aids.storage_entities.custom_components.loadable;
 
 import java.util.Map;
 
-import component_construction.storage.StorableCustomCompiler;
+import component_construction.storable.StorableCustomCompiler;
 import storage.external_interfaces.Loadable;
 import storage.storage_values.*;
 
