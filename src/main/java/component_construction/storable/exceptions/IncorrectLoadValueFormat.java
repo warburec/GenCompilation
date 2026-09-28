@@ -1,0 +1,11 @@
+package component_construction.storable.exceptions;
+
+public class IncorrectLoadValueFormat extends RuntimeException {
+
+    public IncorrectLoadValueFormat(String expectedFormat, String actualFormat, Throwable cause) {
+        super(
+            "A load value was provided in an incorrect format. Expected - " + expectedFormat + ", Actual - " + actualFormat,
+            cause
+        );
+    }
+}
