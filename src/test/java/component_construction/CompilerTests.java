@@ -1,9 +1,9 @@
 package component_construction;
-
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 
-import component_construction.builders.CustomCompilerBuilder;
+import component_construction.builders.CompilerBuilder;
 import component_construction.factories.code_generation.BasicCodeGenFactory;
 import component_construction.factories.lexical_analysis.GeneralLexicalAnalyserFactory;
 import component_construction.factories.syntax_analysis.CLR1ParserFactory;
@@ -18,7 +18,7 @@ public class CompilerTests {
     
     @Test
     public void basicIdentifierCompiler() throws ParseFailedException {
-        CustomCompilerBuilder builder = new CustomCompilerBuilder();
+        CompilerBuilder builder = new CompilerBuilder();
 
         builder.setComponents(
             new GeneralLexicalAnalyserFactory(),

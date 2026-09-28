@@ -17,21 +17,16 @@ sourceSets {
             srcDirs = ['src/test/java']
         }
     }
-    playground {
-        java {
-            srcDirs = ['src/playground/java']
-        }
-    }
 }
 
 dependencies {
+    implementation platform('org.junit:junit-bom:5.10.3')
+    implementation 'org.junit.jupiter:junit-jupiter'
+
     testImplementation platform('org.junit:junit-bom:5.10.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    playgroundImplementation sourceSets.main.output
-    // playgroundImplementation configurations.implementation
-    // playgroundRuntimeOnly configurations.runtimeClasspath
 }
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -54,25 +49,17 @@ tasks.named('test') {
             events = [TestLogEvent.STARTED, TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_ERROR, TestLogEvent.STANDARD_OUT]
             exceptionFormat = TestExceptionFormat.FULL
         }
-        
+
         info.events = debug.events
         info.exceptionFormat = debug.exceptionFormat
 
         afterSuite { desc, result ->
-            if (desc.parent) return
-
-            def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-            def startItem = '|  ', endItem = '  |'
-            def repeatLength = startItem.length() + output.length() + endItem.length()
-            
-            println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            if (!desc.parent) {
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
         }
     }
-}
-
-tasks.register('playground', JavaExec) {
-    group = 'application'
-    description = 'Runs the playground main method'
-    classpath = sourceSets.playground.runtimeClasspath
-    mainClass = 'Test' 
 }

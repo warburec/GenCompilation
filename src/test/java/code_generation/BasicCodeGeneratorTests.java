@@ -1,5 +1,4 @@
 package code_generation;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
@@ -8,7 +7,8 @@ import code_generation.BasicCodeGenerator.IncompleteReductionException;
 import grammar_objects.RuleConvertor;
 import syntax_analysis.parsing.ParseState;
 import test_aids.*;
-import test_aids.test_grammars.*;
+import test_aids.test_grammars.BasicIdentifierTestGrammar;
+import test_aids.test_grammars.SmallTestGrammar;
 
 public class BasicCodeGeneratorTests {
     
