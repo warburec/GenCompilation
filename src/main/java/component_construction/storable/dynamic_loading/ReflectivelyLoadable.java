@@ -1,8 +1,0 @@
-package component_construction.storable.dynamic_loading;
-
-import storage.external_interfaces.Loadable;
-
-/**
- * Classes of this type must have a constructor that may be used to reflectively construct objects.
- */
-public interface ReflectivelyLoadable extends Loadable {}
