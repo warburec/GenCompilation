@@ -6,6 +6,16 @@ Objects can produce a `StroageValue<?>` representation of their state. This stat
 
 Stored state may be loaded through the `Storable` helper, and may be used to hydrate objects through the `Loadable` interface.
 
+```java
+Storage storage = new Storage()
+    .setTargetPath("./testFilepath.bin")
+    .setFileEditor(new ExampleStreamEditor())
+    .setFormatter(new ExampleValueFormatter());
+
+storage.store(someStorable);
+storage.loadInto(new ExampleLoadable());
+```
+
 ## Diagrams
 ### Usage Pipeline
 ![Usage Pipeline Diagram](/docs/diagrams/StorageUsagePipeline.drawio.svg)
