@@ -1,4 +1,4 @@
-package storage.storage_value_adapters;
+package storage.exceptions;
 
 import storage.storage_values.StorageValue;
 

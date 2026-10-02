@@ -5,7 +5,7 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 import helper_objects.*;
-import storage.storage_value_adapters.UnsupportedValueException;
+import storage.exceptions.UnsupportedValueException;
 import storage.storage_values.*;
 
 public class ValueToStringFormatterTests {

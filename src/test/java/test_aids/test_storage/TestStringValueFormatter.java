@@ -1,6 +1,6 @@
 package test_aids.test_storage;
 
-import storage.storage_value_adapters.UnsupportedValueException;
+import storage.exceptions.UnsupportedValueException;
 import storage.storage_values.StorageValue;
 import storage.value_formatters.ValueFormatter;
 

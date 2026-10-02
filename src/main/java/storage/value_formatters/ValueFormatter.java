@@ -1,6 +1,6 @@
 package storage.value_formatters;
 
-import storage.storage_value_adapters.UnsupportedValueException;
+import storage.exceptions.UnsupportedValueException;
 import storage.storage_values.StorageValue;
 
 /**
