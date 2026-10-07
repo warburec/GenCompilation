@@ -1,7 +1,7 @@
 package test_aids.storage_entities.custom_components.loadable;
 
 import code_generation.CodeGenerator;
-import component_construction.storable.dynamic_loading.ReflectivelyLoadable;
+import storage.dynamic_loading.ReflectivelyLoadable;
 import storage.external_interfaces.*;
 import storage.storage_values.*;
 import syntax_analysis.parsing.ParseState;

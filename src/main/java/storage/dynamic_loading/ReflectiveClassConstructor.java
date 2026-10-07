@@ -1,4 +1,4 @@
-package component_construction.storable.dynamic_loading;
+package storage.dynamic_loading;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;

@@ -1,6 +1,6 @@
 package test_aids.storage_entities.loadableby_entities;
 
-import component_construction.storable.dynamic_loading.Loader;
+import storage.dynamic_loading.Loader;
 import storage.storage_values.StorageValue;
 
 public class StandardLoader implements Loader<LoadableObject> {

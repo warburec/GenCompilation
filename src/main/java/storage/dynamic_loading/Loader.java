@@ -1,9 +1,8 @@
-package component_construction.storable.dynamic_loading;
+package storage.dynamic_loading;
 
 import java.lang.reflect.InvocationTargetException;
 
-import component_construction.storable.exceptions.MissingEmptyConstructorException;
-import component_construction.storable.factories.Factory;
+import storage.exceptions.MissingEmptyConstructorException;
 
 /**
  * An interface defining the ability construct objects of the specified type

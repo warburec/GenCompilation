@@ -4,10 +4,9 @@ import java.util.*;
 
 import code_generation.CodeGenerator;
 import component_construction.storable.StorableCustomCompiler;
-import component_construction.storable.dynamic_loading.*;
 import component_construction.storable.exceptions.*;
-import component_construction.storable.factories.Factory;
 import lexical_analysis.LexicalAnalyser;
+import storage.dynamic_loading.*;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
 

@@ -1,9 +1,11 @@
-package component_construction.storable.dynamic_loading;
+package storage.dynamic_loading;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import component_construction.storable.exceptions.IncorrectlyFormattedException;
+import storage.dynamic_loading.LoadableBy;
+import storage.dynamic_loading.Loader;
+import storage.exceptions.IncorrectlyFormattedException;
 import test_aids.storage_entities.loadableby_entities.*;
 
 public class LoadableByTests {

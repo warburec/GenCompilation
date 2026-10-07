@@ -1,8 +1,8 @@
 package test_aids.storage_entities.custom_components.loadable;
 
-import component_construction.storable.dynamic_loading.ReflectivelyLoadable;
 import grammar_objects.Token;
 import lexical_analysis.LexicalAnalyser;
+import storage.dynamic_loading.ReflectivelyLoadable;
 import storage.external_interfaces.Storable;
 import storage.storage_values.*;
 

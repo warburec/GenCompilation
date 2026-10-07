@@ -1,9 +1,10 @@
-package component_construction.storable.dynamic_loading;
+package storage.dynamic_loading;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import component_construction.storable.exceptions.MissingEmptyConstructorException;
+import storage.dynamic_loading.Loader;
+import storage.exceptions.MissingEmptyConstructorException;
 import test_aids.storage_entities.*;
 
 public class LoaderTests {

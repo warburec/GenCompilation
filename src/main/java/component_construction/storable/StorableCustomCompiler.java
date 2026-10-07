@@ -4,11 +4,11 @@ import java.util.Map;
 
 import code_generation.CodeGenerator;
 import component_construction.custom_components.*;
-import component_construction.storable.dynamic_loading.LoadableBy;
 import component_construction.storable.exceptions.NonStorableComponentException;
 import component_construction.storable.factories.StorableCustomCompilerFactory;
 import component_construction.storable.StorableCustomCompiler;
 import lexical_analysis.LexicalAnalyser;
+import storage.dynamic_loading.LoadableBy;
 import storage.external_interfaces.Storable;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
