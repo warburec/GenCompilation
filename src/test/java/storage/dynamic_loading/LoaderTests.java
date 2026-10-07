@@ -3,7 +3,6 @@ package storage.dynamic_loading;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import storage.dynamic_loading.Loader;
 import storage.exceptions.MissingEmptyConstructorException;
 import test_aids.storage_entities.*;
 
