@@ -1,4 +1,4 @@
-package component_construction.storable.exceptions;
+package storage.exceptions;
 
 public class IncorrectlyFormattedException extends RuntimeException {
 

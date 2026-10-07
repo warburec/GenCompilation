@@ -1,6 +1,6 @@
-package component_construction.storable.exceptions;
+package storage.exceptions;
 
-import component_construction.storable.dynamic_loading.Loader;
+import storage.dynamic_loading.Loader;
 
 public class MissingEmptyConstructorException extends RuntimeException {
     

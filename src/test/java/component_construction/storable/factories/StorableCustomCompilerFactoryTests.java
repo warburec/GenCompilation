@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import code_generation.CodeGenerator;
 import component_construction.storable.exceptions.*;
 import lexical_analysis.LexicalAnalyser;
+import storage.dynamic_loading.Factory;
 import storage.storage_values.*;
 import syntax_analysis.SyntaxAnalyser;
 import test_aids.storage_entities.custom_components.*;

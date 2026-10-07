@@ -3,7 +3,7 @@ package storage.value_formatters;
 import java.util.*;
 import java.util.Map.Entry;
 
-import storage.storage_value_adapters.UnsupportedValueException;
+import storage.exceptions.UnsupportedValueException;
 import storage.storage_values.*;
 
 /**

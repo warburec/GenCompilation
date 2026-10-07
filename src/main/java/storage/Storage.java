@@ -8,7 +8,6 @@ import helper_objects.TypeReference;
 import storage.exceptions.*;
 import storage.file_editors.*;
 import storage.external_interfaces.*;
-import storage.storage_value_adapters.UnsupportedValueException;
 import storage.storage_values.StorageValue;
 import storage.value_formatters.*;
 

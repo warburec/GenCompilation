@@ -1,4 +1,4 @@
-package component_construction.storable.dynamic_loading;
+package storage.dynamic_loading;
 
 import storage.external_interfaces.Loadable;
 

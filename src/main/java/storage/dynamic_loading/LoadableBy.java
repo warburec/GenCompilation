@@ -1,8 +1,8 @@
-package component_construction.storable.dynamic_loading;
+package storage.dynamic_loading;
 
 import java.lang.reflect.*;
 
-import component_construction.storable.exceptions.IncorrectlyFormattedException;
+import storage.exceptions.IncorrectlyFormattedException;
 
 /**
  * A class specifying a designated loader for the current class.
