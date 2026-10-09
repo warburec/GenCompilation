@@ -7,6 +7,14 @@ import syntax_analysis.parsing.ParseState;
 
 public class TestStorableCustomCodeGenerator implements CodeGenerator, Storable {
 
+    public String value = null;
+
+    public TestStorableCustomCodeGenerator() {}
+
+    public TestStorableCustomCodeGenerator(String value) {
+        this.value = value;
+    }
+
     @Override
     public String generate(ParseState parseRoot) {
         throw new UnsupportedOperationException("Unimplemented method 'generate'");
@@ -20,6 +28,10 @@ public class TestStorableCustomCodeGenerator implements CodeGenerator, Storable 
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof TestStorableCustomCodeGenerator)) return false;
+
+        TestStorableCustomCodeGenerator other = (TestStorableCustomCodeGenerator)obj;
+        if (this.value != other.value) return false;
+
 		return true;
     }
 
