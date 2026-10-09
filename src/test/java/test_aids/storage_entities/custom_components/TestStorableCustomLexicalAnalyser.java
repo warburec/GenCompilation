@@ -7,6 +7,14 @@ import storage.storage_values.*;
 
 public class TestStorableCustomLexicalAnalyser implements LexicalAnalyser, Storable {
 
+    public String value = null;
+
+    public TestStorableCustomLexicalAnalyser() {}
+
+    public TestStorableCustomLexicalAnalyser(String value) {
+        this.value = value;
+    }
+
     @Override
     public Token[] analyse(String sentence) {
         throw new UnsupportedOperationException("Unimplemented method 'analyse'");
@@ -19,7 +27,11 @@ public class TestStorableCustomLexicalAnalyser implements LexicalAnalyser, Stora
     
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof TestStorableCustomCodeGenerator)) return false;
+        if (!(obj instanceof TestStorableCustomLexicalAnalyser)) return false;
+
+        TestStorableCustomLexicalAnalyser other = (TestStorableCustomLexicalAnalyser)obj;
+        if (this.value != other.value) return false;
+
 		return true;
     }
     
