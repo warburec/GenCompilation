@@ -321,4 +321,119 @@ public class FirstSetGeneratorTests {
 
         assertEquals(expectedSets, actualSets);
     }
+
+    @Test
+    public void emptyTokenRule() {
+        Set<ProductionRule> productionRules = new HashSet<>();
+        productionRules.add(new ProductionRule(
+            new NonTerminal("s"), 
+            new LexicalElement[] {
+                new Token("")
+            }
+        ));
+
+        Set<NonTerminal> nonTerminals = new HashSet<>();
+        nonTerminals.add(new NonTerminal("s"));
+
+
+        HashMap<NonTerminal, Set<Token>> actualSets = FirstSetGenerator.generate(productionRules, nonTerminals);
+
+
+        HashMap<NonTerminal, Set<Token>> expectedSets = new HashMap<>();
+        expectedSets.put(
+            new NonTerminal("s"),
+            Set.of(
+                new Token("")
+        ));
+
+        assertEquals(expectedSets, actualSets);
+    }
+
+    @Test
+    public void emptyTokenRule_explicitEmptyToken() {
+        Set<ProductionRule> productionRules = new HashSet<>();
+        productionRules.add(new ProductionRule(
+            new NonTerminal("s"), 
+            new LexicalElement[] {
+                new EmptyToken()
+            }
+        ));
+
+        Set<NonTerminal> nonTerminals = new HashSet<>();
+        nonTerminals.add(new NonTerminal("s"));
+
+
+        HashMap<NonTerminal, Set<Token>> actualSets = FirstSetGenerator.generate(productionRules, nonTerminals);
+
+
+        HashMap<NonTerminal, Set<Token>> expectedSets = new HashMap<>();
+        expectedSets.put(
+            new NonTerminal("s"),
+            Set.of(
+                new EmptyToken()
+        ));
+
+        assertEquals(expectedSets, actualSets);
+    }
+
+    @Test
+    public void ruleWithMultipleEmptyTokens() {
+        Set<ProductionRule> productionRules = new HashSet<>();
+        productionRules.add(new ProductionRule(
+            new NonTerminal("s"), 
+            new LexicalElement[] {
+                new EmptyToken(),
+                new Token("")
+            }
+        ));
+
+        Set<NonTerminal> nonTerminals = new HashSet<>();
+        nonTerminals.add(new NonTerminal("s"));
+
+
+        HashMap<NonTerminal, Set<Token>> actualSets = FirstSetGenerator.generate(productionRules, nonTerminals);
+
+
+        HashMap<NonTerminal, Set<Token>> expectedSets = new HashMap<>();
+        expectedSets.put(
+            new NonTerminal("s"),
+            Set.of(
+                new EmptyToken()
+        ));
+
+        assertEquals(expectedSets, actualSets);
+    }
+
+    @Test
+    public void selfReferentialRule() {
+        Set<ProductionRule> productionRules = new HashSet<>();
+        productionRules.add(new ProductionRule(
+            new NonTerminal("s"), 
+            new LexicalElement[] {
+                new NonTerminal("s")
+            }
+        ));
+        productionRules.add(new ProductionRule(
+            new NonTerminal("s"), 
+            new LexicalElement[] {
+                new EmptyToken()
+            }
+        ));
+
+        Set<NonTerminal> nonTerminals = new HashSet<>();
+        nonTerminals.add(new NonTerminal("s"));
+
+
+        HashMap<NonTerminal, Set<Token>> actualSets = FirstSetGenerator.generate(productionRules, nonTerminals);
+
+
+        HashMap<NonTerminal, Set<Token>> expectedSets = new HashMap<>();
+        expectedSets.put(
+            new NonTerminal("s"),
+            Set.of(
+                new EmptyToken()
+        ));
+
+        assertEquals(expectedSets, actualSets);
+    }
 }

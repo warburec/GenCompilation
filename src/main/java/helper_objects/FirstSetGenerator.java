@@ -5,35 +5,46 @@ import java.util.*;
 import grammar_objects.*;
 
 public class FirstSetGenerator {
+    private static Token EmptyToken = new EmptyToken();
 
     public static HashMap<NonTerminal, Set<Token>> generate(Set<ProductionRule> productionRules, Set<NonTerminal> nonTerminals) {
         HashMap<NonTerminal, Set<Token>> firstTokenSets = new HashMap<>();
         HashMap<NonTerminal, Set<NonTerminal>> firstNTSets = new HashMap<>();
-
-        Token emptyToken = new Token("");
 
         for(NonTerminal nonTerminal : nonTerminals) {
             firstTokenSets.put(nonTerminal, new HashSet<>());
             firstNTSets.put(nonTerminal, new HashSet<>());
         }
 
-        Set<NonTerminal> emptyNonTerminals = findEmptyNonTerminals(productionRules, nonTerminals, emptyToken);
+        Set<NonTerminal> emptyNonTerminals = findEmptyNonTerminals(productionRules, nonTerminals);
 
-        findAllFirstElements(productionRules, firstTokenSets, firstNTSets, emptyToken, emptyNonTerminals);
+        findAllFirstElements(productionRules, firstTokenSets, firstNTSets, emptyNonTerminals);
 
         resolveCompleteSets(firstTokenSets, firstNTSets);
-        resolveConnectedSets(firstTokenSets, firstNTSets, emptyToken);
+        resolveConnectedSets(firstTokenSets, firstNTSets);
 
         return firstTokenSets;
     }
 
-    private static Set<NonTerminal> findEmptyNonTerminals(Set<ProductionRule> productionRules, Set<NonTerminal> nonTerminals, Token emptyToken) {
+    private static Set<NonTerminal> findEmptyNonTerminals(Set<ProductionRule> productionRules, Set<NonTerminal> nonTerminals) {
         Set<NonTerminal> emptyNonTerminals = new HashSet<>();
 
         for (ProductionRule rule : productionRules) {
-            if(rule.productionSequence().length == 0 || 
-                (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
-            ) {
+            if (rule.productionSequence().length == 0) {
+                emptyNonTerminals.add(rule.nonTerminal());
+                continue;
+            }
+
+            boolean isEmpty = true;
+
+            for (LexicalElement element : rule.productionSequence()) {
+                if (!EmptyToken.equals(element)) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+
+            if (isEmpty) {
                 emptyNonTerminals.add(rule.nonTerminal());
             }
         }
@@ -44,56 +55,60 @@ public class FirstSetGenerator {
     private static void findAllFirstElements(
         Set<ProductionRule> productionRules, 
         HashMap<NonTerminal, Set<Token>> firstTokenSets,
-        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets, 
-        Token emptyToken,
+        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets,
         Set<NonTerminal> emptyNonTerminals
     ) {
         for(ProductionRule rule : productionRules) {
-            if(rule.productionSequence().length == 0 || 
-                (rule.productionSequence().length == 1 && rule.getFirstElement().equals(emptyToken))
-            ) {
-                firstTokenSets.get(rule.nonTerminal()).add((Token)emptyToken);
-                continue;
+            findFirstElementsForRule(
+                rule.nonTerminal(),
+                rule.productionSequence(), 
+                firstTokenSets,
+                firstNTSets,
+                emptyNonTerminals
+            );
+        }
+    }
+
+    private static void findFirstElementsForRule(
+        NonTerminal ruleNonTerminal,
+        LexicalElement[] productionSequence, 
+        HashMap<NonTerminal, Set<Token>> firstTokenSets,
+        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets,
+        Set<NonTerminal> emptyNonTerminals
+    ) {
+        boolean isEmpty = true;
+
+        for(LexicalElement element : productionSequence) {
+            if(element instanceof Token) {
+                if(EmptyToken.equals(element)) {
+                    firstTokenSets.get(ruleNonTerminal).add(EmptyToken);
+                    continue;
+                }
+
+                firstTokenSets.get(ruleNonTerminal).add((Token)element);
+                return;
             }
-
-            boolean foundNonEmpty = false;
-            int index = -1;
-            LexicalElement element = rule.getFirstElement();
-
-            while(index < rule.productionSequence().length) {
-                index += 1;
-                element = rule.productionSequence()[index];
-
-                if(element instanceof Token) {
-                    if(emptyToken.equals(element)) {
+            else {
+                if(ruleNonTerminal.equals(element)) {
+                    if (emptyNonTerminals.contains((NonTerminal)element)) {
                         continue;
                     }
 
-                    firstTokenSets.get(rule.nonTerminal()).add((Token)element);
-
-                    foundNonEmpty = true;
+                    isEmpty = false;
                     break;
                 }
-                else {
-                    if(rule.nonTerminal().equals(element)) { 
-                        foundNonEmpty = true;
-                        break;
-                    }
 
-                    firstNTSets.get(rule.nonTerminal()).add((NonTerminal)element);
+                firstNTSets.get(ruleNonTerminal).add((NonTerminal)element);
 
-                    if(!emptyNonTerminals.contains((NonTerminal)element)) { 
-                        foundNonEmpty = true;
-                        break;
-                    }
+                if(!emptyNonTerminals.contains((NonTerminal)element)) { 
+                    isEmpty = false;
+                    return;
                 }
             }
+        }
 
-            if(!foundNonEmpty) {
-                if(emptyNonTerminals.contains((NonTerminal)element)) {
-                    firstTokenSets.get(rule.nonTerminal()).add(emptyToken);
-                }
-            }
+        if(isEmpty) {
+            firstTokenSets.get(ruleNonTerminal).add(EmptyToken);
         }
     }
 
@@ -137,8 +152,7 @@ public class FirstSetGenerator {
 
     private static void resolveConnectedSets(
         HashMap<NonTerminal, Set<Token>> firstTokenSets,
-        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets,
-        Token emptyToken
+        HashMap<NonTerminal, Set<NonTerminal>> firstNTSets
     ) {
         boolean changesMade = false;
 
@@ -147,7 +161,7 @@ public class FirstSetGenerator {
 
             for (NonTerminal nonTerminal : firstNTSets.keySet()) {
                 for (NonTerminal nonTerminal2 : firstNTSets.get(nonTerminal)) {
-                    Set<Token> tokensWithoutEmpty = removeEmpty(firstTokenSets.get(nonTerminal2), emptyToken);
+                    Set<Token> tokensWithoutEmpty = removeEmpty(firstTokenSets.get(nonTerminal2));
 
                     if(firstTokenSets.get(nonTerminal).containsAll(tokensWithoutEmpty)) {
                         continue;
@@ -161,14 +175,15 @@ public class FirstSetGenerator {
         } while (changesMade);
     }
 
-    private static Set<Token> removeEmpty(Set<Token> set, Token emptyToken) {
+    private static Set<Token> removeEmpty(Set<Token> set) {
         Set<Token> tokens = new HashSet<>();
 
         for (Token token : set) {
-            if(!emptyToken.equals(token)) {
+            if(!EmptyToken.equals(token)) {
                 tokens.add(token);
             }
         }
+        
         return tokens;
     }
 

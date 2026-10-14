@@ -4,9 +4,7 @@ public class Token extends LexicalElement {
 
     private Integer lineNumber;
     private Integer columnNumber;
-
     private Integer symbolNumber;
-
     private PositionType positionType;
 
     /**
