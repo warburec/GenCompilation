@@ -64,16 +64,16 @@ public class Token extends LexicalElement {
         }
     }
 
+    @Override
+    public String toString() {
+        return "\"" + getName() + "\"";
+    }
 
+    
     private enum PositionType {
         LineAndColumn,
         ColumnOnly,
         Symbol
-    }
-
-    @Override
-    public String toString() {
-        return "\"" + getName() + "\"";
     }
 
 }
