@@ -69,6 +69,11 @@ public class Token extends LexicalElement {
         return "\"" + getName() + "\"";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Token)) { return false; }
+        return super.equals(obj);
+    }
     
     private enum PositionType {
         LineAndColumn,
