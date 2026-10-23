@@ -393,47 +393,21 @@ public class CLR1Parser extends SLR1Parser {
         Stack<ParseState> parseStates = new Stack<>();
 
         parseStates.add(new ShiftedState(rootState, null));
-        Token currentToken = getNextToken(input);
+        Holder<Token> currentToken = new Holder<>(getNextToken(input));
 
         try {
             while(!accepted) {
-                Action action = actionTable.get(parseStates.peek().state()).get(currentToken);
+                Action action = actionTable
+                    .get(parseStates.peek().state())
+                    .get(currentToken.value);
 
-                if(action instanceof Shift) {
-                    Shift shiftAction = (Shift)action;
-
-                    parseStates.add(new ShiftedState(shiftAction.gotoState(), currentToken));
-
-                    currentToken = getNextToken(input);
-                }
-                else if(action instanceof Reduction) {
-                    Reduction reduceAction = (Reduction)action;
-
-                    int stackSize = parseStates.size();
-                    int numOfElements = reduceAction.reductionRule().productionSequence().length;
-                    List<ParseState> statesToReduce = new ArrayList<>(parseStates.subList(stackSize - numOfElements, stackSize));
-
-                    for(int i = 0; i < numOfElements; i++) {
-                        parseStates.remove(stackSize - 1 - i);
-                    }
-
-                    State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
-                    parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
-                }
-                else if(action instanceof Accept) {
-                    if(parseStates.size() > 2) {
-                        throw new IncompleteParseException();
-                    }
-
-                    return parseStates.pop();
-                }
-                else {
-                    if(currentToken.equals(EOF)) {
-                        throw new IncompleteParseException();
-                    }
-                    
-                    throw new SyntaxError(currentToken, parseStates.peek().state());
-                }   
+                accepted = applyAction(
+                    action,
+                    input,
+                    currentToken,
+                    parseStates,
+                    null
+                );
             }
         }
         catch(Exception e) {
@@ -441,6 +415,88 @@ public class CLR1Parser extends SLR1Parser {
         }
 
         return parseStates.pop();
+    }
+    
+    /**
+     * Applies a specified action. Recurses one time when attempting to parse an empty token
+     * @param action The current action to apply
+     * @param input An iterator for the input tokens of the sentence being parsed
+     * @param currentToken A reference to the current token. Will move to the next input token on a Shift action
+     * @param parseStates The states of the current parse
+     * @param pausedToken A reference to the previous token, paused while an empty token is being parsed. Non-null only on recursive calls (emptyToken)
+     * @return Whether the accept state has been reached
+     * @throws EarlyAcceptAcception The parse completed before the end of the input
+     * @throws IncompleteParseException The input ended before a full parse could be made
+     * @throws SyntaxError The next token is incorrect
+     */
+    private boolean applyAction(
+        Action action, 
+        Iterator<Token> input, 
+        Holder<Token> currentToken, 
+        Stack<ParseState> parseStates, 
+        Holder<Token> pausedToken
+    ) throws 
+        EarlyAcceptAcception,
+        IncompleteParseException, 
+        SyntaxError 
+    {
+        if(action instanceof Shift) {
+            applyShift(parseStates, currentToken.value, action);
+            currentToken.value = getNextToken(input);
+            return false;
+        }
+        else if(action instanceof Reduction) {
+            applyReduction(parseStates, action);
+            return false;
+        }
+        else if(action instanceof Accept) {
+            if(parseStates.size() > 2) {
+                throw new EarlyAcceptAcception();
+            }
+
+            return true;
+        } 
+        else if(currentToken.value.equals(EOF)) {
+            throw new IncompleteParseException();
+        }
+        else {
+            State currentState = parseStates.peek().state();
+
+            if(currentToken.value.equals(emptyToken)) {
+                throw new SyntaxError(pausedToken.value, currentState);
+            }
+
+            action = actionTable.get(currentState).get(emptyToken);
+            
+            return applyAction(
+                action,
+                input,
+                new Holder<>(emptyToken),
+                parseStates,
+                currentToken
+            );
+        }
+    }
+
+    private void applyShift(Stack<ParseState> parseStates, Token currentToken, Action action) {
+        Shift shiftAction = (Shift)action;
+        
+        parseStates.add(new ShiftedState(shiftAction.gotoState(), currentToken));
+    }
+    
+    private void applyReduction(Stack<ParseState> parseStates, Action action) {
+        Reduction reduceAction = (Reduction)action;
+
+        int stackSize = parseStates.size();
+        int numOfElements = reduceAction.reductionRule().productionSequence().length;
+        List<ParseState> statesToReduce = new ArrayList<>(parseStates.subList(stackSize - numOfElements, stackSize));
+
+        for(int i = 0; i < numOfElements; i++) {
+            parseStates.remove(stackSize - 1 - i);
+        }
+
+        State gotoState = gotoTable.get(parseStates.peek().state()).get(reduceAction.reductionRule().nonTerminal());
+        parseStates.add(new ReducedState(gotoState, reduceAction.reductionRule(), statesToReduce));
     }
 
     private Token getNextToken(Iterator<Token> input) {

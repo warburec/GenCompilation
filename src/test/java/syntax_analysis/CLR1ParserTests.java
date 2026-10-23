@@ -9,11 +9,7 @@ import syntax_analysis.grammar_structure_creation.*;
 import syntax_analysis.parsing.*;
 import syntax_analysis.parsing.parsers.CLR1Parser;
 import test_aids.*;
-import test_aids.test_grammars.BasicCLR1TestGrammar;
-import test_aids.test_grammars.BasicIdentifierTestGrammar;
-import test_aids.test_grammars.BasicSLR1TestGrammar;
-import test_aids.test_grammars.SelfReferentialTestGrammar;
-import test_aids.test_grammars.SmallTestGrammar;
+import test_aids.test_grammars.*;
 
 public class CLR1ParserTests {
     
