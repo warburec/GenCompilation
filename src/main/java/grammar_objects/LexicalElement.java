@@ -13,7 +13,7 @@ public abstract class LexicalElement {
 
     @Override
     public boolean equals(Object obj) {
-        if (!this.getClass().isInstance(obj)) { return false; }
+        if (!(obj instanceof LexicalElement)) { return false; }
          
         LexicalElement otherElement = (LexicalElement) obj;
 

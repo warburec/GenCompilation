@@ -244,17 +244,17 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
         return tokenHolder.tokenList.toArray(new Token[tokenHolder.tokenList.size()]);
     }
 
-    private void tokeniseSection(String regex, TokenisationHolder tokenHolder) {
-        if(matchWeaklyReservedWord(regex, tokenHolder)){
+    private void tokeniseSection(String section, TokenisationHolder tokenHolder) {
+        if(matchWeaklyReservedWord(section, tokenHolder)){
             return;
         }
 
         while(true) {
-            BookendDetails startBookend = findStartingBookend(regex);
+            BookendDetails startBookend = findStartingBookend(section);
             
             //Due to assumption that two non-bookended dynamic tokens cannot be adjacent. If this changes, change this to tokenise without using bookends
             if(startBookend == null) { 
-                Token newToken = tokenise(regex, tokenHolder);
+                Token newToken = tokenise(section, tokenHolder);
 
                 if(newToken == null) {
                     throw new LexicalError(
@@ -270,25 +270,25 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
                 }
 
                 tokenHolder.tokenList.add(newToken);
-                updateDisplayPosition(tokenHolder, regex, StringType.Dynamic);
+                updateDisplayPosition(tokenHolder, section, StringType.Dynamic);
                 
                 return;
             }
 
             if(startBookend.position != BookendPosition.Start) {
-                tokenHolder.tokenList.add(tokeniseWithoutBookends(regex.substring(0, startBookend.startIndex)));
-                regex = regex.substring(startBookend.startIndex);
+                tokenHolder.tokenList.add(tokeniseWithoutBookends(section.substring(0, startBookend.startIndex)));
+                section = section.substring(startBookend.startIndex);
             }
 
-            String afterStart = regex.substring(startBookend.length);
+            String afterStart = section.substring(startBookend.length);
             BookendDetails endBookend = findFirstEndBookend(startBookend.regex, afterStart);
 
             if(endBookend == null) {
-                Token token = tokenise(regex, tokenHolder);
+                Token token = tokenise(section, tokenHolder);
 
                 if(token != null) {
                     tokenHolder.tokenList.add(token);
-                    updateDisplayPosition(tokenHolder, regex, StringType.Dynamic);
+                    updateDisplayPosition(tokenHolder, section, StringType.Dynamic);
                     return;
                 }
 
@@ -301,7 +301,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             
             if(endBookend.position == BookendPosition.End) {
                 tokenHolder.tokenList.add(tokenise(
-                    regex.substring(0, startBookend.length + endBookend.startIndex + endBookend.length), 
+                    section.substring(0, startBookend.length + endBookend.startIndex + endBookend.length), 
                     startBookend.regex, 
                     endBookend.regex,
                     tokenHolder
@@ -315,13 +315,13 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
             if(edgeIndex == null) {
                 //Tokenise all as one token
                 tokenHolder.tokenList.add(tokenise(
-                    regex, 
+                    section, 
                     startBookend.regex, 
                     endBookend.regex,
                     tokenHolder
                 ));
 
-                updateDisplayPosition(tokenHolder, regex, StringType.Dynamic);
+                updateDisplayPosition(tokenHolder, section, StringType.Dynamic);
                 return;
             }
             
@@ -331,10 +331,10 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             BookendDetails finalMatch = findFirstEndBookend(
                 startBookend.regex,
-                regex.substring(endOfStartIndex + edgeIndex)
+                section.substring(endOfStartIndex + edgeIndex)
             ); //TODO: Alter to use the same endBookend, not just any potential one, only useful for length
 
-            String stringToTokenise = regex.substring(0, endOfStartIndex + edgeIndex + finalMatch.length);
+            String stringToTokenise = section.substring(0, endOfStartIndex + edgeIndex + finalMatch.length);
 
             tokenHolder.tokenList.add(tokenise(
                 stringToTokenise, 
@@ -345,7 +345,7 @@ public class GeneralLexicalAnalyser implements LexicalAnalyser {
 
             updateDisplayPosition(tokenHolder, stringToTokenise, StringType.Dynamic);
 
-            regex = regex.substring(endOfStartIndex + edgeIndex + finalMatch.length);
+            section = section.substring(endOfStartIndex + edgeIndex + finalMatch.length);
         }
     }
 
