@@ -13,7 +13,8 @@ public class NonTerminal extends LexicalElement {
     
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof NonTerminal)) { return false; }
+        if (!(obj instanceof NonTerminal)) return false;
         return super.equals(obj);
     }
+
 }
