@@ -45,18 +45,22 @@ public class DynamicToken extends Token {
     /**
      * Grammatical equality, based on grammatical qualities, not DynamicToken value
      */
-    public boolean grammaticallyEquals(DynamicToken otherToken) {
-        return super.equals(otherToken);
+    public boolean grammaticallyEquals(LexicalElement other) {
+        return super.equals(other);
     }
 
     /**
      * Exact equality, including DynamicToken value, useful for semantic evaluation
      */
-    public boolean exactlyEquals(DynamicToken otherDynamicToken) {
-        if(!grammaticallyEquals(otherDynamicToken)) return false;
-        if(value == null) return otherDynamicToken.getValue() == null;
+    public boolean exactlyEquals(LexicalElement other) {
+        if(!grammaticallyEquals(other)) return false;
+        if(!(other instanceof DynamicToken)) return false;
 
-        return value.equals(otherDynamicToken.getValue());
+        DynamicToken otherToken = (DynamicToken)other;
+
+        if(value == null) return otherToken.getValue() == null;
+
+        return value.equals(otherToken.getValue());
     }
 
     @Override
