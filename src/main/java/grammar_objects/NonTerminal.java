@@ -11,4 +11,9 @@ public class NonTerminal extends LexicalElement {
         return "<" + this.getName() + ">";
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NonTerminal)) { return false; }
+        return super.equals(obj);
+    }
 }

@@ -14,11 +14,20 @@ public class IdentifierTests {
     }
 
     @Test
-    public void similarTokenEquality() {
+    public void similarTokenEquality_grammatically() {
         Identifier ident = new Identifier("Identifier", "x");
         Token token = new Token("Identifier");
 
-        assertNotEquals(ident, token);
+        assertTrue(ident.equals(token));
+        assertTrue(ident.grammaticallyEquals(token));
+    }
+
+    @Test
+    public void similarTokenEquality_exact() {
+        Identifier ident = new Identifier("Identifier", "x");
+        Token token = new Token("Identifier");
+
+        assertFalse(ident.exactlyEquals(token));
     }
 
     @Test
