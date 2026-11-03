@@ -6,4 +6,10 @@ public class Holder<T> {
     public Holder(T value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+    
 }

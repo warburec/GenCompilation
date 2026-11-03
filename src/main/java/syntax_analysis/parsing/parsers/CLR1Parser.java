@@ -397,16 +397,17 @@ public class CLR1Parser extends SLR1Parser {
 
         try {
             while(!accepted) {
+                State currentState = parseStates.peek().state();
+
                 Action action = actionTable
-                    .get(parseStates.peek().state())
+                    .get(currentState)
                     .get(currentToken.value);
 
                 accepted = applyAction(
                     action,
                     input,
                     currentToken,
-                    parseStates,
-                    null
+                    parseStates
                 );
             }
         }
@@ -423,7 +424,6 @@ public class CLR1Parser extends SLR1Parser {
      * @param input An iterator for the input tokens of the sentence being parsed
      * @param currentToken A reference to the current token. Will move to the next input token on a Shift action
      * @param parseStates The states of the current parse
-     * @param pausedToken A reference to the previous token, paused while an empty token is being parsed. Non-null only on recursive calls (emptyToken)
      * @return Whether the accept state has been reached
      * @throws EarlyAcceptAcception The parse completed before the end of the input
      * @throws IncompleteParseException The input ended before a full parse could be made
@@ -433,8 +433,7 @@ public class CLR1Parser extends SLR1Parser {
         Action action, 
         Iterator<Token> input, 
         Holder<Token> currentToken, 
-        Stack<ParseState> parseStates, 
-        Holder<Token> pausedToken
+        Stack<ParseState> parseStates
     ) throws 
         EarlyAcceptAcception,
         IncompleteParseException, 
@@ -442,7 +441,11 @@ public class CLR1Parser extends SLR1Parser {
     {
         if(action instanceof Shift) {
             applyShift(parseStates, currentToken.value, action);
-            currentToken.value = getNextToken(input);
+
+            if(!currentToken.value.equals(emptyToken)) {
+                currentToken.value = getNextToken(input);
+            }
+
             return false;
         }
         else if(action instanceof Reduction) {
@@ -462,18 +465,19 @@ public class CLR1Parser extends SLR1Parser {
         else {
             State currentState = parseStates.peek().state();
 
-            if(currentToken.value.equals(emptyToken)) {
-                throw new SyntaxError(pausedToken.value, currentState);
+            action = actionTable
+                .get(currentState)
+                .get(emptyToken);
+            
+            if(action == null) {
+                throw new SyntaxError(currentToken.value, currentState);
             }
 
-            action = actionTable.get(currentState).get(emptyToken);
-            
             return applyAction(
                 action,
                 input,
-                new Holder<>(emptyToken),
-                parseStates,
-                currentToken
+                new Holder<Token>(emptyToken),
+                parseStates
             );
         }
     }
