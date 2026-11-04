@@ -3,7 +3,7 @@ package helper_objects;
 import java.util.*;
 
 /**
- * Note: This is not a true composite set as elements may be repeated between sub sets
+ * Note: This is not a true composite set as elements may be repeated between sub sets.
  * This class is useful to combine sets whilst maintaining reference to each original set
  */
 public class CombinedSet <T> implements Set<T> {

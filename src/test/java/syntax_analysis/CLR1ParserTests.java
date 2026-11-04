@@ -409,4 +409,5 @@ public class CLR1ParserTests {
     
     //TODO: Make tests to parse sentences that would cause SLR1 issues
     //TODO: Missing tests targetting emptyToken cases, early accept
+    //TODO: Test left and right recursive grammars
 }

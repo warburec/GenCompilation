@@ -292,13 +292,13 @@ public class CLR1Parser extends SLR1Parser {
             if(!firstSet.contains(emptyToken)) {
                 return lookahead;
             }
+            
+            seqPosition++;
 
             if(seqPosition >= productionSequence.length) { 
                 lookahead.addSet(positionLookahead);
                 return lookahead; 
             }
-
-            seqPosition++;
         } while(keepLooking);
 
         return lookahead;
