@@ -10,4 +10,10 @@ public class EOF extends Token {
     public String toString() {
         return "$";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof EOF;
+    }
+
 }

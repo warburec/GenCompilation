@@ -13,13 +13,12 @@ public abstract class LexicalElement {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof LexicalElement)) { return false; }
+        if (!(obj instanceof LexicalElement)) return false;
          
         LexicalElement otherElement = (LexicalElement) obj;
 
-        if (name == null) { return otherElement.getName() == null; }
-
-        return getName().equals(otherElement.getName());
+        if (name == null) return otherElement.getName() == null;
+        return name.equals(otherElement.getName());
     }
 
     @Override

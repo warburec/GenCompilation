@@ -32,4 +32,14 @@ public class NonTerminalTests {
 
         assertTrue(set.contains(nt2));
     }
+
+    @Test
+    public void nonEqualityWithTokens() {
+        NonTerminal nonTerminal = new NonTerminal("A");
+        Token token = new Token("A");
+
+        assertNotEquals(nonTerminal, token);
+        assertNotEquals(token, nonTerminal);
+    }
+    
 }
